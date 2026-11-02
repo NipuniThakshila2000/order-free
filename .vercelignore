@@ -1,0 +1,11 @@
+# Source books and development files are kept in GitHub, outside the public site.
+*.pdf
+*.docx
+test/
+scripts/
+src/*.mjs
+assets/angels/*.png
+server.mjs
+SOURCE_NOTES.md
+README.md
+index (2).html
