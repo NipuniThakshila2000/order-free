@@ -1,7 +1,7 @@
 import {calculateReading} from './reading.mjs';
 import {SIGNS, TRIBES} from './source-data.mjs';
 import {julianRecordToGregorian} from './lilly.mjs';
-import {renderCelestialHierarchy} from './hierarchy.mjs';
+import {renderCelestialHierarchy, getHierarchyInfo} from './hierarchy.mjs';
 import {displaySign, birthSunLabels} from './display.mjs';
 import {ASCENDANT_PROFECTION_PASSAGES, LILLY_JUDGEMENT_LIMIT} from './lilly-passages.mjs';
 
@@ -379,8 +379,11 @@ function showYear(index) {
 }
 
 function renderGuardianAngels() {
-  angelCards.innerHTML = reading.guardianAngels.map((angel) => `<article class="angel-card">
+  angelCards.innerHTML = reading.guardianAngels.map((angel) => {
+    const info = angel.number ? getHierarchyInfo(`angel:${angel.number - 1}`) : null;
+    return `<article class="angel-card">
     ${angel.number ? `<div class="angel-name">${escapeHtml(angel.name)}</div><img src="${artPath(angel.number)}" alt="Illustrative artwork paired with ${escapeHtml(angel.name)}" width="720" height="1080">` : '<div class="angel-unassigned" aria-hidden="true">No date assignment</div>'}
-    <div class="angel-card-copy"><span class="card-role"><i></i>${escapeHtml(angel.role)}</span><h4>${escapeHtml(angel.name || 'No date assignment')}</h4><p>${angel.number ? 'A historical correspondence from Lenain’s tables.' : 'No unique correspondence is assigned for the available details.'}</p><small>The portrait is illustrative.</small></div>
-  </article>`).join('');
+    <div class="angel-card-copy"><span class="card-role"><i></i>${escapeHtml(angel.role)}</span><h4>${escapeHtml(angel.name || 'No date assignment')}</h4>${info ? `<p class="angel-attribute">${escapeHtml(info.subtitle)}</p><p class="angel-description">${escapeHtml(info.body)}</p>` : '<p>No unique correspondence is assigned for the available details.</p>'}<small>The portrait is illustrative.</small></div>
+  </article>`;
+  }).join('');
 }

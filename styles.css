@@ -52,6 +52,8 @@
 .card-role i{width:7px;height:7px;flex:none;border-radius:50%;background:#d6ae58;box-shadow:0 0 9px #d6ae58}
 .result-chapter .angel-card-copy h4{font-family:Georgia,serif;font-size:29px;color:#f5dfaa;margin:10px 0}
 .result-chapter .angel-card-copy p{font-size:19px;line-height:1.4;min-height:90px;color:#eee9db}
+.result-chapter .angel-card-copy .angel-attribute{min-height:0;margin-bottom:8px;color:#f5dfaa;font-size:16px}
+.result-chapter .angel-card-copy .angel-description{min-height:0;font-size:15px;line-height:1.6}
 .result-chapter .angel-card-copy small{border-top:1px solid rgba(214,174,88,.25);padding-top:12px;line-height:1.5}
 .governance-grid{display:grid;grid-template-columns:1.08fr 1fr;gap:20px}
 .governance-panel{padding:27px;background:linear-gradient(180deg,#132d4d,#0b2340);border:1px solid rgba(214,174,88,.35);border-radius:15px;min-width:0}

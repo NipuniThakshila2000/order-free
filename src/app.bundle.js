@@ -8088,9 +8088,12 @@
     <div class="age-cycle-note"><b>Reflection in Christ</b><p>Christ is supreme over every age, sign, and symbolic point. These historical classifications cannot determine your life in him.</p></div>`;
   }
   function renderGuardianAngels() {
-    angelCards.innerHTML = reading.guardianAngels.map((angel) => `<article class="angel-card">
+    angelCards.innerHTML = reading.guardianAngels.map((angel) => {
+      const info = angel.number ? getHierarchyInfo(`angel:${angel.number - 1}`) : null;
+      return `<article class="angel-card">
     ${angel.number ? `<div class="angel-name">${escapeHtml(angel.name)}</div><img src="${artPath(angel.number)}" alt="Illustrative artwork paired with ${escapeHtml(angel.name)}" width="720" height="1080">` : '<div class="angel-unassigned" aria-hidden="true">No date assignment</div>'}
-    <div class="angel-card-copy"><span class="card-role"><i></i>${escapeHtml(angel.role)}</span><h4>${escapeHtml(angel.name || "No date assignment")}</h4><p>${angel.number ? "A historical correspondence from Lenain\u2019s tables." : "No unique correspondence is assigned for the available details."}</p><small>The portrait is illustrative.</small></div>
-  </article>`).join("");
+    <div class="angel-card-copy"><span class="card-role"><i></i>${escapeHtml(angel.role)}</span><h4>${escapeHtml(angel.name || "No date assignment")}</h4>${info ? `<p class="angel-attribute">${escapeHtml(info.subtitle)}</p><p class="angel-description">${escapeHtml(info.body)}</p>` : "<p>No unique correspondence is assigned for the available details.</p>"}<small>The portrait is illustrative.</small></div>
+  </article>`;
+    }).join("");
   }
 })();
