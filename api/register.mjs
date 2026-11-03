@@ -2,9 +2,10 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default async function handler(request, response) {
   response.setHeader('Cache-Control', 'no-store');
+  const proxyUrl = process.env.REGISTRATION_PROXY_URL;
   const scriptUrl = process.env.GOOGLE_SCRIPT_URL;
   const token = process.env.REGISTRATION_TOKEN;
-  const ready = Boolean(scriptUrl && token && process.env.REGISTRATION_OPEN === 'true');
+  const ready = Boolean((proxyUrl || (scriptUrl && token)) && process.env.REGISTRATION_OPEN === 'true');
   if (request.method === 'GET') return response.status(200).json({ready});
   if (request.method !== 'POST') return response.status(405).json({error: 'Method not allowed.'});
   if (!ready) return response.status(503).json({error: 'Registration is not open yet.'});
@@ -25,15 +26,16 @@ export default async function handler(request, response) {
     return response.status(400).json({error: 'Check your name, email, and attendance choice.'});
   }
   try {
-    const sheetResponse = await fetch(scriptUrl, {
+    const sheetResponse = await fetch(proxyUrl || scriptUrl, {
       method: 'POST',
-      headers: {'Content-Type': 'text/plain;charset=utf-8'},
-      body: JSON.stringify({...data, token})
+      headers: {'Content-Type': proxyUrl ? 'application/json' : 'text/plain;charset=utf-8'},
+      body: JSON.stringify(proxyUrl ? data : {...data, token})
     });
     const result = await sheetResponse.json();
-    if (!sheetResponse.ok || result.ok !== true) throw new Error('Sheet write failed.');
+    if (!sheetResponse.ok || result.ok !== true) throw new Error(`Registration upstream returned ${sheetResponse.status}.`);
     return response.status(200).json({ok: true});
-  } catch {
+  } catch (problem) {
+    console.error(`Registration ${proxyUrl ? 'proxy' : 'sheet'} failed: ${problem instanceof Error ? problem.message : 'unknown error'}`);
     return response.status(502).json({error: 'Registration could not be saved. Please try again.'});
   }
 }
