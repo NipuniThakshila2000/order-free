@@ -7024,7 +7024,7 @@
         hasDateAngel ? `Born ${date}; the five-day interval is ${formatTableDate(intervalStart)}\u2013${formatTableDate(intervalStart + 4)}.` : `${date} has no numbered birth-date correspondence.`
       ),
       makeAngel(
-        "Character guardian angel",
+        "Moral guardian angel",
         hasDateAngel ? dayOffset % 72 + 1 : null,
         hasDateAngel ? `Born ${date}; day ${dayOffset + 1} from 20 March gives position ${dayOffset % 72 + 1} in the repeating 72-day cycle.` : `${date} has no numbered birth-date correspondence.`
       ),

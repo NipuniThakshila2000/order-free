@@ -40,7 +40,7 @@ export function guardianAngelsFor(person) {
   return [
     makeAngel('Physical guardian angel', hasDateAngel ? Math.floor(dayOffset / 5) + 1 : null,
       hasDateAngel ? `Born ${date}; the five-day interval is ${formatTableDate(intervalStart)}–${formatTableDate(intervalStart + 4)}.` : `${date} has no numbered birth-date correspondence.`),
-    makeAngel('Character guardian angel', hasDateAngel ? dayOffset % 72 + 1 : null,
+    makeAngel('Moral guardian angel', hasDateAngel ? dayOffset % 72 + 1 : null,
       hasDateAngel ? `Born ${date}; day ${dayOffset + 1} from 20 March gives position ${dayOffset % 72 + 1} in the repeating 72-day cycle.` : `${date} has no numbered birth-date correspondence.`),
     {...makeAngel('Spirit guardian angel', timeStart === null ? null : Math.floor(timeStart / 20) + 1,
       certainty === 'exact' ? `Local birth time ${clock(person.hour * 60 + person.minute)} falls in the ${clock(timeStart)}–${clock(timeStart + 20)} interval.` : certainty === 'hour' ? `Only the birth hour is known. Lenain's three possible twenty-minute positions are ${hourCandidates.join(', ')}; no unique spirit guardian is assigned.` : 'Birth time is unknown; no spirit guardian is assigned.'), candidates:hourCandidates}
