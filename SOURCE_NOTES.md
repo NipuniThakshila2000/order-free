@@ -16,6 +16,8 @@ The Gladstone worked example gives 29 December 1809 in the morning → 28 Decemb
 
 *The Kabala of Numbers* (1911), printed pp. 27–29 and 132–133, supplies a **separate** 22-point age cycle and descriptions. The documented 1864 sequence is 19, 21, 1, 16, 18, 20, 22, 2, 17, 19, 21, 1, 3, 18, 20, 22, 2. Age-cycle point 5 is the Hierophant, 14 the Two Urns, and 20 Resurrection. Completed age zero is the first year of life. Annual point ratings remain separate from sign cautions. The symbolic and astronomical degrees cannot be averaged or substituted for one another; discrepancies in historical examples remain differences of method, not a reason to switch inputs.
 
+The visitor-facing year cards, timeline, detail title, interpretation, and status use this **year plus age attained** cycle. The displayed 2026 point for a person born on 12 March 1975 is 2026 + 51 = 2077 → 16; the adjacent checks are 2025/50/14, 2027/52/18, and 2028/53/11. Current-period selection changes on the civil birthday. The separate symbolic annual point and its noon-based period boundaries remain in the calculation data but are not displayed as the age-cycle result. Personal-key values remain internal.
+
 ## Lenain, *La Science cabalistique*
 
 Tables II–IV assign a five-day physical guardian from March 20, a repeating 72-day character sequence, and a twenty-minute spirit interval from midnight. The printed p. 40 example, 17 November at 10:15, gives positions 49, 27, 31. Date lookup uses the entered civil birth date; time lookup uses the entered local civil clock. Intervals are left-inclusive: 00:00–00:19 gives 1, and 23:40–23:59 gives 72. There is no silent conversion to solar time or claim that Lenain resolved modern time-zone questions.

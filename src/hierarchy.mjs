@@ -1,5 +1,6 @@
 import {ANGEL_NAMES, SIGNS, TRIBES} from './source-data.mjs';
 import {ANGEL_QUALITIES} from './angel-qualities.mjs';
+import {displaySign} from './display.mjs';
 
 const CONSTELLATIONS = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpius','Sagittarius','Capricornus','Aquarius','Pisces'];
 const SIGN_GLYPHS = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'].map((symbol) => `${symbol}\uFE0E`);
@@ -70,8 +71,8 @@ export function buildHierarchyMarkup(reading) {
   const constellations = CONSTELLATIONS.map((name, index) => {
     const {x,y} = point(238, -90 + index * 30);
     const active = index === selected.signIndex || index === selected.lillySignIndex;
-    const methodLabel = selected.lillySignIndex === selected.signIndex ? 'Lilly and Sepharial' : index === selected.lillySignIndex ? 'Lilly' : 'Sepharial';
-    return `<g class="wheel-constellation ${active ? 'is-active' : 'is-muted'}" data-hierarchy-info="constellation:${index}" tabindex="0" role="button" aria-label="${clean(TRIBES[index].tribe)}, corresponding tribe for ${clean(SIGNS[index])}${active ? ` (${methodLabel})` : ''}. Show description"><circle class="wheel-hit" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="35"/><text class="wheel-glyph" x="${x.toFixed(1)}" y="${(y - 14).toFixed(1)}" text-anchor="middle">${SIGN_GLYPHS[index]}</text><text class="wheel-tribe" x="${x.toFixed(1)}" y="${(y + 5).toFixed(1)}" text-anchor="middle">${clean(TRIBES[index].tribe)}</text><text class="wheel-sign-name" x="${x.toFixed(1)}" y="${(y + 19).toFixed(1)}" text-anchor="middle">${clean(SIGNS[index])}</text></g>`;
+    const methodLabel = selected.lillySignIndex !== selected.signIndex && active ? ` (${index === selected.lillySignIndex ? 'Lilly' : 'Sepharial'})` : '';
+    return `<g class="wheel-constellation ${active ? 'is-active' : 'is-muted'}" data-hierarchy-info="constellation:${index}" tabindex="0" role="button" aria-label="${clean(TRIBES[index].tribe)}, corresponding tribe for ${clean(displaySign(SIGNS[index]))}${methodLabel}. Show description"><circle class="wheel-hit" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="35"/><text class="wheel-glyph" x="${x.toFixed(1)}" y="${(y - 14).toFixed(1)}" text-anchor="middle">${SIGN_GLYPHS[index]}</text><text class="wheel-tribe" x="${x.toFixed(1)}" y="${(y + 5).toFixed(1)}" text-anchor="middle">${clean(TRIBES[index].tribe)}</text><text class="wheel-sign-name" x="${x.toFixed(1)}" y="${(y + 19).toFixed(1)}" text-anchor="middle"><tspan x="${x.toFixed(1)}">${clean(SIGNS[index])}</tspan><tspan x="${x.toFixed(1)}" dy="10">under Jesus</tspan></text></g>`;
   }).join('');
   const planetSeparators = PLANET_ORDER.map((_, index) => {
     const angle = -90 + (index + .5) * 360 / 7;
@@ -85,7 +86,7 @@ export function buildHierarchyMarkup(reading) {
   const fullName = `${reading.person.given} ${reading.person.surname}`;
   const centerName = fullName.length > 19 ? `${reading.person.given.split(' ')[0].slice(0,15)}…` : fullName;
   const svg = `<svg class="hierarchy-svg" viewBox="0 0 1000 1040" role="img" aria-labelledby="hierarchy-svg-title" xmlns="http://www.w3.org/2000/svg">
-    <title id="hierarchy-svg-title">Christ above all; ${selected.signIndex >= 0 ? `${clean(selected.tribe)}, corresponding tribe for Sepharial's ${clean(selected.sign)}, ` : 'birth sign unavailable; '}${selected.lillySignIndex >= 0 && selected.lillySignIndex !== selected.signIndex ? `${clean(TRIBES[selected.lillySignIndex].tribe)}, corresponding tribe for Lilly's ${clean(SIGNS[selected.lillySignIndex])}, ` : ''}${selected.planet ? `${clean(selected.planet)}, ${clean(selected.archangel)}, ` : ''}${selected.angelNames.map(clean).join(', ')} shown for ${clean(fullName)}.</title>
+    <title id="hierarchy-svg-title">Christ above all; ${selected.signIndex >= 0 ? `${clean(selected.tribe)}, corresponding tribe for Sepharial's ${clean(displaySign(selected.sign))}, ` : 'birth sign unavailable; '}${selected.lillySignIndex >= 0 && selected.lillySignIndex !== selected.signIndex ? `${clean(TRIBES[selected.lillySignIndex].tribe)}, corresponding tribe for Lilly's ${clean(displaySign(SIGNS[selected.lillySignIndex]))}, ` : ''}${selected.planet ? `${clean(selected.planet)}, ${clean(selected.archangel)}, ` : ''}${selected.angelNames.map(clean).join(', ')} shown for ${clean(fullName)}.</title>
     <rect width="1000" height="1040" fill="#0b1538"/>
     <g fill="none">${circles}${zodiacSeparators}${planetSeparators}${angelMarks}</g>
     <text class="wheel-christ" x="500" y="79" text-anchor="middle">✝ CHRIST · ABOVE ALL</text>
@@ -96,9 +97,9 @@ export function buildHierarchyMarkup(reading) {
     <text class="wheel-center-label" x="500" y="550" text-anchor="middle">YOUR PLACE</text>
     <text class="wheel-center-name" x="500" y="579" text-anchor="middle">${clean(centerName)}</text>
   </svg>`;
-  const signSummary = selected.signIndex < 0 ? 'Birth time needed for a corresponding tribe' : selected.lillySignIndex >= 0 && selected.lillySignIndex !== selected.signIndex ? `Sepharial: ${clean(selected.tribe)} (${clean(selected.sign)}) · Lilly: ${clean(TRIBES[selected.lillySignIndex].tribe)} (${clean(SIGNS[selected.lillySignIndex])})` : `${clean(selected.tribe)} (${clean(selected.sign)})`;
+  const signSummary = selected.signIndex < 0 ? 'Birth time needed for a corresponding tribe' : selected.lillySignIndex >= 0 && selected.lillySignIndex !== selected.signIndex ? `Sepharial: ${clean(selected.tribe)} (${clean(displaySign(selected.sign))}) · Lilly: ${clean(TRIBES[selected.lillySignIndex].tribe)} (${clean(displaySign(SIGNS[selected.lillySignIndex]))})` : `${clean(selected.tribe)} (${clean(displaySign(selected.sign))})`;
   const roster = `<div class="hierarchy-summary"><p><small>CORRESPONDING TRIBE · CAMP-ORDER TRADITION</small><strong>${signSummary}</strong></p><p><small>PLANET</small><strong>${selected.planet ? clean(selected.planet) : 'Birth time needed'}</strong></p><p><small>PLANETARY ANGEL · SEVEN SPIRITS TRADITION</small><strong>${selected.archangel ? clean(selected.archangel) : 'Birth time needed'}</strong></p><p><small>THREE BIRTH CORRESPONDENCES</small><strong>${selected.angelNames.map(clean).join(' · ')}</strong></p></div>
-    <div class="hierarchy-roster"><div class="hierarchy-roster-heading"><h4>72 angels / genies</h4><p>Hover or focus for qualities; click or tap to keep details open. Gold names correspond to this reading.</p></div><div class="hierarchy-roster-grid" role="list">${ANGEL_NAMES.map((name, index) => `<span role="listitem"><button type="button" class="${activeAngels.has(index + 1) ? 'is-active' : 'is-muted'}" data-hierarchy-info="angel:${index}" aria-label="${clean(name)}. Show qualities">${clean(name)}</button></span>`).join('')}</div></div>`;
+    <div class="hierarchy-roster"><div class="hierarchy-roster-heading"><h4>72 angels / genies</h4><p>Hover or focus for qualities; click or tap to keep details open. Gold names mark the corresponding results.</p></div><div class="hierarchy-roster-grid" role="list">${ANGEL_NAMES.map((name, index) => `<span role="listitem"><button type="button" class="${activeAngels.has(index + 1) ? 'is-active' : 'is-muted'}" data-hierarchy-info="angel:${index}" aria-label="${clean(name)}. Show qualities">${clean(name)}</button></span>`).join('')}</div></div>`;
   return {svg, roster};
 }
 
@@ -120,7 +121,7 @@ export function getHierarchyInfo(key) {
   if (kind === 'constellation') {
     const index = Number(value);
     if (!Number.isInteger(index) || index < 0 || index >= CONSTELLATIONS.length) return null;
-    return {eyebrow:'TRIBAL CORRESPONDENCE — CAMP-ORDER TRADITION', title:TRIBES[index].tribe, subtitle:`Corresponding tribe for ${SIGNS[index]} · ${TRIBES[index].month}`, body:`${SIGNS[index]} is represented by ${CONSTELLATION_FIGURES[index]}. This traditional correspondence does not establish ancestry or an actual Hebrew birth month; other arrangements exist.`};
+    return {eyebrow:'TRIBAL CORRESPONDENCE — CAMP-ORDER TRADITION', title:TRIBES[index].tribe, subtitle:`Corresponding tribe for ${displaySign(SIGNS[index])} · ${TRIBES[index].month}`, body:`${displaySign(SIGNS[index])} is represented by ${CONSTELLATION_FIGURES[index]}. This traditional correspondence does not establish ancestry or an actual Hebrew birth month; other arrangements exist.`};
   }
   if (kind === 'planet' && PLANET_ANGELS[value]) {
     return {eyebrow:'CLASSICAL PLANET', title:value, subtitle:`Paired angel: ${PLANET_ANGELS[value]}`, body:`This planetary pairing comes from the supplied Seven Spirits tradition, not Lenain. Its theme there is ${PLANET_THEMES[value]}. The Sun and Moon are included among the seven classical lights.`};

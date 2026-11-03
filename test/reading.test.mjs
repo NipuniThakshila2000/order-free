@@ -8,7 +8,7 @@ test('reproduces Sepharial’s worked Gladstone example', () => {
   assert.deepEqual(reading.method.names.map((name) => name.value), [84,60,149]);
   assert.deepEqual(reading.method.sun, {sign:'Capricorn', degree:7, signNumber:10});
   assert.equal(reading.method.key, 40);
-  assert.equal(reading.years.find((year) => year.year === 1894).pointNumber, 17);
+  assert.equal(reading.years.find((year) => year.year === 1894).annualPointNumber, 17);
 });
 
 test('keeps the noon adjustment within Sepharial’s symbolic calendar across New Year', () => {
@@ -16,7 +16,8 @@ test('keeps the noon adjustment within Sepharial’s symbolic calendar across Ne
   assert.equal(reading.method.astroDate, '31 December 1999');
   assert.equal(reading.years[0].pointYear, 1999);
   assert.equal(reading.person.birthDate, '2000-01-01');
-  assert.equal(reading.years[0].periodStart,'1999-12-31 12:00');
+  assert.equal(reading.years[0].symbolicPeriodStart,'1999-12-31 12:00');
+  assert.equal(reading.years[0].periodStart,'2000-01-01 00:00');
 });
 
 test('honours repeated degrees in the printed calendar', () => {
@@ -55,7 +56,8 @@ test('reproduces the 1911 age-plus-year Tarot cycle example', () => {
 test('keeps Sepharial annual points 23–28 distinct from the 22-point age cycle', () => {
   const reading = calculateReading({given:'Anna', surname:'Smith', date:'1700-03-25', time:'08:00'});
   const year = reading.years.find((item) => item.year === 1756);
-  assert.deepEqual([year.pointSum, year.pointDigitSum, year.pointNumber], [1769, 23, 23]);
+  assert.deepEqual([year.pointSum, year.pointDigitSum, year.annualPointNumber], [1769, 23, 23]);
+  assert.equal(year.pointNumber, year.agePointNumber);
   assert.deepEqual([1769,1995,1996,1997,1998,1999].map((sum) => annualPoint(0,sum)), [23,24,25,26,27,28]);
   assert.equal(POINTS[27][0], 'The Sceptre');
   assert.equal(ageCyclePoint(1866, 2), 1);
@@ -68,13 +70,46 @@ test('reproduces the documented 1859 and 1894 annual examples', () => {
   assert.equal(annualPoint(1859,40),27);
   assert.equal(annualPoint(1894,40),17);
   const years=calculateReading({given:'William Ewart',surname:'Gladstone',date:'1809-12-29',time:'08:00'}).years;
-  assert.equal(years.find((item) => item.year === 1859).pointNumber,27);
-  assert.equal(years.find((item) => item.year === 1894).pointNumber,17);
+  assert.equal(years.find((item) => item.year === 1859).annualPointNumber,27);
+  assert.equal(years.find((item) => item.year === 1894).annualPointNumber,17);
 });
 
 test('matches the full printed 1864 age-cycle sequence', () => {
   const expected=[19,21,1,16,18,20,22,2,17,19,21,1,3,18,20,22,2];
   assert.deepEqual(expected.map((_,age) => ageCyclePoint(1864+age,age)),expected);
+});
+
+test('uses year plus age for the main point, interpretation, and tone', () => {
+  const input={given:'Kirby',surname:'de Lanerolle',date:'1975-03-12',time:'12:00'};
+  const years=calculateReading(input).years;
+  const expected=[[2025,50,2075,14],[2026,51,2077,16],[2027,52,2079,18],[2028,53,2081,11]];
+  for (const [displayYear,age,sum,point] of expected) {
+    const year=years.find((item)=>item.year===displayYear);
+    assert.deepEqual([year.ageAttained,year.ageCycleSum,year.pointNumber],[age,sum,point]);
+    assert.deepEqual([year.pointName,year.pointText,year.pointTone],AGE_POINTS[point]);
+    assert.equal(year.agePointNumber,point);
+  }
+  assert.equal(years.find((item)=>item.year===2026).pointNumber,16);
+  assert.notEqual(years.find((item)=>item.year===2026).pointNumber,years.find((item)=>item.year===2026).annualPointNumber);
+});
+
+test('changes the current age-based period on the birthday', () => {
+  const input={given:'Kirby',surname:'de Lanerolle',date:'1975-03-12',time:'08:00',location:{label:'Test location',latitude:0,longitude:0,timezone:'Etc/UTC'}};
+  const before=calculateReading({...input,now:new Date('2026-03-11T12:00:00Z')}).years;
+  const after=calculateReading({...input,now:new Date('2026-03-12T12:00:00Z')}).years;
+  assert.equal(before.find((year)=>year.year===2025).isCurrent,true);
+  assert.equal(before.find((year)=>year.year===2026).isCurrent,false);
+  assert.equal(after.find((year)=>year.year===2025).isCurrent,false);
+  assert.equal(after.find((year)=>year.year===2026).isCurrent,true);
+  assert.equal(after.find((year)=>year.year===2026).periodStart,'2026-03-12 00:00');
+  assert.equal(after.find((year)=>year.year===2026).symbolicPeriodStart,'2026-03-11 12:00');
+});
+
+test('retains year-plus-age points when birth time is unknown', () => {
+  const reading=calculateReading({given:'Kirby',surname:'de Lanerolle',date:'1975-03-12',timeCertainty:'unknown'});
+  assert.equal(reading.method,null);
+  const year=reading.years.find((item)=>item.year===2026);
+  assert.deepEqual([year.ageAttained,year.pointNumber,year.pointName,year.pointTone],[51,16,AGE_POINTS[16][0],AGE_POINTS[16][2]]);
 });
 
 test('uses four and eight symbolic months from displayed degree 20', () => {

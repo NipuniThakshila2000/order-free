@@ -60,9 +60,8 @@
 .sign-glyph{display:grid;place-items:center;width:76px;height:76px;flex:none;border:1px solid rgba(214,174,88,.55);border-radius:50%;font-size:42px;color:#f4dfa6;background:radial-gradient(circle at 40% 30%,rgba(214,174,88,.18),transparent 70%)}
 .sign-hero strong{display:block;font-family:var(--serif);font-size:37px;font-weight:500;color:#f4dfb2;line-height:1}
 .sign-hero span:last-child{font-family:var(--serif);font-size:17px;font-style:italic;color:#c4cbd1}
-.sign-hero .tribe-copy small{display:block;margin-bottom:5px;color:#dec78f;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
-.sign-hero .tribe-copy p{margin:4px 0;color:#e6edf2;font-size:14px;line-height:1.45}
-.sign-hero .tribe-copy p strong{display:inline;font-family:var(--serif);font-size:18px;color:#f4dfb2}
+.sign-hero>div{min-width:0}
+.sign-hero>div>span{display:block;font-family:var(--serif);font-size:19px;font-style:normal;color:#f4dfb2;line-height:1.3}
 .tribe-answer{margin:-5px 0 20px;padding:12px 16px;border-left:3px solid var(--gold);background:rgba(214,174,88,.09);border-radius:0 7px 7px 0}
 .tribe-answer small{display:block;margin-bottom:5px;color:#dec78f;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
 .tribe-answer>strong{display:block;color:#ffe6a8;font-family:var(--serif);font-size:30px;line-height:1.1}
@@ -443,8 +442,8 @@
 }
 
 /* Retain the wheel footprint while making tribe names its leading zodiac labels. */
-.hierarchy-svg .wheel-constellation .wheel-glyph{font-size:15px;opacity:.72}
-.hierarchy-svg .wheel-constellation .wheel-tribe{font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:.015em;fill:currentColor}
+.hierarchy-svg .wheel-constellation .wheel-glyph{font-size:12px;opacity:.58}
+.hierarchy-svg .wheel-constellation .wheel-tribe{font-family:var(--sans);font-size:14px;font-weight:700;letter-spacing:.015em;fill:currentColor}
 .hierarchy-svg .wheel-constellation .wheel-sign-name{font-family:var(--sans);font-size:9px;letter-spacing:.035em;fill:currentColor;opacity:.73}
 .hierarchy-svg .wheel-constellation.is-active .wheel-tribe{fill:#ffe6a8;font-weight:800;stroke:#0b1538;stroke-width:2;paint-order:stroke}
 .hierarchy-svg .wheel-constellation.is-active .wheel-glyph{opacity:.68}
@@ -462,3 +461,16 @@
 .lilly-position-list span{min-width:0;overflow-wrap:anywhere}
 .rising-note span{display:block;margin-top:8px}
 @media(max-width:460px){.lilly-position-list{grid-template-columns:1fr}}
+
+.hero-appointment{font-family:var(--serif);font-size:clamp(27px,3.2vw,45px);font-style:italic;line-height:1.1;color:#f3d18c;opacity:0;animation:appointed-reveal .85s ease-out .35s forwards}
+@keyframes appointed-reveal{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.hero-reference{font-size:12px;font-weight:700;letter-spacing:.15em;color:#f6e0aa;margin:12px 0 27px}
+.hero-reference span{display:block;margin-top:5px;font-size:10px;font-weight:400;letter-spacing:.08em;color:#cbd6dc;text-transform:none}
+.hero-genesis{max-width:570px;margin:14px 0 0;font-family:var(--serif);font-size:clamp(17px,1.5vw,20px);font-style:italic;line-height:1.4;color:#efdfc1}
+.hero-genesis span{display:block;margin-top:8px;font-family:var(--sans);font-size:10px;font-style:normal;font-weight:700;letter-spacing:.14em;color:var(--light-gold)}
+.appointed-statement{padding:clamp(48px,6vw,82px) 20px;text-align:center;background:#0b2543;border-block:1px solid var(--line)}
+.appointed-statement h2{max-width:1240px;margin:0 auto;font-size:clamp(43px,5.3vw,78px);line-height:1.04;color:#f4e8ca}
+.celestial-heading .ephesians-scripture{margin-top:19px;padding-top:17px;border-top:1px solid rgba(235,217,169,.28)}
+.tribe-answer>span{display:block;margin-top:6px}
+.section-heading small a{text-decoration:underline;text-underline-offset:2px}
+@media(prefers-reduced-motion:reduce){.hero-appointment{animation:none;opacity:1;transform:none}}

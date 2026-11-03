@@ -82,7 +82,7 @@
     13: ["Death the Reaper", "Change, reaction, collapse, and an ending.", "bad"],
     14: ["The Two Urns", "Vital forces, friendship, social obligations, and mutual affection.", "good"],
     15: ["Typhon", "Passion, wilfulness, controversy, and disorder.", "bad"],
-    16: ["The Stricken Tower", "Sudden upheaval, accident, and the cost of pride.", "bad"],
+    16: ["The Stricken Tower", "A historical image of sudden upheaval and a call to humility.", "bad"],
     17: ["The Star", "Faith, hope, intuition, and expectation.", "good"],
     18: ["The Twilight", "Doubt, hesitation, and adverse change.", "bad"],
     19: ["The Great Light", "Vitality, joy, attainment, and recognition.", "good"],
@@ -6985,6 +6985,10 @@
     return [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1];
   };
   var birthdayInYear = (person, year) => dateString(year, person.month, person.month === 2 && person.day === 29 && monthLength(year, 2, person.calendar) < 29 ? 28 : person.day);
+  var localClock = (now, location) => {
+    const parts = location?.timezone ? Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: location.timezone, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(now).filter((part) => part.type !== "literal").map((part) => [part.type, Number(part.value)])) : { year: now.getFullYear(), month: now.getMonth() + 1, day: now.getDate(), hour: now.getHours(), minute: now.getMinutes() };
+    return `${dateString(parts.year, parts.month, parts.day)} ${String(parts.hour).padStart(2, "0")}:${String(parts.minute).padStart(2, "0")}`;
+  };
   function guardianAngelsFor(person) {
     const leapDay = person.month === 2 && person.day === 29;
     const tableYear = person.month > 3 || person.month === 3 && person.day >= 20 ? 2001 : 2002;
@@ -7058,7 +7062,16 @@
   }
   function calculateReading(input) {
     const person = validateInput(input);
-    if (person.timeCertainty === "unknown") return { person: { given: person.given, surname: person.surname, place: person.place, calendar: person.calendar, birthDate: dateString(person.year, person.month, person.day) }, method: null, portrait: null, lilly: { available: false, reason: "Birth time is unknown; a precise Ascendant, houses, and timed chart cannot be calculated." }, guardianAngels: guardianAngelsFor(person), years: [], limits: "Birth time is unknown. Sepharial\u2019s noon-based symbolic date and numerical key, Lilly\u2019s timed chart, and a unique spirit guardian cannot be calculated." };
+    if (person.timeCertainty === "unknown") {
+      const currentClock2 = localClock(input.now instanceof Date ? input.now : /* @__PURE__ */ new Date(), person.location);
+      const years2 = Array.from({ length: Math.min(98, 2200 - person.year) }, (_, index) => {
+        const year = person.year + index, ageAttained = index, ageCycleSum = year + ageAttained;
+        const pointNumber = ageCyclePoint(year, ageAttained), point3 = AGE_POINTS[pointNumber];
+        const periodStart = `${birthdayInYear(person, year)} 00:00`, periodEnd = `${birthdayInYear(person, year + 1)} 00:00`;
+        return { year, age: index + 1, ageAttained, ageCycleSum, agePointDigitSum: sumDigits(ageCycleSum), agePointNumber: pointNumber, agePointName: point3[0], agePointText: point3[1], agePointTone: point3[2], pointNumber, pointName: point3[0], pointText: point3[1], pointTone: point3[2], periodStart, periodEnd, isCurrent: currentClock2 >= periodStart && currentClock2 < periodEnd, isPast: currentClock2 >= periodEnd, lilly: null, house: null, rising: null, risingNext: null };
+      });
+      return { person: { given: person.given, surname: person.surname, place: person.place, calendar: person.calendar, birthDate: dateString(person.year, person.month, person.day) }, method: null, portrait: null, lilly: { available: false, reason: "Birth time is unknown; a precise Ascendant, houses, and timed chart cannot be calculated." }, guardianAngels: guardianAngelsFor(person), years: years2, limits: "Birth time is unknown. The noon-based symbolic sign, timed astronomical chart, and a unique spirit correspondence cannot be determined. Year-plus-age points remain available." };
+    }
     const morning = person.hour < 12;
     let symbolicYear = person.year, symbolicMonth = person.month, symbolicDay = person.day;
     if (morning) {
@@ -7085,14 +7098,16 @@
       lilly = { available: false, reason: `Lilly chart unavailable: ${problem.message}` };
     }
     const symbolicAnniversary = { month: symbolicMonth, day: symbolicDay, calendar: person.calendar };
+    const now = input.now instanceof Date ? input.now : /* @__PURE__ */ new Date();
+    const currentClock = localClock(now, person.location);
     const years = Array.from({ length: maxAge }, (_, index) => {
       const age = index + 1;
       const year = person.year + index;
       const pointYear = symbolicYear + index;
       const pointSum = pointYear + key;
       const pointDigitSum = sumDigits(pointSum);
-      const pointNumber = annualPoint(pointYear, key);
-      const point3 = pointNumber === null ? ["Unsupported annual point", "The supplied table does not give this annual value.", "neutral"] : POINTS[pointNumber];
+      const annualPointNumber = annualPoint(pointYear, key);
+      const annualPointResult = annualPointNumber === null ? ["Unsupported annual point", "The supplied table does not give this annual value.", "neutral"] : POINTS[annualPointNumber];
       const ageAttained = index;
       const ageCycleSum = year + ageAttained;
       const agePointDigitSum = sumDigits(ageCycleSum);
@@ -7104,21 +7119,24 @@
       const nextRising = SIGNS[(SIGNS.indexOf(sun.sign) + index + 1) % 12];
       const risingInitialMonths = (30 - sun.degree) * 12 / 30;
       const risingData = RISING[rising];
-      const periodStart = `${birthdayInYear(symbolicAnniversary, pointYear)} 12:00`;
-      const periodEnd = `${birthdayInYear(symbolicAnniversary, pointYear + 1)} 12:00`;
-      const today = /* @__PURE__ */ new Date();
-      const currentParts = person.location?.timezone ? Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: person.location.timezone, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(today).filter((part) => part.type !== "literal").map((part) => [part.type, Number(part.value)])) : { year: today.getFullYear(), month: today.getMonth() + 1, day: today.getDate(), hour: today.getHours(), minute: today.getMinutes() };
-      const todayString = `${dateString(currentParts.year, currentParts.month, currentParts.day)} ${String(currentParts.hour).padStart(2, "0")}:${String(currentParts.minute).padStart(2, "0")}`;
+      const symbolicPeriodStart = `${birthdayInYear(symbolicAnniversary, pointYear)} 12:00`;
+      const symbolicPeriodEnd = `${birthdayInYear(symbolicAnniversary, pointYear + 1)} 12:00`;
+      const periodStart = `${birthdayInYear(person, year)} 00:00`;
+      const periodEnd = `${birthdayInYear(person, year + 1)} 00:00`;
       return {
         age,
         year,
         pointYear,
         pointSum,
         pointDigitSum,
-        pointNumber,
-        pointName: point3[0],
-        pointText: point3[1],
-        pointTone: point3[2],
+        annualPointNumber,
+        annualPointName: annualPointResult[0],
+        annualPointText: annualPointResult[1],
+        annualPointTone: annualPointResult[2],
+        pointNumber: agePointNumber,
+        pointName: agePoint[0],
+        pointText: agePoint[1],
+        pointTone: agePoint[2],
         ageAttained,
         ageCycleSum,
         agePointDigitSum,
@@ -7135,8 +7153,10 @@
         risingInitialMonths,
         periodStart,
         periodEnd,
-        isCurrent: todayString >= periodStart && todayString < periodEnd,
-        isPast: todayString >= periodEnd,
+        symbolicPeriodStart,
+        symbolicPeriodEnd,
+        isCurrent: currentClock >= periodStart && currentClock < periodEnd,
+        isPast: currentClock >= periodEnd,
         lilly: lilly.available ? lilly.years[index] : null,
         risingCaution: risingData.bad.includes(sun.sign),
         risingNextCaution: RISING[nextRising].bad.includes(sun.sign)
@@ -7149,7 +7169,7 @@
       lilly,
       guardianAngels: guardianAngelsFor(person),
       years,
-      limits: "This symbolic reading cannot establish a death year, certain future events, or the existence of a personal guardian angel."
+      limits: "These symbolic methods cannot establish a death year, certain future events, or the existence of a personal guardian angel. Christ is above every sign and number."
     };
   }
 
@@ -7445,6 +7465,18 @@
     }
   ];
 
+  // src/display.mjs
+  function displaySign(sign) {
+    const name = String(sign || "").replace(/\s+under Jesus$/i, "").trim();
+    return name ? `${name} under Jesus` : "";
+  }
+  function birthSunLabels(symbolicSign, astronomicalSign) {
+    const symbolic = displaySign(symbolicSign);
+    const astronomical = displaySign(astronomicalSign);
+    if (!astronomical || astronomical === symbolic) return [symbolic];
+    return [`Lilly: ${astronomical}`, `Sepharial: ${symbolic}`];
+  }
+
   // src/hierarchy.mjs
   var CONSTELLATIONS = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpius", "Sagittarius", "Capricornus", "Aquarius", "Pisces"];
   var SIGN_GLYPHS = ["\u2648", "\u2649", "\u264A", "\u264B", "\u264C", "\u264D", "\u264E", "\u264F", "\u2650", "\u2651", "\u2652", "\u2653"].map((symbol) => `${symbol}\uFE0E`);
@@ -7511,8 +7543,8 @@
     const constellations = CONSTELLATIONS.map((name, index) => {
       const { x, y } = point2(238, -90 + index * 30);
       const active = index === selected.signIndex || index === selected.lillySignIndex;
-      const methodLabel = selected.lillySignIndex === selected.signIndex ? "Lilly and Sepharial" : index === selected.lillySignIndex ? "Lilly" : "Sepharial";
-      return `<g class="wheel-constellation ${active ? "is-active" : "is-muted"}" data-hierarchy-info="constellation:${index}" tabindex="0" role="button" aria-label="${clean(TRIBES[index].tribe)}, corresponding tribe for ${clean(SIGNS[index])}${active ? ` (${methodLabel})` : ""}. Show description"><circle class="wheel-hit" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="35"/><text class="wheel-glyph" x="${x.toFixed(1)}" y="${(y - 14).toFixed(1)}" text-anchor="middle">${SIGN_GLYPHS[index]}</text><text class="wheel-tribe" x="${x.toFixed(1)}" y="${(y + 5).toFixed(1)}" text-anchor="middle">${clean(TRIBES[index].tribe)}</text><text class="wheel-sign-name" x="${x.toFixed(1)}" y="${(y + 19).toFixed(1)}" text-anchor="middle">${clean(SIGNS[index])}</text></g>`;
+      const methodLabel = selected.lillySignIndex !== selected.signIndex && active ? ` (${index === selected.lillySignIndex ? "Lilly" : "Sepharial"})` : "";
+      return `<g class="wheel-constellation ${active ? "is-active" : "is-muted"}" data-hierarchy-info="constellation:${index}" tabindex="0" role="button" aria-label="${clean(TRIBES[index].tribe)}, corresponding tribe for ${clean(displaySign(SIGNS[index]))}${methodLabel}. Show description"><circle class="wheel-hit" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="35"/><text class="wheel-glyph" x="${x.toFixed(1)}" y="${(y - 14).toFixed(1)}" text-anchor="middle">${SIGN_GLYPHS[index]}</text><text class="wheel-tribe" x="${x.toFixed(1)}" y="${(y + 5).toFixed(1)}" text-anchor="middle">${clean(TRIBES[index].tribe)}</text><text class="wheel-sign-name" x="${x.toFixed(1)}" y="${(y + 19).toFixed(1)}" text-anchor="middle"><tspan x="${x.toFixed(1)}">${clean(SIGNS[index])}</tspan><tspan x="${x.toFixed(1)}" dy="10">under Jesus</tspan></text></g>`;
     }).join("");
     const planetSeparators = PLANET_ORDER2.map((_, index) => {
       const angle = -90 + (index + 0.5) * 360 / 7;
@@ -7526,7 +7558,7 @@
     const fullName = `${reading2.person.given} ${reading2.person.surname}`;
     const centerName = fullName.length > 19 ? `${reading2.person.given.split(" ")[0].slice(0, 15)}\u2026` : fullName;
     const svg = `<svg class="hierarchy-svg" viewBox="0 0 1000 1040" role="img" aria-labelledby="hierarchy-svg-title" xmlns="http://www.w3.org/2000/svg">
-    <title id="hierarchy-svg-title">Christ above all; ${selected.signIndex >= 0 ? `${clean(selected.tribe)}, corresponding tribe for Sepharial's ${clean(selected.sign)}, ` : "birth sign unavailable; "}${selected.lillySignIndex >= 0 && selected.lillySignIndex !== selected.signIndex ? `${clean(TRIBES[selected.lillySignIndex].tribe)}, corresponding tribe for Lilly's ${clean(SIGNS[selected.lillySignIndex])}, ` : ""}${selected.planet ? `${clean(selected.planet)}, ${clean(selected.archangel)}, ` : ""}${selected.angelNames.map(clean).join(", ")} shown for ${clean(fullName)}.</title>
+    <title id="hierarchy-svg-title">Christ above all; ${selected.signIndex >= 0 ? `${clean(selected.tribe)}, corresponding tribe for Sepharial's ${clean(displaySign(selected.sign))}, ` : "birth sign unavailable; "}${selected.lillySignIndex >= 0 && selected.lillySignIndex !== selected.signIndex ? `${clean(TRIBES[selected.lillySignIndex].tribe)}, corresponding tribe for Lilly's ${clean(displaySign(SIGNS[selected.lillySignIndex]))}, ` : ""}${selected.planet ? `${clean(selected.planet)}, ${clean(selected.archangel)}, ` : ""}${selected.angelNames.map(clean).join(", ")} shown for ${clean(fullName)}.</title>
     <rect width="1000" height="1040" fill="#0b1538"/>
     <g fill="none">${circles}${zodiacSeparators}${planetSeparators}${angelMarks}</g>
     <text class="wheel-christ" x="500" y="79" text-anchor="middle">\u271D CHRIST \xB7 ABOVE ALL</text>
@@ -7537,9 +7569,9 @@
     <text class="wheel-center-label" x="500" y="550" text-anchor="middle">YOUR PLACE</text>
     <text class="wheel-center-name" x="500" y="579" text-anchor="middle">${clean(centerName)}</text>
   </svg>`;
-    const signSummary = selected.signIndex < 0 ? "Birth time needed for a corresponding tribe" : selected.lillySignIndex >= 0 && selected.lillySignIndex !== selected.signIndex ? `Sepharial: ${clean(selected.tribe)} (${clean(selected.sign)}) \xB7 Lilly: ${clean(TRIBES[selected.lillySignIndex].tribe)} (${clean(SIGNS[selected.lillySignIndex])})` : `${clean(selected.tribe)} (${clean(selected.sign)})`;
+    const signSummary = selected.signIndex < 0 ? "Birth time needed for a corresponding tribe" : selected.lillySignIndex >= 0 && selected.lillySignIndex !== selected.signIndex ? `Sepharial: ${clean(selected.tribe)} (${clean(displaySign(selected.sign))}) \xB7 Lilly: ${clean(TRIBES[selected.lillySignIndex].tribe)} (${clean(displaySign(SIGNS[selected.lillySignIndex]))})` : `${clean(selected.tribe)} (${clean(displaySign(selected.sign))})`;
     const roster = `<div class="hierarchy-summary"><p><small>CORRESPONDING TRIBE \xB7 CAMP-ORDER TRADITION</small><strong>${signSummary}</strong></p><p><small>PLANET</small><strong>${selected.planet ? clean(selected.planet) : "Birth time needed"}</strong></p><p><small>PLANETARY ANGEL \xB7 SEVEN SPIRITS TRADITION</small><strong>${selected.archangel ? clean(selected.archangel) : "Birth time needed"}</strong></p><p><small>THREE BIRTH CORRESPONDENCES</small><strong>${selected.angelNames.map(clean).join(" \xB7 ")}</strong></p></div>
-    <div class="hierarchy-roster"><div class="hierarchy-roster-heading"><h4>72 angels / genies</h4><p>Hover or focus for qualities; click or tap to keep details open. Gold names correspond to this reading.</p></div><div class="hierarchy-roster-grid" role="list">${ANGEL_NAMES.map((name, index) => `<span role="listitem"><button type="button" class="${activeAngels.has(index + 1) ? "is-active" : "is-muted"}" data-hierarchy-info="angel:${index}" aria-label="${clean(name)}. Show qualities">${clean(name)}</button></span>`).join("")}</div></div>`;
+    <div class="hierarchy-roster"><div class="hierarchy-roster-heading"><h4>72 angels / genies</h4><p>Hover or focus for qualities; click or tap to keep details open. Gold names mark the corresponding results.</p></div><div class="hierarchy-roster-grid" role="list">${ANGEL_NAMES.map((name, index) => `<span role="listitem"><button type="button" class="${activeAngels.has(index + 1) ? "is-active" : "is-muted"}" data-hierarchy-info="angel:${index}" aria-label="${clean(name)}. Show qualities">${clean(name)}</button></span>`).join("")}</div></div>`;
     return { svg, roster };
   }
   function renderCelestialHierarchy(reading2) {
@@ -7559,7 +7591,7 @@
     if (kind === "constellation") {
       const index = Number(value);
       if (!Number.isInteger(index) || index < 0 || index >= CONSTELLATIONS.length) return null;
-      return { eyebrow: "TRIBAL CORRESPONDENCE \u2014 CAMP-ORDER TRADITION", title: TRIBES[index].tribe, subtitle: `Corresponding tribe for ${SIGNS[index]} \xB7 ${TRIBES[index].month}`, body: `${SIGNS[index]} is represented by ${CONSTELLATION_FIGURES[index]}. This traditional correspondence does not establish ancestry or an actual Hebrew birth month; other arrangements exist.` };
+      return { eyebrow: "TRIBAL CORRESPONDENCE \u2014 CAMP-ORDER TRADITION", title: TRIBES[index].tribe, subtitle: `Corresponding tribe for ${displaySign(SIGNS[index])} \xB7 ${TRIBES[index].month}`, body: `${displaySign(SIGNS[index])} is represented by ${CONSTELLATION_FIGURES[index]}. This traditional correspondence does not establish ancestry or an actual Hebrew birth month; other arrangements exist.` };
     }
     if (kind === "planet" && PLANET_ANGELS[value]) {
       return { eyebrow: "CLASSICAL PLANET", title: value, subtitle: `Paired angel: ${PLANET_ANGELS[value]}`, body: `This planetary pairing comes from the supplied Seven Spirits tradition, not Lenain. Its theme there is ${PLANET_THEMES[value]}. The Sun and Moon are included among the seven classical lights.` };
@@ -7679,7 +7711,7 @@
   fetch("api/register").then((response) => response.json()).then(({ ready }) => {
     if (!ready) return;
     programButton.disabled = false;
-    programButton.textContent = "Register for the free program \u2197";
+    programButton.textContent = "Register to attend \u2197";
     programStatus.textContent = "";
   }).catch(() => {
   });
@@ -7745,7 +7777,6 @@
   var signGlyphs = ["\u2648", "\u2649", "\u264A", "\u264B", "\u264C", "\u264D", "\u264E", "\u264F", "\u2650", "\u2651", "\u2652", "\u2653"];
   var toneLabel = { bad: "Watchful", mixed: "Mixed", good: "Favourable", neutral: "Steady" };
   var toneClass = (tone) => ["bad", "mixed", "good"].includes(tone) ? tone : "neutral";
-  var risingTiming = (year) => year.risingInitialMonths === 0 ? `${year.risingNext} throughout (displayed natal degree 30 is treated as the sign boundary).` : `${year.rising} for about ${Number(year.risingInitialMonths.toFixed(1))} months, then ${year.risingNext} for the rest of this period.`;
   var timelineTrack = document.querySelector("#timeline-track");
   var timelineScroll = document.querySelector("#timeline-scroll");
   var timelinePreview = document.querySelector("#timeline-preview");
@@ -7841,7 +7872,7 @@
       const place = placeInput.value.trim();
       if (place && timeCertainty.value === "exact" && (!selectedLocation || place !== locationQuery)) {
         const response = await fetch(`api/geocode?q=${encodeURIComponent(place)}`);
-        if (!response.ok) throw new Error("Birthplace lookup is unavailable. Try again, or leave the place blank for a symbolic reading only.");
+        if (!response.ok) throw new Error("Birthplace lookup is unavailable. Try again, or leave the place blank for symbolic results only.");
         locationMatches = (await response.json()).results || [];
         locationQuery = place;
         if (!locationMatches.length) throw new Error("No matching birthplace was found. Add a country or region, then try again.");
@@ -7850,7 +7881,7 @@
           locationResult.innerHTML = '<option value="">Choose a city</option>' + locationMatches.map((item, index) => `<option value="${index + 1}">${escapeHtml(item.label)}</option>`).join("");
           locationChoice.hidden = false;
           locationResult.focus();
-          throw new Error("Choose the matching birthplace, then reveal your reading.");
+          throw new Error("Choose the matching birthplace, then begin your reflection.");
         }
       }
       if (place && timeCertainty.value === "exact" && !selectedLocation) throw new Error("Choose the matching birthplace.");
@@ -7894,7 +7925,7 @@
     if (previewedMark !== mark) hideTimelinePreview();
     previewedMark = mark;
     const tone = toneClass(year.pointTone);
-    timelinePreview.innerHTML = `<small>COMPLETED AGE ${year.ageAttained} \xB7 YEAR ${year.age} OF LIFE</small><strong>${escapeHtml(year.pointName)}</strong><span class="season-badge ${tone}">${toneLabel[tone]}</span><p>${escapeHtml(year.pointText)}</p><em>${year.periodStart} to ${year.periodEnd} \xB7 Select for details</em>`;
+    timelinePreview.innerHTML = `<small>${year.year} \xB7 AGE ${year.ageAttained} \xB7 POINT ${year.pointNumber}</small><strong>${escapeHtml(year.pointName)}</strong><span class="season-badge ${tone}">${toneLabel[tone]}</span><p>${escapeHtml(year.pointText)}</p><em>Select for details</em>`;
     timelinePreview.hidden = false;
     mark.setAttribute("aria-describedby", "timeline-preview");
     const markBox = mark.getBoundingClientRect();
@@ -7930,10 +7961,10 @@
     timelineTrack.style.setProperty("--year-count", years.length);
     const marks = years.map((year, index) => {
       const tone = toneClass(year.pointTone);
-      return `<button type="button" class="timeline-mark ${tone}" data-index="${index}" aria-label="Completed age ${year.ageAttained}, year ${year.age} of life, ${year.periodStart} to ${year.periodEnd}, ${escapeHtml(year.pointName)}, ${toneLabel[tone]}"><span aria-hidden="true"></span></button>`;
+      return `<button type="button" class="timeline-mark ${tone}" data-index="${index}" aria-label="${year.year}, Age ${year.ageAttained}, Point ${year.pointNumber}, ${escapeHtml(year.pointName)}, ${toneLabel[tone]}"><span aria-hidden="true"></span></button>`;
     }).join("");
-    const labels = years.map((year, index) => index === 0 || year.age % 10 === 0 || index === years.length - 1 ? `<span style="grid-column:${index + 1}">${year.age}</span>` : "").join("");
-    timelineTrack.innerHTML = `<div class="timeline-marks" aria-label="Years of life">${marks}</div><div class="timeline-axis" aria-hidden="true">${labels}</div>`;
+    const labels = years.map((year, index) => index === 0 || year.year % 10 === 0 || index === years.length - 1 ? `<span style="grid-column:${index + 1}">${year.year}</span>` : "").join("");
+    timelineTrack.innerHTML = `<div class="timeline-marks" aria-label="Calendar years">${marks}</div><div class="timeline-axis" aria-hidden="true">${labels}</div>`;
   }
   function centerTimelineMark(index) {
     const mark = timelineTrack.querySelector(`.timeline-mark[data-index="${index}"]`);
@@ -7943,17 +7974,18 @@
   }
   function renderReading() {
     const { person, method, portrait, years, lilly } = reading;
-    document.querySelector("#result-title").textContent = `${person.given}\u2019s appointed seasons`;
+    document.querySelector("#result-title").textContent = "Your Results";
     if (!method) {
       renderCelestialHierarchy(reading);
       renderGuardianAngels();
-      document.querySelector("#governance-sign").innerHTML = `<h4>Birth Sun sign unavailable</h4><p>Without a birth time, Sepharial\u2019s noon boundary cannot choose the symbolic date. Lilly\u2019s timed chart also requires a precise clock time and a resolved birthplace.</p>`;
-      document.querySelector("#summary-content").innerHTML = "<h4>Numerical key unavailable</h4><p>The key depends on Sepharial\u2019s symbolic solar degree, which cannot be selected without a birth time.</p>";
-      select.innerHTML = "";
-      timelineTrack.innerHTML = "";
-      document.querySelector("#year-grid").innerHTML = "";
-      document.querySelector("#year-detail").innerHTML = "<p>Annual and age-cycle results are unavailable until the symbolic birth date can be established.</p>";
-      document.querySelector("#timeline-selected").textContent = "Time needed";
+      document.querySelector("#governance-sign").innerHTML = `<h4>Your birth sun sign, under Christ</h4><p>A birth time is needed to determine the symbolic sign used here.</p>`;
+      document.querySelector("#summary-content").innerHTML = "<h4>Historical sign portrait</h4><p>A birth time is needed to choose this historical correspondence. Christ remains above every sign and number.</p>";
+      select.innerHTML = years.map((year, index) => `<option value="${index}">${year.year} \xB7 Age ${year.ageAttained}</option>`).join("");
+      const requested2 = Number(fromYear.value);
+      const startIndex2 = years.findIndex((year) => year.year >= requested2);
+      windowStartIndex = startIndex2 < 0 ? years.length - 1 : startIndex2;
+      renderTimeline(years);
+      showYear(windowStartIndex);
       document.querySelector("#limit-text").textContent = reading.limits;
       return;
     }
@@ -7962,21 +7994,18 @@
     const signAgreement = lilly.available && lilly.sun.sign === method.sun.sign;
     const symbolicTribe = TRIBES[signIndex];
     const astronomicalTribe = lilly.available ? TRIBES[SIGNS.indexOf(lilly.sun.sign)] : null;
-    const signDisplay = lilly.available && !signAgreement ? `<span>Lilly: ${escapeHtml(lilly.sun.sign)} \xB7 astronomical</span><span>Sepharial: ${escapeHtml(method.sun.sign)} \xB7 symbolic</span>` : `<strong>${escapeHtml(method.sun.sign)}</strong><span>${signAgreement ? "Lilly and Sepharial agree on the sign" : "Sepharial symbolic sign"}</span>`;
-    const tribeDisplay = lilly.available && !signAgreement ? `<div class="tribe-answer" aria-label="Tribal correspondence \u2014 camp-order tradition"><small>Tribal correspondence \u2014 camp-order tradition</small><p>Lilly: <strong>${escapeHtml(astronomicalTribe.tribe)}</strong> <span>(${escapeHtml(lilly.sun.sign)} \xB7 ${escapeHtml(astronomicalTribe.month)})</span></p><p>Sepharial: <strong>${escapeHtml(symbolicTribe.tribe)}</strong> <span>(${escapeHtml(method.sun.sign)} \xB7 ${escapeHtml(symbolicTribe.month)})</span></p></div>` : `<div class="tribe-answer" aria-label="Tribal correspondence \u2014 camp-order tradition: ${escapeHtml(symbolicTribe.tribe)} for ${escapeHtml(method.sun.sign)}"><small>Tribal correspondence \u2014 camp-order tradition</small><strong>${escapeHtml(symbolicTribe.tribe)}</strong><span>${escapeHtml(method.sun.sign)} \xB7 ${escapeHtml(symbolicTribe.month)}${lilly.available ? " \xB7 Lilly and Sepharial agree" : " \xB7 Sepharial symbolic sign"}</span></div>`;
-    const tribeInHero = tribeDisplay.replace('class="tribe-answer"', 'class="tribe-copy"');
-    const chartPositions = lilly.available ? `<div class="lilly-positions"><b>Lilly \xB7 actual birth chart</b><p>Calculated at ${escapeHtml(lilly.utc)} UTC for ${escapeHtml(lilly.location.label || person.place)} (${lilly.location.latitude.toFixed(3)}\xB0, ${lilly.location.longitude.toFixed(3)}\xB0), historical clock offset ${Number((lilly.offsetMinutes / 60).toFixed(4))} hours. Regiomontanus houses.</p><div class="lilly-position-list">${lilly.planets.map((planet) => `<span>${escapeHtml(planet.name)} \xB7 ${escapeHtml(planet.formatted)} \xB7 house ${planet.house}</span>`).join("")}${lilly.cusps.map((cusp) => `<span>House ${cusp.house} \xB7 ${escapeHtml(cusp.formatted)}</span>`).join("")}</div></div>` : `<p class="reading-citation"><strong>Lilly chart unavailable:</strong> ${escapeHtml(lilly.reason)} Sepharial\u2019s symbolic result is shown on its own.</p>`;
+    const signLabels = birthSunLabels(method.sun.sign, lilly.available ? lilly.sun.sign : null);
+    const signDisplay = signLabels.length === 1 ? `<strong>${escapeHtml(signLabels[0])}</strong>` : signLabels.map((label) => `<span>${escapeHtml(label)}</span>`).join("");
+    const tribeDisplay = lilly.available && !signAgreement ? `<div class="tribe-answer" aria-label="Tribal correspondence \u2014 camp-order tradition"><small>Tribal correspondence \u2014 camp-order tradition</small><p>Lilly: <strong>${escapeHtml(astronomicalTribe.tribe)}</strong></p><p>Sepharial: <strong>${escapeHtml(symbolicTribe.tribe)}</strong></p></div>` : `<div class="tribe-answer" aria-label="Tribal correspondence \u2014 camp-order tradition: ${escapeHtml(symbolicTribe.tribe)}"><small>Tribal correspondence \u2014 camp-order tradition</small><strong>${escapeHtml(symbolicTribe.tribe)}</strong><span>${escapeHtml(symbolicTribe.month)}</span></div>`;
     document.querySelector("#governance-sign").innerHTML = `
-    <h4>Your birth Sun sign</h4>
-    <div class="sign-hero"><span class="sign-glyph" aria-hidden="true">${signGlyphs[signIndex]}</span>${tribeInHero}</div>
-    <div class="tribe-answer">${signDisplay}</div>
-    <div class="governance-facts"><div><small>Sepharial's symbolic Sun</small><strong>${escapeHtml(method.sun.sign)} ${method.sun.degree}\xB0</strong><span>Fixed symbolic calendar; not an astronomical position</span></div>${lilly.available ? `<div><small>Lilly's astronomical Sun</small><strong>${escapeHtml(lilly.sun.formatted)}</strong><span>Actual civil date and clock time</span></div><div><small>Lilly's Ascendant</small><strong>${escapeHtml(lilly.ascendant.formatted)}</strong><span>Regiomontanus first house</span></div>` : ""}<div><small>Symbolic calculation date</small><strong>${escapeHtml(method.astroDate)}</strong><span>${method.morning ? "Reckoned to the previous noon" : "Reckoned from this noon"}</span></div><div><small>Birth place</small><strong>${escapeHtml(person.place || "Not supplied")}</strong><span>${lilly.available ? "Used for Lilly\u2019s coordinates and historical clock time" : "No astronomical result inferred"}</span></div></div>${chartPositions}`;
+    <h4>Your birth sun sign, under Christ</h4>
+    <div class="sign-hero"><span class="sign-glyph" aria-hidden="true">${signGlyphs[signIndex]}</span><div>${signDisplay}</div></div>
+    ${tribeDisplay}
+    <div class="governance-facts">${lilly.available ? `<div><small>Lilly's Ascendant</small><strong>${escapeHtml(displaySign(lilly.ascendant.sign))}</strong></div>` : ""}<div><small>Symbolic calculation date</small><strong>${escapeHtml(method.astroDate)}</strong></div><div><small>Birth place</small><strong>${escapeHtml(person.place || "Not supplied")}</strong></div></div>`;
     document.querySelector("#summary-content").innerHTML = `
-    <h4>Portrait of your sign</h4>
-    <p><b>Your fortunes</b> ${escapeHtml(portrait[0])}</p><p><b>Your nature</b> ${escapeHtml(portrait[1])}</p>
-    <div class="birth-seal"><small>Your key number</small><strong>${method.key}</strong><span>From your birth names, ${method.sun.degree}\xB0 of ${escapeHtml(method.sun.sign)}, and sign number ${method.sun.signNumber}</span></div>
-    <div class="calculation"><strong>How it was calculated</strong><span>${method.names.map((item) => `${escapeHtml(item.name)} = ${item.value}`).join(" \xB7 ")}</span><span>${escapeHtml(method.keyString)} \u2192 digit sum ${method.key}</span></div>`;
-    select.innerHTML = years.map((year, index) => `<option value="${index}">${year.year} \xB7 year ${year.age} of life (age ${year.ageAttained})</option>`).join("");
+    <h4>Historical sign portrait</h4>
+    <p>${escapeHtml(portrait[1])}</p><p>These source descriptions are symbolic and do not define your identity in Christ.</p>`;
+    select.innerHTML = years.map((year, index) => `<option value="${index}">${year.year} \xB7 Age ${year.ageAttained}</option>`).join("");
     const requested = Number(fromYear.value);
     const startIndex = years.findIndex((year) => year.year >= requested);
     windowStartIndex = startIndex < 0 ? years.length - 1 : startIndex;
@@ -7992,42 +8021,39 @@
     const visible = years.slice(windowStartIndex, windowStartIndex + 10);
     document.querySelector("#year-grid").innerHTML = visible.map((year2) => {
       const tone2 = toneClass(year2.pointTone);
-      const currentLabel = year2.lilly && year2.lilly.isCurrent !== year2.isCurrent ? year2.lilly.isCurrent ? "CURRENT \xB7 LILLY" : "CURRENT \xB7 SEPHARIAL" : year2.isCurrent ? "CURRENT PERIOD" : year2.isPast ? "PAST PERIOD" : "COMING PERIOD";
-      return `<button class="year-card ${year2.age === years[index].age ? "active" : ""} ${year2.isCurrent || year2.lilly?.isCurrent ? "current" : ""}" type="button" data-age="${year2.age}" aria-pressed="${year2.age === years[index].age}">
+      const currentLabel = year2.isCurrent ? "CURRENT YEAR" : year2.isPast ? "PAST YEAR" : "COMING YEAR";
+      const yearIndex = windowStartIndex + visible.indexOf(year2);
+      return `<button class="year-card ${yearIndex === index ? "active" : ""} ${year2.isCurrent ? "current" : ""}" type="button" data-index="${yearIndex}" aria-pressed="${yearIndex === index}" aria-label="${year2.year}, Age ${year2.ageAttained}, Point ${year2.pointNumber}, ${escapeHtml(year2.pointName)}">
       <span>${currentLabel}</span>
-      <strong>${year2.year}\u2013${String(year2.year + 1).slice(-2)}</strong><small>Year ${year2.age} of life \xB7 age ${year2.ageAttained}</small><em class="season-badge ${tone2}">${toneLabel[tone2]}</em>
-      <span class="year-bar ${tone2}" aria-hidden="true"></span><i>${escapeHtml(year2.risingInitialMonths === 0 ? year2.risingNext : year2.rising)} symbolic \xB7 Point ${year2.pointNumber ?? "unassigned"}</i>
+      <strong>${year2.year}</strong><small>Age ${year2.ageAttained}</small><em class="season-badge ${tone2}">${toneLabel[tone2]}</em>
+      <span class="year-bar ${tone2}" aria-hidden="true"></span><i>Point ${year2.pointNumber}</i>
     </button>`;
     }).join("");
-    document.querySelectorAll(".year-card").forEach((button) => button.addEventListener("click", () => showYear(Number(button.dataset.age) - 1)));
+    document.querySelectorAll(".year-card").forEach((button) => button.addEventListener("click", () => showYear(Number(button.dataset.index))));
     select.value = String(index);
     const year = years[index];
     const tone = toneClass(year.pointTone);
-    const lillyPeriod = year.lilly ? `<p>Lilly: ${escapeHtml(year.lilly.start)} to ${escapeHtml(year.lilly.end)} (solar returns; end exclusive).</p>` : "";
-    const startingSign = year.risingInitialMonths === 0 ? year.risingNext : year.rising;
-    const signComparison = year.lilly ? year.lilly.sign === startingSign ? `Both methods begin in ${escapeHtml(startingSign)}; their timing and meaning remain separate.` : `Lilly: ${escapeHtml(year.lilly.sign)}. Sepharial: ${escapeHtml(startingSign)}.` : `Sepharial: ${escapeHtml(startingSign)}. Lilly\u2019s timed result is unavailable.`;
-    const lillyTiming = year.lilly ? `<span>Lilly: natal Ascendant ${year.lilly.natalDegree.toFixed(2)}\xB0 advances from ${escapeHtml(year.lilly.sign)} (ruler ${escapeHtml(year.lilly.ruler)}) to ${escapeHtml(year.lilly.nextSign)} (ruler ${escapeHtml(year.lilly.nextRuler)}) at ${escapeHtml(year.lilly.transition)}.</span>` : "";
     timelineTrack.querySelector(".timeline-mark.active")?.classList.remove("active");
     const activeMark = timelineTrack.querySelector(`.timeline-mark[data-index="${index}"]`);
     if (activeMark) {
       activeMark.classList.add("active");
       if (!result.hidden) centerTimelineMark(index);
     }
-    document.querySelector("#timeline-selected").textContent = `Age ${year.ageAttained} \xB7 year ${year.age} of life`;
+    document.querySelector("#timeline-selected").textContent = `${year.year} \xB7 Age ${year.ageAttained} \xB7 Point ${year.pointNumber}`;
     document.querySelector("#year-detail").innerHTML = `
-    <div class="year-detail-title"><div class="year-detail-topline"><span class="section-number">${year.year}\u2013${year.year + 1} / YEAR ${year.age} OF LIFE \xB7 COMPLETED AGE ${year.ageAttained}</span><a class="button button-gold year-change-cta" href="https://order.wowlife.lk/" target="_blank" rel="noopener noreferrer">What can I do about this? <span aria-hidden="true">\u2197</span></a></div><h4>${escapeHtml(year.pointName)} <em class="season-badge ${tone}">${toneLabel[tone]}</em></h4><p>Sepharial: ${year.periodStart} to ${year.periodEnd} (birthday period; end exclusive).</p>${lillyPeriod}</div>
-    <div class="rising-note ${year.risingCaution || year.risingNextCaution ? "watchful" : ""}"><b>${signComparison}</b>${lillyTiming}<span>Sepharial: ${escapeHtml(risingTiming(year))} ${escapeHtml(year.rising)}: ${escapeHtml(year.risingText)} ${escapeHtml(year.risingNext)}: ${escapeHtml(year.risingNextText)}${year.risingCaution || year.risingNextCaution ? ` A caution applies to ${[year.risingCaution ? year.rising : null, year.risingNextCaution ? year.risingNext : null].filter(Boolean).join(" and ")} in relation to ${escapeHtml(reading.method.sun.sign)}; it does not change the annual point's rating.` : ""}</span></div>
+    <div class="year-detail-title"><div class="year-detail-topline"><span class="section-number">${year.year} \xB7 AGE ${year.ageAttained} \xB7 POINT ${year.pointNumber}</span><a class="button button-gold year-change-cta" href="https://order.wowlife.lk/" target="_blank" rel="noopener noreferrer">What can I do about this? <span aria-hidden="true">\u2197</span></a></div><h4>${escapeHtml(year.pointName)} <em class="season-badge ${tone}">${toneLabel[tone]}</em></h4></div>
+    <div class="rising-note"><b>Christ above every season</b><span>These historical symbols invite reflection; they do not determine your future or your redemption in Christ.</span></div>
     <div class="detail-grid">
-      <div><small>01 / SEPHARIAL ANNUAL POINT</small><h5>${year.pointSum} \u2192 ${year.pointNumber ?? "unsupported"}</h5><p>${escapeHtml(year.pointText)}</p><span>${year.pointYear} + key ${reading.method.key} = ${year.pointSum}; digit sum ${year.pointDigitSum}. Annual points 23\u201328 remain distinct.</span></div>
-      <div><small>02 / YOUR SIGN'S HOUSE</small><h5>House ${year.house}</h5><p>${escapeHtml(year.houseText)}</p><span>One house of passage per year of life</span></div>
-      <div><small>03 / PROCESSIONAL SIGN</small><h5>${escapeHtml(year.rising)} \u2192 ${escapeHtml(year.risingNext)}</h5><p>${escapeHtml(risingTiming(year))}</p><span>Symbolic timing; read alongside the annual point and house.</span></div>
+      <div><small>01 / YEAR-PLUS-AGE POINT</small><h5>Point ${year.pointNumber}</h5><p>${escapeHtml(year.pointText)}</p><span>${escapeHtml(year.pointName)} \xB7 ${toneLabel[tone]}</span></div>
+      <div><small>02 / YOUR SIGN'S HOUSE</small><h5>${year.house ? `House ${year.house}` : "Birth time needed"}</h5><p>${year.house ? "A historical house correspondence for this year." : "This correspondence requires a birth time."}</p></div>
+      <div><small>03 / PROCESSIONAL SIGN</small><h5>${year.rising ? `${escapeHtml(displaySign(year.rising))} \u2192 ${escapeHtml(displaySign(year.risingNext))}` : "Birth time needed"}</h5><p>${year.rising ? "A symbolic sequence, shown without a forecast." : "This sequence requires a birth time."}</p></div>
     </div>
-    <div class="age-cycle-note"><b>Sepharial's separate age-cycle \xB7 ${escapeHtml(year.agePointName)}</b><span>${year.year} + completed age ${year.ageAttained} = ${year.ageCycleSum}; digit sum ${year.agePointDigitSum}${year.agePointDigitSum > 22 ? `, wrapped to point ${year.agePointNumber}` : `, point ${year.agePointNumber}`}.</span><p>${escapeHtml(year.agePointText)}</p></div>`;
+    <div class="age-cycle-note"><b>Reflection in Christ</b><p>Christ is supreme over every age, sign, and symbolic point. These historical classifications cannot determine your life in him.</p></div>`;
   }
   function renderGuardianAngels() {
     angelCards.innerHTML = reading.guardianAngels.map((angel) => `<article class="angel-card">
     ${angel.number ? `<div class="angel-name">${escapeHtml(angel.name)}</div><img src="${artPath(angel.number)}" alt="Illustrative artwork paired with ${escapeHtml(angel.name)}" width="720" height="1080">` : '<div class="angel-unassigned" aria-hidden="true">No date assignment</div>'}
-    <div class="angel-card-copy"><span class="card-role"><i></i>${escapeHtml(angel.role)}</span><h4>${escapeHtml(angel.name || "No date assignment")}</h4><p>${escapeHtml(angel.basis)}</p><small>The portrait is illustrative.</small></div>
+    <div class="angel-card-copy"><span class="card-role"><i></i>${escapeHtml(angel.role)}</span><h4>${escapeHtml(angel.name || "No date assignment")}</h4><p>${angel.number ? "A historical correspondence from Lenain\u2019s tables." : "No unique correspondence is assigned for the available details."}</p><small>The portrait is illustrative.</small></div>
   </article>`).join("");
   }
 })();

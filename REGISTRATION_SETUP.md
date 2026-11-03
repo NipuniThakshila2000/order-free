@@ -1,4 +1,4 @@
-# Connect the November 11 registration form to Google Sheets
+# Connect the NOV 10 registration form to Google Sheets
 
 The public form posts to `/api/register`. On the original site, that endpoint forwards validated entries to a Google Apps Script, which writes them to a `Registrations` tab. The form stays disabled until the required production environment variables are configured.
 

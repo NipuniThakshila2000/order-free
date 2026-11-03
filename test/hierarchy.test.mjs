@@ -4,6 +4,7 @@ import {calculateReading} from '../src/reading.mjs';
 import {buildHierarchyMarkup, getHierarchyInfo, getHierarchySelection} from '../src/hierarchy.mjs';
 import {ANGEL_QUALITIES} from '../src/angel-qualities.mjs';
 import {SIGNS, TRIBES, ANGEL_NAMES} from '../src/source-data.mjs';
+import {displaySign, birthSunLabels} from '../src/display.mjs';
 
 const example = calculateReading({given:'Anna', surname:'Smith', date:'2000-03-25', time:'00:20'});
 
@@ -57,13 +58,26 @@ test('uses all twelve camp-order tribes and retains the original wheel positions
   const {svg}=buildHierarchyMarkup(example);
   assert.equal((svg.match(/class="wheel-tribe"/g)||[]).length,12);
   assert.equal((svg.match(/class="wheel-sign-name"/g)||[]).length,12);
-  assert.match(svg,/Judah, corresponding tribe for Aries/);
+  assert.match(svg,/Judah, corresponding tribe for Aries under Jesus/);
 });
 
 test('highlights both tribes when the astronomical and symbolic Sun signs differ', () => {
   const reading={...example,lilly:{sun:{sign:'Taurus'}}};
   const {svg,roster}=buildHierarchyMarkup(reading);
   assert.equal((svg.match(/wheel-constellation is-active/g)||[]).length,2);
-  assert.match(roster,/Lilly: Issachar \(Taurus\)/);
-  assert.match(roster,/Sepharial: Judah \(Aries\)/);
+  assert.match(roster,/Lilly: Issachar \(Taurus under Jesus\)/);
+  assert.match(roster,/Sepharial: Judah \(Aries under Jesus\)/);
+});
+
+test('formats every displayed sign once without changing internal sign identifiers', () => {
+  for (const sign of SIGNS) {
+    assert.equal(displaySign(sign),`${sign} under Jesus`);
+    assert.equal(displaySign(displaySign(sign)),`${sign} under Jesus`);
+  }
+});
+
+test('shows one birth Sun label on agreement and concise labels on difference', () => {
+  assert.deepEqual(birthSunLabels('Pisces','Pisces'),['Pisces under Jesus']);
+  assert.deepEqual(birthSunLabels('Pisces',null),['Pisces under Jesus']);
+  assert.deepEqual(birthSunLabels('Aries','Pisces'),['Lilly: Pisces under Jesus','Sepharial: Aries under Jesus']);
 });

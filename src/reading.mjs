@@ -14,6 +14,10 @@ const monthLength = (year,month,calendar) => {
   return [31,leap ? 29 : 28,31,30,31,30,31,31,30,31,30,31][month-1];
 };
 const birthdayInYear = (person, year) => dateString(year, person.month, person.month === 2 && person.day === 29 && monthLength(year,2,person.calendar)<29 ? 28 : person.day);
+const localClock = (now, location) => {
+  const parts = location?.timezone ? Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:location.timezone,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(now).filter((part)=>part.type !== 'literal').map((part)=>[part.type,Number(part.value)])) : {year:now.getFullYear(),month:now.getMonth()+1,day:now.getDate(),hour:now.getHours(),minute:now.getMinutes()};
+  return `${dateString(parts.year,parts.month,parts.day)} ${String(parts.hour).padStart(2,'0')}:${String(parts.minute).padStart(2,'0')}`;
+};
 
 export function guardianAngelsFor(person) {
   // Lenain's date tables start on 20 March in a 360-day cycle. The remaining
@@ -85,7 +89,16 @@ function validateInput(input) {
 
 export function calculateReading(input) {
   const person = validateInput(input);
-  if (person.timeCertainty === 'unknown') return {person:{given:person.given,surname:person.surname,place:person.place,calendar:person.calendar,birthDate:dateString(person.year,person.month,person.day)},method:null,portrait:null,lilly:{available:false,reason:'Birth time is unknown; a precise Ascendant, houses, and timed chart cannot be calculated.'},guardianAngels:guardianAngelsFor(person),years:[],limits:'Birth time is unknown. Sepharial’s noon-based symbolic date and numerical key, Lilly’s timed chart, and a unique spirit guardian cannot be calculated.'};
+  if (person.timeCertainty === 'unknown') {
+    const currentClock = localClock(input.now instanceof Date ? input.now : new Date(),person.location);
+    const years = Array.from({length:Math.min(98,2200-person.year)},(_,index)=>{
+      const year=person.year+index, ageAttained=index, ageCycleSum=year+ageAttained;
+      const pointNumber=ageCyclePoint(year,ageAttained), point=AGE_POINTS[pointNumber];
+      const periodStart=`${birthdayInYear(person,year)} 00:00`, periodEnd=`${birthdayInYear(person,year+1)} 00:00`;
+      return {year,age:index+1,ageAttained,ageCycleSum,agePointDigitSum:sumDigits(ageCycleSum),agePointNumber:pointNumber,agePointName:point[0],agePointText:point[1],agePointTone:point[2],pointNumber,pointName:point[0],pointText:point[1],pointTone:point[2],periodStart,periodEnd,isCurrent:currentClock>=periodStart&&currentClock<periodEnd,isPast:currentClock>=periodEnd,lilly:null,house:null,rising:null,risingNext:null};
+    });
+    return {person:{given:person.given,surname:person.surname,place:person.place,calendar:person.calendar,birthDate:dateString(person.year,person.month,person.day)},method:null,portrait:null,lilly:{available:false,reason:'Birth time is unknown; a precise Ascendant, houses, and timed chart cannot be calculated.'},guardianAngels:guardianAngelsFor(person),years,limits:'Birth time is unknown. The noon-based symbolic sign, timed astronomical chart, and a unique spirit correspondence cannot be determined. Year-plus-age points remain available.'};
+  }
   const morning = person.hour < 12;
   let symbolicYear=person.year, symbolicMonth=person.month, symbolicDay=person.day;
   if (morning) {
@@ -106,14 +119,16 @@ export function calculateReading(input) {
   try { lilly = person.timeCertainty === 'hour' ? {available:false,reason:'Only the birth hour is known; a precise Ascendant, houses, and timed chart require the minute.'} : calculateLilly(person, person.location, maxAge, Number(input.utcOffsetMinutes)); }
   catch (problem) { lilly = {available:false,reason:`Lilly chart unavailable: ${problem.message}`}; }
   const symbolicAnniversary={month:symbolicMonth,day:symbolicDay,calendar:person.calendar};
+  const now = input.now instanceof Date ? input.now : new Date();
+  const currentClock = localClock(now,person.location);
   const years = Array.from({length: maxAge}, (_, index) => {
     const age = index + 1;
     const year = person.year + index;
     const pointYear = symbolicYear + index;
     const pointSum = pointYear + key;
     const pointDigitSum = sumDigits(pointSum);
-    const pointNumber = annualPoint(pointYear, key);
-    const point = pointNumber === null ? ['Unsupported annual point','The supplied table does not give this annual value.','neutral'] : POINTS[pointNumber];
+    const annualPointNumber = annualPoint(pointYear, key);
+    const annualPointResult = annualPointNumber === null ? ['Unsupported annual point','The supplied table does not give this annual value.','neutral'] : POINTS[annualPointNumber];
     const ageAttained = index;
     const ageCycleSum = year + ageAttained;
     const agePointDigitSum = sumDigits(ageCycleSum);
@@ -126,17 +141,18 @@ export function calculateReading(input) {
     // Printed degree 30 is treated as the sign boundary: the next sign begins immediately.
     const risingInitialMonths = (30 - sun.degree) * 12 / 30;
     const risingData = RISING[rising];
-    const periodStart = `${birthdayInYear(symbolicAnniversary,pointYear)} 12:00`;
-    const periodEnd = `${birthdayInYear(symbolicAnniversary,pointYear+1)} 12:00`;
-    const today = new Date();
-    const currentParts = person.location?.timezone ? Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:person.location.timezone,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(today).filter((part)=>part.type !== 'literal').map((part)=>[part.type,Number(part.value)])) : {year:today.getFullYear(),month:today.getMonth()+1,day:today.getDate(),hour:today.getHours(),minute:today.getMinutes()};
-    const todayString = `${dateString(currentParts.year,currentParts.month,currentParts.day)} ${String(currentParts.hour).padStart(2,'0')}:${String(currentParts.minute).padStart(2,'0')}`;
+    const symbolicPeriodStart = `${birthdayInYear(symbolicAnniversary,pointYear)} 12:00`;
+    const symbolicPeriodEnd = `${birthdayInYear(symbolicAnniversary,pointYear+1)} 12:00`;
+    const periodStart = `${birthdayInYear(person,year)} 00:00`;
+    const periodEnd = `${birthdayInYear(person,year+1)} 00:00`;
     return {
-      age, year, pointYear, pointSum, pointDigitSum, pointNumber, pointName: point[0], pointText: point[1], pointTone: point[2],
+      age, year, pointYear, pointSum, pointDigitSum,
+      annualPointNumber, annualPointName: annualPointResult[0], annualPointText: annualPointResult[1], annualPointTone: annualPointResult[2],
+      pointNumber: agePointNumber, pointName: agePoint[0], pointText: agePoint[1], pointTone: agePoint[2],
       ageAttained, ageCycleSum, agePointDigitSum, agePointNumber, agePointName: agePoint[0], agePointText: agePoint[1], agePointTone: agePoint[2],
       house: houseNumber, houseText: house[1], rising, risingText: risingData.t,
-      risingNext: nextRising, risingNextText: RISING[nextRising].t, risingInitialMonths, periodStart, periodEnd,
-      isCurrent: todayString >= periodStart && todayString < periodEnd, isPast: todayString >= periodEnd,
+      risingNext: nextRising, risingNextText: RISING[nextRising].t, risingInitialMonths, periodStart, periodEnd, symbolicPeriodStart, symbolicPeriodEnd,
+      isCurrent: currentClock >= periodStart && currentClock < periodEnd, isPast: currentClock >= periodEnd,
       lilly: lilly.available ? lilly.years[index] : null,
       risingCaution: risingData.bad.includes(sun.sign), risingNextCaution: RISING[nextRising].bad.includes(sun.sign)
     };
@@ -148,6 +164,6 @@ export function calculateReading(input) {
     lilly,
     guardianAngels: guardianAngelsFor(person),
     years,
-    limits: 'This symbolic reading cannot establish a death year, certain future events, or the existence of a personal guardian angel.'
+    limits: 'These symbolic methods cannot establish a death year, certain future events, or the existence of a personal guardian angel. Christ is above every sign and number.'
   };
 }

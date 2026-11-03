@@ -23,3 +23,9 @@
   background-size:cover;
   background-position:center;
 }
+.hero-copy{max-width:850px}
+.hero h1{max-width:850px;font-size:clamp(45px,5.1vw,78px);line-height:1.02;text-wrap:balance}
+@media(max-width:600px){
+  .hero h1{font-size:clamp(37px,9.3vw,49px);line-height:1.04}
+  .hero-appointment{font-size:clamp(27px,7vw,35px)}
+}

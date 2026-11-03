@@ -66,7 +66,7 @@ export const AGE_POINTS={
 13:["Death the Reaper","Change, reaction, collapse, and an ending.","bad"],
 14:["The Two Urns","Vital forces, friendship, social obligations, and mutual affection.","good"],
 15:["Typhon","Passion, wilfulness, controversy, and disorder.","bad"],
-16:["The Stricken Tower","Sudden upheaval, accident, and the cost of pride.","bad"],
+16:["The Stricken Tower","A historical image of sudden upheaval and a call to humility.","bad"],
 17:["The Star","Faith, hope, intuition, and expectation.","good"],
 18:["The Twilight","Doubt, hesitation, and adverse change.","bad"],
 19:["The Great Light","Vitality, joy, attainment, and recognition.","good"],
