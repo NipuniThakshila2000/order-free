@@ -3,9 +3,34 @@ import {renderCelestialHierarchy} from './hierarchy.mjs';
 
 const form = document.querySelector('#reading-form');
 const programForm = document.querySelector('#program-registration-form');
-programForm.addEventListener('submit', (event) => {
+const programButton = programForm.querySelector('[type="submit"]');
+const programStatus = document.querySelector('#program-form-status');
+fetch('/api/register').then((response) => response.json()).then(({ready}) => {
+  if (!ready) return;
+  programButton.disabled = false;
+  programButton.textContent = 'Register for the free program ↗';
+  programStatus.textContent = '';
+}).catch(() => {});
+programForm.addEventListener('submit', async (event) => {
   event.preventDefault();
-  document.querySelector('#program-form-status').textContent = 'Registration is being set up. Your details have not been sent.';
+  if (programButton.disabled || !programForm.reportValidity()) return;
+  programButton.disabled = true;
+  programStatus.textContent = 'Saving your registration…';
+  try {
+    const response = await fetch('/api/register', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(Object.fromEntries(new FormData(programForm)))
+    });
+    const result = await response.json();
+    if (!response.ok || !result.ok) throw new Error(result.error || 'Registration could not be saved.');
+    programForm.reset();
+    programStatus.textContent = 'Your registration was received. Thank you!';
+  } catch (problem) {
+    programStatus.textContent = problem.message || 'Registration could not be saved. Please try again.';
+  } finally {
+    programButton.disabled = false;
+  }
 });
 const result = document.querySelector('#result');
 const error = document.querySelector('#form-error');
