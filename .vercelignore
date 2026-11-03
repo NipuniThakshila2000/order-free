@@ -2,13 +2,15 @@
 *.pdf
 *.docx
 test/
-scripts/
-src/*.mjs
 assets/angels/*.png
 server.mjs
 SOURCE_NOTES.md
 README.md
 index (2).html
+*.patch
+.deploy-registration/
+.chrome-qa/
+desktop-qa.png
 Up up down down.jpeg
 seven spirits.jpeg
 Guide.jpeg

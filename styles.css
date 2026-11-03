@@ -60,6 +60,12 @@
 .sign-glyph{display:grid;place-items:center;width:76px;height:76px;flex:none;border:1px solid rgba(214,174,88,.55);border-radius:50%;font-size:42px;color:#f4dfa6;background:radial-gradient(circle at 40% 30%,rgba(214,174,88,.18),transparent 70%)}
 .sign-hero strong{display:block;font-family:var(--serif);font-size:37px;font-weight:500;color:#f4dfb2;line-height:1}
 .sign-hero span:last-child{font-family:var(--serif);font-size:17px;font-style:italic;color:#c4cbd1}
+.tribe-answer{margin:-5px 0 20px;padding:12px 16px;border-left:3px solid var(--gold);background:rgba(214,174,88,.09);border-radius:0 7px 7px 0}
+.tribe-answer small{display:block;margin-bottom:5px;color:#dec78f;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.tribe-answer>strong{display:block;color:#ffe6a8;font-family:var(--serif);font-size:30px;line-height:1.1}
+.tribe-answer>span,.tribe-answer p span{color:#cbd5df;font-size:13px}
+.tribe-answer p{margin:4px 0;color:#e6edf2;font-size:14px}
+.tribe-answer p strong{color:#ffe6a8;font-size:17px}
 .governance-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .governance-facts>div{padding:14px;background:#0a1e37;border:1px solid rgba(214,174,88,.18);border-radius:9px}
 .governance-facts small,.birth-seal small{display:block;font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#adbbca}
@@ -326,6 +332,8 @@
 .time-controls select{min-width:0;padding:11px 7px;font-size:14px}
 .time-controls select[aria-invalid="true"]{border-color:#ffb6a9}
 .time-field input[type="hidden"]{display:none}
+#time-certainty{display:block;width:100%;margin:9px 0 8px;padding:9px 11px;background:#102f52;color:#f4ede1;border:1px solid #45607a;border-radius:2px;font-size:13px}
+.time-controls select:disabled{opacity:.48}
 .reading-citation{margin:20px 0 0;padding:12px 15px;border-left:2px solid rgba(214,174,88,.65);background:rgba(214,174,88,.07);color:#c8d1da;font-size:11px;line-height:1.65}
 .reading-citation strong{color:#efdaa8}.reading-citation cite{font-style:italic}.reading-citation a{color:#f0dcae;text-decoration:underline;text-underline-offset:2px}.reading-citation a:hover{color:#fff1ca}
 .program-section{padding:clamp(58px,7vw,96px) clamp(20px,7vw,110px);background:linear-gradient(145deg,#081c35,#102e50);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
@@ -345,6 +353,7 @@
 .program-form fieldset{display:flex;flex-wrap:wrap;gap:14px 24px;margin:20px 0 24px;padding:0;border:0}.program-form legend{margin-bottom:12px}.program-form fieldset label{display:inline-flex;align-items:center;gap:9px;min-height:30px;font-size:13px;letter-spacing:normal;text-transform:none;color:#e9e1d2;cursor:pointer}.program-form input[type="radio"]{accent-color:var(--gold);width:18px;height:18px;margin:0}
 .program-form-status{min-height:1.4em;margin:12px 0 0;color:#d6e2ed;font-size:12px;line-height:1.4}
 .program-form .button:disabled{opacity:.6;cursor:not-allowed}
+.program-form .registration-honeypot{position:absolute!important;left:-9999px;width:1px!important;height:1px!important;opacity:0;pointer-events:none}
 @media(max-width:900px){.program-registration{grid-template-columns:1fr;gap:20px}}
 @media(max-width:600px){.program-registration{margin-top:38px;padding:23px 20px}.program-form-grid{grid-template-columns:1fr}.program-email{grid-column:auto}.program-form .button{width:100%}}
 @media(max-width:760px){
@@ -363,6 +372,7 @@
   .nav-cta-long{display:none}
   .nav-cta-short{display:inline}
 }
+
 /* An editorial opening for the reading, with the supplied celestial painting. */
 .hero{
   position:relative;
@@ -428,3 +438,24 @@
   .hero-art{width:min(100%,420px);aspect-ratio:1/.84}
   .hero .art-caption{bottom:25px;font-size:9px}
 }
+
+/* Retain the wheel footprint while making tribe names its leading zodiac labels. */
+.hierarchy-svg .wheel-constellation .wheel-glyph{font-size:15px;opacity:.72}
+.hierarchy-svg .wheel-constellation .wheel-tribe{font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:.015em;fill:currentColor}
+.hierarchy-svg .wheel-constellation .wheel-sign-name{font-family:var(--sans);font-size:9px;letter-spacing:.035em;fill:currentColor;opacity:.73}
+.hierarchy-svg .wheel-constellation.is-active .wheel-tribe{fill:#ffe6a8;font-weight:800;stroke:#0b1538;stroke-width:2;paint-order:stroke}
+.hierarchy-svg .wheel-constellation.is-active .wheel-glyph{opacity:.68}
+.location-choice{grid-column:1/-1;min-width:0}
+.location-choice label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:#dfca9b}
+.location-choice select{display:block;width:100%;min-height:47px;margin-top:9px;padding:11px 14px;border:1px solid #45607a;border-radius:2px;background:#102f52;color:#f4ede1;font-size:14px}
+.location-choice small{display:block;margin-top:6px;color:#aebed0;font-size:11px}
+.location-choice select:focus-visible{outline:2px solid var(--light-gold);outline-offset:2px}
+.form-grid #birth-calendar{display:block;width:100%;min-height:47px;margin-top:9px;padding:11px 14px;border:1px solid #45607a;border-radius:2px;background:#102f52;color:#f4ede1;font-size:14px;letter-spacing:normal;text-transform:none}
+.form-grid #birth-calendar:focus-visible{outline:2px solid var(--light-gold);outline-offset:2px}
+.lilly-positions{margin-top:22px;padding-top:19px;border-top:1px solid rgba(214,174,88,.35)}
+.lilly-positions>b{display:block;color:#f0dcae;font-size:13px}
+.lilly-positions p{margin:8px 0 15px;color:#bdcbd7;font-size:12px;line-height:1.6}
+.lilly-position-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 12px;color:#e1e8ed;font-size:11px;line-height:1.5}
+.lilly-position-list span{min-width:0;overflow-wrap:anywhere}
+.rising-note span{display:block;margin-top:8px}
+@media(max-width:460px){.lilly-position-list{grid-template-columns:1fr}}

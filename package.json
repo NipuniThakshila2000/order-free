@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "build": "node scripts/build_browser.mjs",
+    "test": "node --test test/*.test.mjs",
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "celestine": "0.8.0",
+    "tz-lookup": "6.1.25"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12"
+  }
+}

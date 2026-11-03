@@ -1,41 +1,31 @@
 # Source and calculation notes
 
-The reading calculations use the supplied Sepharial and Lilly files, including the 1911 edition of Sepharial's *The Kabala of Numbers*. Guardian angel correspondences use Lenain's separate historical tables. This is a symbolic interpretation of old texts, not a prediction of certain events.
+This application combines three separate historical procedures. It does not present them as a unified system taught by William Lilly, Sepharial, or Lenain. Symbolic interpretations do not prove predictive accuracy.
 
-## What the code calculates
+## William Lilly, *Christian Astrology*, Book III
 
-| Result | Supplied source | Implemented rule |
-| --- | --- | --- |
-| Birth-name values | Sepharial, *Kabalistic Astrology*, chapter III, PDF pp. 18–19 | A–Z values from the printed table, multiplied by descending letter positions. Each given name and the birth surname are counted separately. |
-| Astrological date and Sun degree | Sepharial, chapter I, PDF pp. 14–15 | The day starts at noon. A birth before noon uses the previous date. The book's fixed calendar and repeated degrees determine the symbolic Sun degree. |
-| Key number | Sepharial, chapters III and VI, PDF pp. 18–19 and 31–32 | Join the name values, degree, and sign number, then sum the digits. |
-| Sign portrait | Sepharial, chapter VII, PDF pp. 35–37 | Short paraphrase of the sign description. |
-| Annual point | Sepharial, *Kabalistic Astrology*, chapters XIII and XV, PDF pp. 57–59 and 68–69; 1911 *The Kabala of Numbers*, p. 133 | Add key number to calendar year; sum the result's digits; wrap values above 22 through the 22 Tarot points. |
-| Annual house and rising sign | Sepharial, chapter XV, PDF pp. 64–68 | Move the natal sign through the houses in a 12-year cycle and the processional sign through the zodiac. The card text is a shortened paraphrase. |
-| Age-cycle Tarot point | Sepharial, *The Kabala of Numbers* (1911), pp. 132–133 | Add the calendar year and the age attained on that year's birthday, sum the digits, and wrap values above 22 through the 22 Tarot points. The book's worked example is 1865 + age 1 = 1866 → 21; 1866 + age 2 = 1868 → 23 → point 1. |
-| Guardian angel correspondences | Lenain, *La Science Cabalistique* (1823), Tables II–IV, pp. 28–38 | Date's five-day interval, date's 72-day cycle from 20 March, and local birth time's 20-minute interval yield three positions in the 72-name roster. The 1911 Sepharial book has no guardian angel table. |
+The natal chart uses the entered birth-record calendar, clock time, resolved birthplace coordinates, and IANA historical time-zone rule. Old Style (Julian) dates are converted to Gregorian before astronomical calculation. An ambiguous daylight-saving time requires an offset choice; a nonexistent clock time is rejected. Celestine 0.8.0 calculates geocentric tropical longitudes for the traditional seven planets and Regiomontanus houses. Place changes the Ascendant and house cusps.
 
-The page provides years of life 1–98, matching the range of the printed annual conjunction table. It currently uses three of Sepharial's annual methods; it does not claim to implement every table or 700 calculations. The local Node API and browser call the same module at `src/reading.mjs`. The API does not store birth details.
+Book III, chapter CLXVI, advances annual profections from the natal degree at 30 degrees per year. The code solves each Sun return to natal longitude and shows the within-year sign and ruler change. The first period begins at birth; later periods begin at solar return. Further judgement by essential dignity, accidental strength, and aspects requires source-checked rules from Book I and relevant Book III passages; generic modern interpretation is not labelled Lilly's. Unknown or hour-only times do not yield a precise timed chart. IANA pre-standard-time rules are historical reconstructions; a birth record might instead use local mean time. The applied UTC instant and offset are displayed.
 
-## Limits of the supplied material and inputs
+## Sepharial, two distinct books
 
-- The supplied Sepharial and Lilly books do not contain a verified roster of 72 named guardian angels or a rule assigning three by name, birth date, and birth time. Lenain's *La Science Cabalistique* (1823), [original scan](https://iapsop.com/ssoc/1823__lenain___science_cabalistique.pdf), supplies the separate historical date and time method. Spellings and order were checked against [this reading edition](https://magick.ly/kabbalah/yhvh/72angels), licensed CC BY 4.0 and credited here for its transcription. The site calls the resulting figures guardian angels for clarity; Lenain calls them *génies* in the source.
-- The angel detail panels display Lenain's Chapter VI attribute and sphere of influence in the [Magick.ly English reading edition](https://magick.ly/books/la-science-cabalistique/chapitre-6), translated under CC BY 4.0. The 72 positions remain separate even where Lenain repeats a spelling; the page does not treat these historical descriptions as certain effects.
-- The 72 angel portraits are artwork, not historical depictions of these named angels: 18 original painted figures were generated, and four color and ornament treatments of each create 72 separate WebP assets. The displayed images follow Lenain's resulting roster positions, but the appearance of each angel is illustrative.
-- Lenain reserves 15–19 March, and leap day, outside the numbered date tables. The page reports no date assignment for those dates; the 20-minute birth-time correspondence remains available. The date calculation uses the printed calendar dates and local birth time as entered, without timezone conversion.
-- Sepharial says that judging length of life requires the Moon's age and position (chapter I, PDF p. 15). Lilly's natal and annual methods also require a complete chart, including astronomical positions and a birth location. This page does not invent a death year.
-- The supplied Lilly PDF and Word transcription cover historical natal, directions, profections, revolutions, and transits. They inform the source boundary, but the implemented numeric rules above come from Sepharial. No full Lilly chart is implied.
-- The printed A–Z name table cannot faithfully evaluate names in other scripts. The form asks for Latin spelling.
+*Kabalistic Astrology*, printed pp. 11–19, supplies the fixed **symbolic** solar calendar, noon boundary, letter values and descending position weights, and numerical key. Morning uses the preceding symbolic date only; January 1 before noon becomes December 31 of the prior year. Each given name and surname is valued separately. Their values, degree and sign number are concatenated and digit-summed. Only A–Z are supported. Spaces, apostrophes and hyphens are ignored as separators; other punctuation and unsupported characters are rejected. This explicit input convention adds no invented values.
 
-## Run locally
+The Gladstone worked example gives 29 December 1809 in the morning → 28 December, Capricorn 7, name values 84, 60, 149, and key 40. *Kabalistic Astrology*, printed p. 55, has annual points through **28**. The digit sum of symbolic calendar year plus key is not wrapped at 22: 1859 + 40 = 1899 → point 27, and 1894 + 40 = 1934 → point 17. Values outside the printed table are marked unsupported. Printed p. 65 gives four months under the first sign and eight under the next from degree 20. The app uses the book's 30-degree/12-month scale and treats displayed degree 30 as a boundary with zero months in the first sign. This symbolic timing is independent of Lilly's astronomical timing.
 
-You can open `index (2).html` directly in a browser. Its classic browser script is generated from the source modules; after changing `src/app.mjs`, `src/reading.mjs`, or `src/source-data.mjs`, run `node scripts/build_browser.mjs` to refresh `src/app.bundle.js`.
+*The Kabala of Numbers* (1911), printed pp. 27–29 and 132–133, supplies a **separate** 22-point age cycle and descriptions. The documented 1864 sequence is 19, 21, 1, 16, 18, 20, 22, 2, 17, 19, 21, 1, 3, 18, 20, 22, 2. Age-cycle point 5 is the Hierophant, 14 the Two Urns, and 20 Resurrection. Completed age zero is the first year of life. Annual point ratings remain separate from sign cautions. The symbolic and astronomical degrees cannot be averaged or substituted for one another; discrepancies in historical examples remain differences of method, not a reason to switch inputs.
 
-Use Node.js 20 or newer:
+## Lenain, *La Science cabalistique*
 
-```text
-node server.mjs
-```
+Tables II–IV assign a five-day physical guardian from March 20, a repeating 72-day character sequence, and a twenty-minute spirit interval from midnight. The printed p. 40 example, 17 November at 10:15, gives positions 49, 27, 31. Date lookup uses the entered civil birth date; time lookup uses the entered local civil clock. Intervals are left-inclusive: 00:00–00:19 gives 1, and 23:40–23:59 gives 72. There is no silent conversion to solar time or claim that Lenain resolved modern time-zone questions.
 
-Open `http://localhost:3000`. A POST to `/api/reading` accepts JSON with `given`, `surname`, `date` (`YYYY-MM-DD`), and `time` (`HH:MM`).
-The optional `place` field is returned on the profile, and the form's `from` year selects the first displayed year. Neither changes the book's arithmetic.
+The 360 numbered dates end March 14. March 15–19 are the five remaining days and receive no invented numbered date guardian. This application also leaves February 29 unnumbered, an explicit convention rather than the only possible reading of the leap-year discussion. With only an hour, Lenain advises considering three twenty-minute candidates; the app lists all three without assigning one. Unknown time leaves the spirit position unassigned. Chapter VI qualities are abridged summaries. Apparent printing errors in the scanned tables were resolved against the corroborating sequence; positions 11 and 17 both remain Lauviah.
+
+The existing seven planetary angel names and associations follow the separate supplied **Seven Spirits** diagram, not Lenain. The wheel is a simplified illustration. Lenain's hierarchy is Seraphim, Cherubim, then Thrones.
+
+## Tribe correspondence, verification and operation
+
+The signs use the supplied camp-order mapping, Aries/Judah/Nisan through Pisces/Naphtali/Adar, consistent with the [Encyclopaedia Judaica Zodiac entry](https://jewishvirtuallibrary.org/jsource/judaica/ejud_0002_0021_0_21598.html). [Gal Einai](https://inner.org/responsa/leter1/resp5.htm) discusses alternatives. Hebrew months are traditional correspondences, not computed birth months; tribe labels do not infer ancestry. The one existing wheel shows the birth sign for each available method and highlights two tribes when they differ.
+
+`npm test` checks independent Swiss Ephemeris reference longitudes and Regiomontanus cusps, a solar-return boundary, Sepharial worked examples, the two point tables, all 360 numbered Lenain dates, all 1,440 clock minutes, special dates, and tribe/angel invariants. Swiss reference data is test-only. Build the browser bundle with `npm ci` then `npm run build`; run the local API with `npm start`. Birthplace lookup is user-triggered via OpenStreetMap Nominatim. Failed or unresolved lookup leaves Lilly unavailable instead of guessing coordinates. The reading API does not store birth details.

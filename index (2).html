@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="A free symbolic reading of your appointed seasons and guardian angel correspondences.">
   <title>Appointed Seasons | Your Reading</title>
-  <link rel="stylesheet" href="styles.css?v=29">
+  <link rel="stylesheet" href="styles.css?v=30">
   <link rel="stylesheet" href="hero-images.css?v=2">
-  <script defer src="src/app.bundle.js?v=24"></script>
+  <script defer src="src/app.bundle.js?v=28"></script>
   <script defer src="src/recovery-cta.js?v=1"></script>
 </head>
 <body>
@@ -54,11 +54,11 @@
       </div>
     </section>
     <section class="intro-band" id="method" aria-labelledby="method-title">
-      <div class="section-heading"><span class="section-number">01 / THE METHOD</span><h2 id="method-title">A reading you can <em>trace.</em></h2><p>Each part follows a defined rule. The page shows the arithmetic behind the interpretation.</p></div>
+      <div class="section-heading"><span class="section-number">01 / THE METHOD</span><h2 id="method-title">A reading you can <em>trace.</em></h2><p>This reading combines Lilly’s astrology, Sepharial’s numerical symbolism, and guardian correspondences. Where Lilly and Sepharial differ, their results are labelled individually.</p></div>
       <div class="method-grid">
         <article class="method-card"><span class="method-icon">Ⅰ</span><h3>Your name in numbers</h3><p>Each letter receives a value. Its position in each birth name changes its contribution.</p><small>NAME VALUES</small></article>
-        <article class="method-card"><span class="method-icon">Ⅱ</span><h3>The birth sign</h3><p>The reading’s calendar gives the Sun’s symbolic degree. Its day begins at noon, so morning births use the previous date.</p><small>BIRTH DATE</small></article>
-        <article class="method-card"><span class="method-icon">Ⅲ</span><h3>The years of life</h3><p>The yearly point, your sign’s passage through the houses, and an age-plus-year cycle offer separate views of each year.</p><small>YEARLY PATTERNS</small></article>
+        <article class="method-card"><span class="method-icon">Ⅱ</span><h3>Two views of the sky</h3><p>Sepharial’s fixed calendar gives a symbolic solar degree; its day begins at noon. Lilly’s birth chart uses the actual date, clock time, and birthplace.</p><small>SEPARATE METHODS</small></article>
+        <article class="method-card"><span class="method-icon">Ⅲ</span><h3>The years of life</h3><p>Sepharial’s annual point and separate age cycle sit beside Lilly’s solar-return profection. Their periods and meanings are kept distinct.</p><small>YEARLY PATTERNS</small></article>
       </div>
     </section>
     <section class="reading-section" id="reading" aria-labelledby="reading-title">
@@ -68,8 +68,11 @@
           <label>Christian / given name(s) <input name="given" autocomplete="given-name" placeholder="e.g. William Ewart" aria-describedby="given-validation" required><span id="given-validation" class="field-validation" aria-live="polite">Use A–Z letters; spaces between names are welcome.</span></label>
           <label>Family name (father's surname) <input name="surname" autocomplete="family-name" placeholder="e.g. Gladstone" aria-describedby="surname-validation" required><span id="surname-validation" class="field-validation" aria-live="polite">Use A–Z letters; two-part family names are welcome.</span></label>
           <label>Date of birth <input name="date" type="date" aria-describedby="date-validation" required><span id="date-validation" class="field-validation" aria-live="polite">Choose a real date from 1600 through today.</span></label>
-          <div class="time-field"><span class="field-label" id="time-label">Time of birth</span><div class="time-controls" role="group" aria-labelledby="time-label" aria-describedby="time-validation"><select id="time-hour" aria-label="Birth hour"><option value="">Hour</option></select><select id="time-minute" aria-label="Birth minute"><option value="">Minute</option></select><select id="time-period" aria-label="AM or PM"><option value="">AM/PM</option><option value="AM">AM</option><option value="PM">PM</option></select></div><input name="time" type="hidden"><span id="time-validation" class="field-validation" aria-live="polite">Choose hour, minute, and AM or PM.</span></div>
-          <label>Place of birth (city) <input name="place" autocomplete="address-level2" placeholder="e.g. Colombo"><span class="field-hint">Recorded on your profile; local clock time is used.</span></label>
+          <label>Birth record calendar <select name="calendar" id="birth-calendar"><option value="gregorian">Gregorian / New Style</option><option value="julian">Julian / Old Style</option></select><span class="field-hint">For historical records, choose the calendar actually used.</span></label>
+          <div class="time-field"><span class="field-label" id="time-label">Time of birth</span><select id="time-certainty" name="timeCertainty" aria-label="Birth time precision"><option value="exact">Known to the minute</option><option value="hour">Only the hour is known</option><option value="unknown">Unknown</option></select><div class="time-controls" role="group" aria-labelledby="time-label" aria-describedby="time-validation"><select id="time-hour" aria-label="Birth hour"><option value="">Hour</option></select><select id="time-minute" aria-label="Birth minute"><option value="">Minute</option></select><select id="time-period" aria-label="AM or PM"><option value="">AM/PM</option><option value="AM">AM</option><option value="PM">PM</option></select></div><input name="time" type="hidden"><span id="time-validation" class="field-validation" aria-live="polite">Choose hour, minute, and AM or PM.</span></div>
+          <label>Place of birth (city) <input name="place" autocomplete="address-level2" placeholder="e.g. Colombo"><span class="field-hint">Used to resolve Lilly’s coordinates and historical time zone.</span></label>
+          <div class="location-choice" id="location-choice" hidden><label for="location-result">Choose the matching birthplace</label><select id="location-result"><option value="">Choose a city</option></select><small>Place data © OpenStreetMap contributors.</small></div>
+          <div class="location-choice" id="offset-choice" hidden><label for="offset-result">Choose the historical clock offset</label><select id="offset-result"><option value="">Choose the offset used at birth</option></select><small>This local time occurred twice during a clock change.</small></div>
           <label>Show seasons from <select name="from" id="from-year"></select><span class="field-hint">Choose the first year to show in your reading.</span></label>
         </div>
         <div class="form-footer"><button class="button button-gold" type="submit">Reveal my reading <span aria-hidden="true">↗</span></button><p>Calculated on this page. No account or payment needed.</p></div>
@@ -92,20 +95,20 @@
         <p class="celestial-swipe">Swipe to explore the whole wheel <span aria-hidden="true">→</span></p>
         <div id="celestial-details" class="celestial-details"></div>
         <div id="hierarchy-popover" class="hierarchy-popover" role="dialog" aria-label="Celestial detail" aria-modal="false" hidden></div>
-        <p class="celestial-note">The constellation is the traditional counterpart of your calculated sign. This symbolic diagram does not chart the physical sky at birth.</p>
-        <p class="reading-citation"><strong>Sources:</strong> Wheel layout adapted from the supplied <cite>Guide</cite> and <cite>Seven Spirits</cite> diagrams. Sign position follows Sepharial, <cite>Kabalistic Astrology</cite>, ch. I, PDF pp. 14–15; the 72-name roster follows <a href="https://iapsop.com/ssoc/1823__lenain___science_cabalistique.pdf" target="_blank" rel="noopener noreferrer">Lenain, <cite>La Science Cabalistique</cite> (1823), Tables II–IV</a>.</p>
+        <p class="celestial-note">Tribal correspondence — camp-order tradition. The highlighted zodiac sign represents the birth Sun in each available method; when the signs differ, both corresponding tribes are highlighted. Other tribal arrangements exist. This illustration is simplified and does not chart physical constellation positions.</p>
+        <p class="reading-citation"><strong>Sources:</strong> Wheel layout adapted from the supplied <cite>Guide</cite> and <cite>Seven Spirits</cite> diagrams. Planetary angel names and pairs follow the supplied Seven Spirits tradition, not Lenain. Sepharial’s symbolic sign follows <cite>Kabalistic Astrology</cite>, ch. I. The camp-order tribe mapping follows <a href="https://jewishvirtuallibrary.org/jsource/judaica/ejud_0002_0021_0_21598.html" target="_blank" rel="noopener noreferrer">Encyclopaedia Judaica’s “Zodiac” entry</a>; <a href="https://inner.org/responsa/leter1/resp5.htm" target="_blank" rel="noopener noreferrer">Gal Einai</a> discusses alternative arrangements. The 72-name roster follows <a href="https://iapsop.com/ssoc/1823__lenain___science_cabalistique.pdf" target="_blank" rel="noopener noreferrer">Lenain, <cite>La Science cabalistique</cite>, Tables II–IV</a>.</p>
       </section>
       <section class="result-chapter" aria-labelledby="angel-title">
         <div class="chapter-heading"><span>I</span><h3 id="angel-title">Your guardian angels</h3></div>
-        <p class="chapter-lead">These guardian angel correspondences use your birth date and local birth time. The portraits are illustrative.</p>
+        <p class="chapter-lead">Lenain’s physical and character correspondences use the civil birth date; the spirit correspondence uses the entered local clock time in twenty-minute intervals from midnight. These are abridged historical summaries, not verified effects. The portraits are illustrative.</p>
         <div id="angel-cards" class="angel-cards"></div>
         <p class="reading-citation"><strong>Sources:</strong> <a href="https://iapsop.com/ssoc/1823__lenain___science_cabalistique.pdf" target="_blank" rel="noopener noreferrer">Lenain, <cite>La Science Cabalistique</cite> (1823), Tables II–IV, pp. 28–38</a>, for the three date and time correspondences; <a href="https://magick.ly/books/la-science-cabalistique/chapitre-6" target="_blank" rel="noopener noreferrer">English reading edition, ch. VI</a>, for the angel attributes. Portraits are illustrative.</p>
       </section>
       <section class="result-chapter" aria-labelledby="governance-title">
         <div class="chapter-heading"><span>II</span><h3 id="governance-title">The heavens at your birth</h3></div>
-        <p class="chapter-lead">Your sign and key number are calculated from your birth details.</p>
+        <p class="chapter-lead">Lilly’s astronomical positions use the resolved birthplace and historical clock rules. Sepharial’s Sun degree and key are symbolic. A corresponding tribe is a traditional association, not a statement about ancestry or a converted Hebrew birth month.</p>
         <div class="governance-grid"><div id="governance-sign" class="governance-panel"></div><div id="summary-content" class="governance-panel"></div></div>
-        <p class="reading-citation"><strong>Sources:</strong> Sepharial, <cite>Kabalistic Astrology</cite>, ch. I, PDF pp. 14–15 (Sun degree and noon boundary); chs. III and VI, pp. 18–19, 31–32 (name values and key number); ch. VII, pp. 35–37 (sign portrait).</p>
+        <p class="reading-citation"><strong>Sources:</strong> William Lilly, <cite>Christian Astrology</cite>, Book III (natal chart and Regiomontanus tables); Sepharial, <cite>Kabalistic Astrology</cite>, ch. I (symbolic Sun and noon boundary), chs. III and VI (name values and key), ch. VII (sign portrait). The astronomical engine calculates positions; generic modern dignity or aspect interpretations are not attributed to Lilly.</p>
       </section>
       <section class="result-chapter" aria-labelledby="seasons-title">
       <div class="chapter-heading"><span>III</span><h3 id="seasons-title">Your seasons, year by year</h3></div>
@@ -120,9 +123,9 @@
       </div>
       <div id="year-grid" class="year-grid"></div>
       <article id="year-detail" class="year-detail"></article>
-      <p class="reading-citation"><strong>Sources:</strong> Sepharial, <cite>Kabalistic Astrology</cite>, chs. XIII and XV, PDF pp. 57–59, 64–69 (annual point, houses, and rising sign); <cite>The Kabala of Numbers</cite> (1911), pp. 132–133 (age plus year cycle). Card descriptions are shortened paraphrases.</p>
+      <p class="reading-citation"><strong>Sources:</strong> William Lilly, <cite>Christian Astrology</cite>, Book III, ch. CLXVI (annual profection and solar return); Sepharial, <cite>Kabalistic Astrology</cite>, chs. XIII and XV, printed pp. 54–55 and 62–66 (annual points 1–28, symbolic houses and changing signs); <cite>The Kabala of Numbers</cite> (1911), printed pp. 27–29 and 132–133 (separate 22-point age cycle). Interpretations are shortened paraphrases.</p>
       </section>
-      <div class="source-limit"><strong>About the limits of this reading</strong><p id="limit-text"></p><p>These correspondences are symbolic, and the art is illustrative. Birth dates from 15–19 March and 29 February have no numbered date assignment.</p></div>
+      <div class="source-limit"><strong>About the limits of this reading</strong><p id="limit-text"></p><p>Lenain assigns 20 March through 14 March to numbered date guardians; 15–19 March are five special days outside that numbered sequence. This application leaves 29 February unnumbered too; Lenain’s leap-year discussion allows more than one reading. Time slots use entered civil clock time, from 00:00–00:19 through 23:40–23:59; no conversion to solar time is implied. The art is illustrative.</p></div>
     </section>
     <section class="recovery-section" id="recovery" aria-labelledby="recovery-title">
       <button id="recovery-open" class="recovery-card" type="button" aria-haspopup="dialog" aria-controls="recovery-dialog">

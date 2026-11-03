@@ -1,5 +1,12 @@
 /* Sepharial data; see SOURCE_NOTES.md. */
 export const SIGNS=["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+// Camp-order tradition (Yalkut Shimoni, Lev. 418); not a claim about ancestry.
+export const TRIBES=[
+  {tribe:'Judah',month:'Nisan'},{tribe:'Issachar',month:'Iyar'},{tribe:'Zebulun',month:'Sivan'},
+  {tribe:'Reuben',month:'Tammuz'},{tribe:'Simeon',month:'Av'},{tribe:'Gad',month:'Elul'},
+  {tribe:'Ephraim',month:'Tishrei'},{tribe:'Manasseh',month:'Cheshvan'},{tribe:'Benjamin',month:'Kislev'},
+  {tribe:'Dan',month:'Tevet'},{tribe:'Asher',month:'Shevat'},{tribe:'Naphtali',month:'Adar'}
+];
 export const PORTRAIT={
 Aries:["Great ambitions; honours; boldness; aptitude; courage; prominence.","Generous, courageous, worthy, ingenious and well-informed; at times fickle."],
 Taurus:["Changes; voyages; durable and lasting affairs; fruitfulness; public affairs.","Imaginative, impulsive, laborious, calm and patient in work; proud."],
@@ -35,7 +42,37 @@ export const POINTS={
 19:["A Season of Blessing","Good fortune; successful marriage; honours; glory; happy associations.","good"],
 20:["The Call to Readiness","Continual hindrances yet unexpected elevation; a call to be ready.","mixed"],
 21:["The Crown of Honour","Dignities; honours; success; aspirations attained.","good"],
-22:["The Trap of Presumption","The trap of presumption: success followed by loss, entrapment, and final catastrophe.","bad"]};
+22:["The Trap of Presumption","The trap of presumption: success followed by loss, entrapment, and final catastrophe.","bad"],
+23:["Royal Star of Leo","Patronage from people in authority; recognition and success.","good"],
+24:["High Associations","Association with people of rank; assistance through women of position.","good"],
+25:["High Office","High office and patronage; contests, experience, and the fruits of action.","mixed"],
+26:["Unfruitful Enterprise","Unfruitful enterprises, adverse combinations, or misuse of one's abilities.","bad"],
+27:["The Sceptre","Authority, creative intelligence, successful enterprises, and fruitful work.","good"],
+28:["Rivalry","Rivals and opposition; vigilance against loss and harmful associations.","bad"]};
+// The Kabala of Numbers (1911), printed pp. 27–29 and 133: a distinct 22-key cycle.
+export const AGE_POINTS={
+1:["The Magician","Creative will, initiative, and mastery of physical forces.","good"],
+2:["The Priestess","Imagination, attraction and repulsion, and creative knowledge.","mixed"],
+3:["The Empress","Ideas, production, growth, and abundance.","good"],
+4:["The Emperor","Foundation, establishment, and practical achievement.","good"],
+5:["The Hierophant","Teaching, discipline, religion, and liberty within law.","neutral"],
+6:["The Two Ways","Discrimination, conscience, duties, and relationships.","mixed"],
+7:["The Chariot of Osiris","Intellect, sensation, and the fulfilment of ambitions.","good"],
+8:["Justice","Judgment, reason, moderation, and impartiality.","neutral"],
+9:["The Hermit","Prudence, inquiry, discovery, and careful selection.","neutral"],
+10:["The Wheel of Fortune","Cause and effect, recurring patterns, and change.","mixed"],
+11:["The Muzzled Lion","Determination, mastery, vitality, and directed force.","good"],
+12:["The Sacrifice","Reversal, loss, undoing, and changed perspective.","bad"],
+13:["Death the Reaper","Change, reaction, collapse, and an ending.","bad"],
+14:["The Two Urns","Vital forces, friendship, social obligations, and mutual affection.","good"],
+15:["Typhon","Passion, wilfulness, controversy, and disorder.","bad"],
+16:["The Stricken Tower","Sudden upheaval, accident, and the cost of pride.","bad"],
+17:["The Star","Faith, hope, intuition, and expectation.","good"],
+18:["The Twilight","Doubt, hesitation, and adverse change.","bad"],
+19:["The Great Light","Vitality, joy, attainment, and recognition.","good"],
+20:["The Resurrection","Awakening, aspiration, activity, and a new phase of work.","good"],
+21:["The Crown","Endurance, position, honours, and distinction.","good"],
+22:["Folly","Error, credulity, vanity, and the need for care.","bad"]};
 export const HOUSE_PASS={
 1:["I","Your birth sign returns to the first house: a year judged by your own sign and nature.","neutral"],
 12:["XII","Troubles hard to overcome; obstacles in all affairs; sickness; bad for travel, negotiation or contest; treachery among supposed friends; sorrows and persecutions.","bad"],

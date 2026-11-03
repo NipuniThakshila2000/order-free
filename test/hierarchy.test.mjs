@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {calculateReading} from '../src/reading.mjs';
 import {buildHierarchyMarkup, getHierarchyInfo, getHierarchySelection} from '../src/hierarchy.mjs';
 import {ANGEL_QUALITIES} from '../src/angel-qualities.mjs';
+import {SIGNS, TRIBES, ANGEL_NAMES} from '../src/source-data.mjs';
 
 const example = calculateReading({given:'Anna', surname:'Smith', date:'2000-03-25', time:'00:20'});
 
@@ -43,6 +44,26 @@ test('provides a distinct historical attribute and sphere for every angel positi
   assert.equal(getHierarchyInfo('angel:10').title, 'Lauviah');
   assert.equal(getHierarchyInfo('angel:16').title, 'Lauviah');
   assert.notEqual(getHierarchyInfo('angel:10').body, getHierarchyInfo('angel:16').body);
-  assert.match(getHierarchyInfo('constellation:7').subtitle, /Scorpion/);
+  assert.equal(getHierarchyInfo('constellation:7').title, 'Manasseh');
+  assert.match(getHierarchyInfo('constellation:7').subtitle, /Scorpio/);
   assert.match(getHierarchyInfo('planet:Mars').subtitle, /Uriel/);
+});
+
+test('uses all twelve camp-order tribes and retains the original wheel positions and angels', () => {
+  assert.deepEqual(TRIBES.map((item) => item.tribe),['Judah','Issachar','Zebulun','Reuben','Simeon','Gad','Ephraim','Manasseh','Benjamin','Dan','Asher','Naphtali']);
+  assert.deepEqual(SIGNS,['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces']);
+  assert.equal(ANGEL_NAMES[10],'Lauviah');
+  assert.equal(ANGEL_NAMES[16],'Lauviah');
+  const {svg}=buildHierarchyMarkup(example);
+  assert.equal((svg.match(/class="wheel-tribe"/g)||[]).length,12);
+  assert.equal((svg.match(/class="wheel-sign-name"/g)||[]).length,12);
+  assert.match(svg,/Judah, corresponding tribe for Aries/);
+});
+
+test('highlights both tribes when the astronomical and symbolic Sun signs differ', () => {
+  const reading={...example,lilly:{sun:{sign:'Taurus'}}};
+  const {svg,roster}=buildHierarchyMarkup(reading);
+  assert.equal((svg.match(/wheel-constellation is-active/g)||[]).length,2);
+  assert.match(roster,/Lilly: Issachar \(Taurus\)/);
+  assert.match(roster,/Sepharial: Judah \(Aries\)/);
 });

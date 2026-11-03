@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {calculateReading} from './src/reading.mjs';
+import {searchBirthplaces} from './src/location.mjs';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const port = Number(process.env.PORT || 3000);
@@ -23,6 +24,12 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method !== 'GET') { res.writeHead(405); res.end(); return; }
     const url = new URL(req.url, `http://localhost:${port}`);
+    if (url.pathname === '/api/geocode') {
+      const results = await searchBirthplaces(url.searchParams.get('q'));
+      res.writeHead(200, {'content-type':'application/json; charset=utf-8', 'cache-control':'public, max-age=3600'});
+      res.end(JSON.stringify({results}));
+      return;
+    }
     const requested = url.pathname === '/' ? '/index (2).html' : decodeURIComponent(url.pathname);
     const filename = path.resolve(root, '.' + requested);
     if (!filename.startsWith(root + path.sep)) { res.writeHead(403); res.end(); return; }
