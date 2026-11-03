@@ -27,15 +27,19 @@ test('keeps registration closed without sheet configuration', async () => {
 test('validates and forwards a complete registration to the sheet script', async () => {
   const previousUrl = process.env.GOOGLE_SCRIPT_URL;
   const previousToken = process.env.REGISTRATION_TOKEN;
+  const previousOpen = process.env.REGISTRATION_OPEN;
   const previousFetch = globalThis.fetch;
   process.env.GOOGLE_SCRIPT_URL = 'https://example.com/exec';
   process.env.REGISTRATION_TOKEN = 'private-test-token';
+  delete process.env.REGISTRATION_OPEN;
   let forwarded;
   globalThis.fetch = async (_url, options) => {
     forwarded = JSON.parse(options.body);
     return {ok: true, json: async () => ({ok: true})};
   };
   try {
+    assert.deepEqual((await call('GET')).body, {ready: false});
+    process.env.REGISTRATION_OPEN = 'true';
     assert.equal((await call('POST', {firstName:'', lastName:'Doe', email:'jane@example.com', attendance:'online'})).statusCode, 400);
     const saved = await call('POST', {firstName:'Jane', lastName:'Doe', email:'jane@example.com', attendance:'in-person'});
     assert.deepEqual(saved.body, {ok: true});
@@ -44,6 +48,7 @@ test('validates and forwards a complete registration to the sheet script', async
   } finally {
     if (previousUrl === undefined) delete process.env.GOOGLE_SCRIPT_URL; else process.env.GOOGLE_SCRIPT_URL = previousUrl;
     if (previousToken === undefined) delete process.env.REGISTRATION_TOKEN; else process.env.REGISTRATION_TOKEN = previousToken;
+    if (previousOpen === undefined) delete process.env.REGISTRATION_OPEN; else process.env.REGISTRATION_OPEN = previousOpen;
     globalThis.fetch = previousFetch;
   }
 });

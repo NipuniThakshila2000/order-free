@@ -4,9 +4,10 @@ export default async function handler(request, response) {
   response.setHeader('Cache-Control', 'no-store');
   const scriptUrl = process.env.GOOGLE_SCRIPT_URL;
   const token = process.env.REGISTRATION_TOKEN;
-  if (request.method === 'GET') return response.status(200).json({ready: Boolean(scriptUrl && token)});
+  const ready = Boolean(scriptUrl && token && process.env.REGISTRATION_OPEN === 'true');
+  if (request.method === 'GET') return response.status(200).json({ready});
   if (request.method !== 'POST') return response.status(405).json({error: 'Method not allowed.'});
-  if (!scriptUrl || !token) return response.status(503).json({error: 'Registration is not open yet.'});
+  if (!ready) return response.status(503).json({error: 'Registration is not open yet.'});
 
   const {firstName, lastName, email, attendance, website} = request.body || {};
   if (website) return response.status(200).json({ok: true}); // Hidden spam trap.
