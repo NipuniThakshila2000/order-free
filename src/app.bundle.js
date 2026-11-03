@@ -6906,7 +6906,16 @@
     }
     return candidates.find((item) => item.minutes === requestedOffset) || candidates[0];
   }
+  var wrap = (degrees) => (degrees % 360 + 360) % 360;
   var signed = (degrees) => ((degrees + 180) % 360 + 360) % 360 - 180;
+  function houseForLongitude(longitude, cusps) {
+    for (let index = 0; index < 12; index++) {
+      const start = cusps[index].longitude;
+      const span = wrap(cusps[(index + 1) % 12].longitude - start);
+      if (wrap(longitude - start) < span) return index + 1;
+    }
+    return null;
+  }
   function solarLongitude(utcMillis) {
     const date = new Date(utcMillis);
     const jd = time_exports.toJulianDate({ year: date.getUTCFullYear(), month: date.getUTCMonth() + 1, day: date.getUTCDate(), hour: date.getUTCHours(), minute: date.getUTCMinutes(), second: date.getUTCSeconds() + date.getUTCMilliseconds() / 1e3, timezone: 0 });
@@ -6943,6 +6952,7 @@
       const firstIndex = (ascendant.sign + index) % 12;
       const secondIndex = (firstIndex + 1) % 12;
       const transition = start + (end - start) * (30 - ascDegree) / 30;
+      const profectionLongitude = wrap(ascendant.longitude + 30 * index);
       return {
         start: new Date(start).toISOString(),
         end: new Date(end).toISOString(),
@@ -6952,7 +6962,9 @@
         nextSign: SIGNS[secondIndex],
         nextRuler: RULERS[secondIndex],
         transition: new Date(transition).toISOString(),
-        natalDegree: ascDegree
+        natalDegree: ascDegree,
+        profectionLongitude,
+        profectionHouse: houseForLongitude(profectionLongitude, chart.houses.cusps)
       };
     });
     return {
@@ -7703,6 +7715,22 @@
     });
   }
 
+  // src/lilly-passages.mjs
+  var ASCENDANT_PROFECTION_PASSAGES = Object.freeze({
+    1: "When the Progression of the Ascendant or the Moon, shall come to the 1st House, the Native is usually cheerfull, and it implies a fit yeer to provide what is necessary for the Body, either Cloathes, victuals, &c.",
+    2: "When to the 2nd house, it\u2019s good to buy and sell Commodities, and argues a proper time for encrease of Estate.",
+    3: "When to the 3rd, the Native may prosper in Journeys and it inclines him to converse with his Kindred and religious men.",
+    4: "When to the 4th, he may expect some Inheritance, a new House, or a blessing from his Parents; he may search for Wealth out of the bowels of the Earth, or deale in Mines, &c. he may build or repaire; yet the Native may be sorrowfull, full of fear, in danger of Water, it\u2019s not good to goe long Journeys, &c.",
+    5: "When to the 5th, the Native takes pleasure according to his yeers, either at Schoole with his equals, or with women, if capable, or according to the yeers of his age when this happpens; it\u2019g good to make Covenants, send Letters, perfect Accompts, put on new Cloathes.",
+    6: "When to the 6th, he may feare a sicknesse, the hatred of many vulgar people, continuing a long time: beware of ill Servants, make no Journeys, an ill time to deale in Merchandize, in Contracts, in Bargaines, &c.",
+    7: "When to the 7th, the Native is forward and impatient, easily inclined to Women and Wantonnesse, many open enemies arise against him, it\u2019s good to marry, the other Significators concurring; oppressed with wangling, vexed with suits or contentions; if the Native radically incline to Souldiery, it now puts him forward and inclines unto quarreling.",
+    8: "When to the 8th, either his Body or his Goods suffer, subject to be abused by lyes, slanders, treacheries, and sometimes death, if the Hyleg come to any mortall Direction: It is not good to make Contracts, or to be too adventurous in Trade, &c.",
+    9: "When to the 9th, it points out a convenient time to undertake long Journeys, it\u2019s good to study and to follow Learning, and to be familiar with Church-men, to study Chymistry, for it shewes a mind and fancy inclinable to curiosities, &c.",
+    10: "When to the 10th, the Native is inclinable to be ambitious, or to endeavour Preferment, and to be conversant with eminent men, Magistrates, Nobels, &c. and he (if capable) attains Preferment, or public employment in the Common-wealth; it notes a fit time in the Tradesman to follow his employment with industry, for it promiseth him much encrease; he may navigate or journey by Land or Sea with good safety and reputation, shall be much esteemed.",
+    12: "When to the 12th, the Native will be sickly, yet hardly find out or discover the cause, be in continuall emnity with ill Neighbours, and none knowes for what; he will be in danger of imprisonment or banishment, or hiding his head, unlesse the 12th house in the Radix was fortunate, it imports an unlucky yeer for dealing in great Cattle, and adviseth the Native to beware of Horsemanship, Horese-races, &c."
+  });
+  var LILLY_JUDGEMENT_LIMIT = "Lilly says profections must be judged with directions, natal conditions, planetary strength and the annual revolution. This page has not calculated those additional judgements, so the passage is historical source text, not a personal prediction.";
+
   // src/app.mjs
   var form = document.querySelector("#reading-form");
   var programForm = document.querySelector("#program-registration-form");
@@ -8033,6 +8061,8 @@
     select.value = String(index);
     const year = years[index];
     const tone = toneClass(year.pointTone);
+    const lillyYear = year.lilly;
+    const lillyPassage = lillyYear && ASCENDANT_PROFECTION_PASSAGES[lillyYear.profectionHouse];
     timelineTrack.querySelector(".timeline-mark.active")?.classList.remove("active");
     const activeMark = timelineTrack.querySelector(`.timeline-mark[data-index="${index}"]`);
     if (activeMark) {
@@ -8045,8 +8075,16 @@
     <div class="rising-note"><b>Christ above every season</b><span>These historical symbols invite reflection; they do not determine your future or your redemption in Christ.</span></div>
     <div class="detail-grid">
       <div><small>01 / YEAR-PLUS-AGE POINT</small><h5>Point ${year.pointNumber}</h5><p>${escapeHtml(year.pointText)}</p><span>${escapeHtml(year.pointName)} \xB7 ${toneLabel[tone]}</span></div>
-      <div><small>02 / YOUR SIGN'S HOUSE</small><h5>${year.house ? `House ${year.house}` : "Birth time needed"}</h5><p>${year.house ? "A historical house correspondence for this year." : "This correspondence requires a birth time."}</p></div>
-      <div><small>03 / PROCESSIONAL SIGN</small><h5>${year.rising ? `${escapeHtml(displaySign(year.rising))} \u2192 ${escapeHtml(displaySign(year.risingNext))}` : "Birth time needed"}</h5><p>${year.rising ? "A symbolic sequence, shown without a forecast." : "This sequence requires a birth time."}</p></div>
+      <div><small>02 / SEPHARIAL'S HOUSE CORRESPONDENCE</small><h5>${year.house ? `House ${year.house}` : "Birth time needed"}</h5><p>${year.house ? escapeHtml(year.houseText) : "This correspondence requires a birth time."}</p></div>
+      <div><small>03 / SEPHARIAL'S PROCESSIONAL SIGN</small><h5>${year.rising ? `${escapeHtml(displaySign(year.rising))} \u2192 ${escapeHtml(displaySign(year.risingNext))}` : "Birth time needed"}</h5><p>${year.rising ? escapeHtml(year.risingText) : "This sequence requires a birth time."}</p></div>
+    </div>
+    <div class="lilly-future"><small>WILLIAM LILLY \xB7 CHRISTIAN ASTROLOGY, BOOK III, CHAPTER CLXIX</small>
+      ${lillyYear ? `<h5>Annual profection: ${escapeHtml(displaySign(lillyYear.sign))} \xB7 ${escapeHtml(lillyYear.ruler)} \xB7 natal house ${lillyYear.profectionHouse}</h5>
+        <p class="lilly-future-lead">Lilly's description for the house reached by the profected Ascendant:</p>
+        <blockquote>${lillyPassage ? escapeHtml(lillyPassage) : "The source moves directly from the tenth to the twelfth house. Lilly supplies no eleventh-house passage in this chapter."}</blockquote>
+        <p class="lilly-future-transition">The profection then enters ${escapeHtml(displaySign(lillyYear.nextSign))}, ruled by ${escapeHtml(lillyYear.nextRuler)}, within this annual period.</p>` : `<h5>Birth place and exact time needed</h5><p>Lilly's Ascendant profection requires a resolved birth place and exact birth time.</p>`}
+      <p class="lilly-future-limit">${escapeHtml(LILLY_JUDGEMENT_LIMIT)}</p>
+      <a href="https://www.worldastrology.net/wp-content/uploads/2008/12/CA-III.pdf" target="_blank" rel="noopener noreferrer">Read Lilly's Book III source \u2197</a>
     </div>
     <div class="age-cycle-note"><b>Reflection in Christ</b><p>Christ is supreme over every age, sign, and symbolic point. These historical classifications cannot determine your life in him.</p></div>`;
   }

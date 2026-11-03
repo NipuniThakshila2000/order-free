@@ -115,6 +115,13 @@
 .result-chapter .detail-grid h5{font-family:Georgia,serif;font-size:19px;color:#f1deba;margin:8px 0}
 .result-chapter .detail-grid p{font-size:14px;color:#d3d8dd}
 .result-chapter .detail-grid span,.result-chapter .detail-source{color:#aebdcc}
+.lilly-future{margin-top:16px;padding:22px;background:#0a1f3a;border:1px solid rgba(214,174,88,.3);border-radius:9px;color:#d7e0e8}
+.lilly-future small{font-size:10px;letter-spacing:.14em;color:#d9b779;font-weight:700}
+.lilly-future h5{font-family:Georgia,serif;font-size:clamp(20px,2.5vw,27px);font-weight:500;color:#f1deba;margin:10px 0}
+.lilly-future p{font-size:14px;line-height:1.6;margin:10px 0}
+.lilly-future blockquote{margin:15px 0;padding:14px 18px;border-left:2px solid var(--gold);background:rgba(214,174,88,.08);font-family:var(--serif);font-size:17px;line-height:1.55}
+.lilly-future .lilly-future-limit{font-size:12px;color:#b4c8d9}
+.lilly-future a{color:#f1cf85;font-size:12px;text-underline-offset:3px}
 @media(max-width:1000px){.result-chapter .year-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:760px){.results{padding:55px 25px}.result-chapter{margin-top:43px}.chapter-heading{gap:11px}.chapter-heading::before{display:none}.chapter-heading h3{font-size:30px}.governance-grid{grid-template-columns:1fr}.result-chapter .angel-card img{aspect-ratio:2/3}.result-chapter .angel-card-copy p{min-height:0}.result-chapter .year-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.result-chapter .year-card{min-height:190px}.result-chapter .detail-grid{grid-template-columns:1fr}}
 @media(max-width:460px){.governance-panel{padding:20px}.governance-facts{grid-template-columns:1fr}.result-chapter .year-card strong{font-size:20px}.result-chapter .year-card{padding:12px;min-height:195px}.result-chapter .year-card i{font-size:14px}}

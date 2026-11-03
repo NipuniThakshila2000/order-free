@@ -3,6 +3,7 @@ import {SIGNS, TRIBES} from './source-data.mjs';
 import {julianRecordToGregorian} from './lilly.mjs';
 import {renderCelestialHierarchy} from './hierarchy.mjs';
 import {displaySign, birthSunLabels} from './display.mjs';
+import {ASCENDANT_PROFECTION_PASSAGES, LILLY_JUDGEMENT_LIMIT} from './lilly-passages.mjs';
 
 const form = document.querySelector('#reading-form');
 const programForm = document.querySelector('#program-registration-form');
@@ -349,6 +350,8 @@ function showYear(index) {
   select.value = String(index);
   const year = years[index];
   const tone = toneClass(year.pointTone);
+  const lillyYear = year.lilly;
+  const lillyPassage = lillyYear && ASCENDANT_PROFECTION_PASSAGES[lillyYear.profectionHouse];
   timelineTrack.querySelector('.timeline-mark.active')?.classList.remove('active');
   const activeMark = timelineTrack.querySelector(`.timeline-mark[data-index="${index}"]`);
   if (activeMark) {
@@ -361,8 +364,17 @@ function showYear(index) {
     <div class="rising-note"><b>Christ above every season</b><span>These historical symbols invite reflection; they do not determine your future or your redemption in Christ.</span></div>
     <div class="detail-grid">
       <div><small>01 / YEAR-PLUS-AGE POINT</small><h5>Point ${year.pointNumber}</h5><p>${escapeHtml(year.pointText)}</p><span>${escapeHtml(year.pointName)} · ${toneLabel[tone]}</span></div>
-      <div><small>02 / YOUR SIGN'S HOUSE</small><h5>${year.house ? `House ${year.house}` : 'Birth time needed'}</h5><p>${year.house ? 'A historical house correspondence for this year.' : 'This correspondence requires a birth time.'}</p></div>
-      <div><small>03 / PROCESSIONAL SIGN</small><h5>${year.rising ? `${escapeHtml(displaySign(year.rising))} → ${escapeHtml(displaySign(year.risingNext))}` : 'Birth time needed'}</h5><p>${year.rising ? 'A symbolic sequence, shown without a forecast.' : 'This sequence requires a birth time.'}</p></div>
+      <div><small>02 / SEPHARIAL'S HOUSE CORRESPONDENCE</small><h5>${year.house ? `House ${year.house}` : 'Birth time needed'}</h5><p>${year.house ? escapeHtml(year.houseText) : 'This correspondence requires a birth time.'}</p></div>
+      <div><small>03 / SEPHARIAL'S PROCESSIONAL SIGN</small><h5>${year.rising ? `${escapeHtml(displaySign(year.rising))} → ${escapeHtml(displaySign(year.risingNext))}` : 'Birth time needed'}</h5><p>${year.rising ? escapeHtml(year.risingText) : 'This sequence requires a birth time.'}</p></div>
+    </div>
+    <div class="lilly-future"><small>WILLIAM LILLY · CHRISTIAN ASTROLOGY, BOOK III, CHAPTER CLXIX</small>
+      ${lillyYear ? `<h5>Annual profection: ${escapeHtml(displaySign(lillyYear.sign))} · ${escapeHtml(lillyYear.ruler)} · natal house ${lillyYear.profectionHouse}</h5>
+        <p class="lilly-future-lead">Lilly's description for the house reached by the profected Ascendant:</p>
+        <blockquote>${lillyPassage ? escapeHtml(lillyPassage) : 'The source moves directly from the tenth to the twelfth house. Lilly supplies no eleventh-house passage in this chapter.'}</blockquote>
+        <p class="lilly-future-transition">The profection then enters ${escapeHtml(displaySign(lillyYear.nextSign))}, ruled by ${escapeHtml(lillyYear.nextRuler)}, within this annual period.</p>`
+        : `<h5>Birth place and exact time needed</h5><p>Lilly's Ascendant profection requires a resolved birth place and exact birth time.</p>`}
+      <p class="lilly-future-limit">${escapeHtml(LILLY_JUDGEMENT_LIMIT)}</p>
+      <a href="https://www.worldastrology.net/wp-content/uploads/2008/12/CA-III.pdf" target="_blank" rel="noopener noreferrer">Read Lilly's Book III source ↗</a>
     </div>
     <div class="age-cycle-note"><b>Reflection in Christ</b><p>Christ is supreme over every age, sign, and symbolic point. These historical classifications cannot determine your life in him.</p></div>`;
 }

@@ -38,6 +38,16 @@ export function resolveHistoricalClock(person, zone, requestedOffset) {
 
 const wrap = (degrees) => ((degrees % 360) + 360) % 360;
 const signed = (degrees) => ((degrees + 180) % 360 + 360) % 360 - 180;
+// Lilly asks which place the profected Ascendant occupied in the radix.
+// Use the natal Regiomontanus cusp intervals rather than assuming equal houses.
+export function houseForLongitude(longitude, cusps) {
+  for (let index=0; index<12; index++) {
+    const start=cusps[index].longitude;
+    const span=wrap(cusps[(index+1)%12].longitude-start);
+    if (wrap(longitude-start)<span) return index+1;
+  }
+  return null;
+}
 function solarLongitude(utcMillis) {
   const date = new Date(utcMillis);
   const jd = time.toJulianDate({year:date.getUTCFullYear(),month:date.getUTCMonth()+1,day:date.getUTCDate(),hour:date.getUTCHours(),minute:date.getUTCMinutes(),second:date.getUTCSeconds()+date.getUTCMilliseconds()/1000,timezone:0});
@@ -75,9 +85,11 @@ export function calculateLilly(person, location, count, requestedOffset) {
     const firstIndex=(ascendant.sign+index)%12;
     const secondIndex=(firstIndex+1)%12;
     const transition=start+(end-start)*(30-ascDegree)/30;
+    const profectionLongitude=wrap(ascendant.longitude+30*index);
     return {start:new Date(start).toISOString(),end:new Date(end).toISOString(),isCurrent:Date.now()>=start && Date.now()<end,
       sign:SIGNS[firstIndex],ruler:RULERS[firstIndex],nextSign:SIGNS[secondIndex],nextRuler:RULERS[secondIndex],
-      transition:new Date(transition).toISOString(),natalDegree:ascDegree};
+      transition:new Date(transition).toISOString(),natalDegree:ascDegree,
+      profectionLongitude,profectionHouse:houseForLongitude(profectionLongitude,chart.houses.cusps)};
   });
   return {available:true,source:'Celestine 0.8.0; geocentric tropical positions, Regiomontanus houses',location,utc:new Date(clock.utc).toISOString(),offsetMinutes:clock.minutes,
     calendar:person.calendar || 'gregorian',astronomicalCivilDate:`${civil.year}-${String(civil.month).padStart(2,'0')}-${String(civil.day).padStart(2,'0')}`,

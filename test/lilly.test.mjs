@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {calculateLilly, resolveHistoricalClock, solarReturnUTC} from '../src/lilly.mjs';
+import {calculateLilly, houseForLongitude, resolveHistoricalClock, solarReturnUTC} from '../src/lilly.mjs';
+import {ASCENDANT_PROFECTION_PASSAGES} from '../src/lilly-passages.mjs';
 
 // Independent Swiss Ephemeris 2.10.03 WASM fixtures (Moshier, tropical,
 // geocentric, mean ecliptic / NONUT, Regiomontanus), 2000-01-01 12:00 UT,
@@ -13,7 +14,7 @@ const swissCusps=[24.07854066014058,67.66738656014849,86.45617746647784,99.52202
 
 test('matches independent Swiss planetary and Regiomontanus positions', () => {
   const chart=calculateLilly({year:2000,month:1,day:1,hour:12,minute:0},
-    {label:'London',latitude:51.5,longitude:-0.1,timezone:'Etc/UTC'},1);
+    {label:'London',latitude:51.5,longitude:-0.1,timezone:'Etc/UTC'},2);
   assert.equal(chart.available,true);
   assert.equal(chart.planets.length,7);
   for (const planet of chart.planets) assert.ok(Math.abs(planet.longitude-swissPlanets[planet.name])<0.003,planet.name);
@@ -21,6 +22,19 @@ test('matches independent Swiss planetary and Regiomontanus positions', () => {
   chart.cusps.forEach((cusp,index) => assert.ok(Math.abs(cusp.longitude-swissCusps[index])<0.001,`house ${index+1}`));
   assert.equal(chart.years[0].sign,'Aries');
   assert.equal(chart.years[0].ruler,'Mars');
+  assert.equal(chart.years[0].profectionHouse,1);
+  assert.equal(chart.years[0].profectionLongitude,chart.ascendant.longitude);
+  assert.equal(chart.years[1].profectionHouse,1);
+  assert.equal(chart.years[1].ruler,'Venus');
+});
+
+test('Lilly profection descriptions cover the source text without inventing an eleventh-house passage', () => {
+  assert.deepEqual(Object.keys(ASCENDANT_PROFECTION_PASSAGES).map(Number),[1,2,3,4,5,6,7,8,9,10,12]);
+  assert.match(ASCENDANT_PROFECTION_PASSAGES[8],/if the Hyleg come to any mortall Direction/);
+  const cusps=swissCusps.map((longitude) => ({longitude}));
+  assert.equal(houseForLongitude(20,cusps),12);
+  assert.equal(houseForLongitude(205,cusps),7);
+  assert.equal(houseForLongitude(280,cusps),10);
 });
 
 test('finds the independent Swiss solar-return boundary', () => {
