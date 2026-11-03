@@ -9,6 +9,12 @@ const submitButton = form.querySelector('[type="submit"]');
 const select = document.querySelector('#year-select');
 const fromYear = document.querySelector('#from-year');
 const dateInput = form.elements.date;
+const timeInput = form.elements.time;
+const timeHour = document.querySelector('#time-hour');
+const timeMinute = document.querySelector('#time-minute');
+const timePeriod = document.querySelector('#time-period');
+timeHour.insertAdjacentHTML('beforeend', Array.from({length:12}, (_, index) => `<option value="${index + 1}">${index + 1}</option>`).join(''));
+timeMinute.insertAdjacentHTML('beforeend', Array.from({length:60}, (_, index) => `<option value="${String(index).padStart(2, '0')}">${String(index).padStart(2, '0')}</option>`).join(''));
 const angelCards = document.querySelector('#angel-cards');
 let reading;
 let windowStartIndex = 0;
@@ -49,7 +55,8 @@ updateFromYears();
 function validateField(input) {
   const value = input.value.trim();
   let message = '';
-  if (!value) message = 'This field is required.';
+  if (input.name === 'time' && (!timeHour.value || !timeMinute.value || !timePeriod.value)) message = 'Choose hour, minute, and AM or PM.';
+  else if (!value) message = 'This field is required.';
   else if (input.name === 'given' || input.name === 'surname') {
     if (!/^[A-Za-z\s'-]+$/.test(value)) message = 'Use A–Z letters, spaces, apostrophes, or hyphens.';
     else if (!/[A-Za-z]/.test(value)) message = 'Enter at least one letter.';
@@ -65,14 +72,23 @@ function validateField(input) {
   note.classList.toggle('is-invalid', Boolean(message));
   note.classList.toggle('is-valid', !message);
   input.setAttribute('aria-invalid', String(Boolean(message)));
+  if (input.name === 'time') [timeHour, timeMinute, timePeriod].forEach((control) => control.setAttribute('aria-invalid', String(Boolean(message))));
   return !message;
 }
 const validatedInputs = ['given', 'surname', 'date', 'time'].map((name) => form.elements[name]);
-validatedInputs.forEach((input) => {
+validatedInputs.filter((input) => input.name !== 'time').forEach((input) => {
   input.addEventListener('blur', () => validateField(input));
   input.addEventListener('input', () => validateField(input));
   input.addEventListener('change', () => validateField(input));
 });
+function updateTime() {
+  if (timeHour.value && timeMinute.value && timePeriod.value) {
+    const hour = Number(timeHour.value) % 12 + (timePeriod.value === 'PM' ? 12 : 0);
+    timeInput.value = `${String(hour).padStart(2, '0')}:${timeMinute.value}`;
+  } else timeInput.value = '';
+  validateField(timeInput);
+}
+[timeHour, timeMinute, timePeriod].forEach((control) => control.addEventListener('change', updateTime));
 
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -80,7 +96,7 @@ form.addEventListener('submit', async (event) => {
   error.hidden = true;
   const invalidInput = validatedInputs.filter((input) => !validateField(input))[0];
   if (invalidInput) {
-    invalidInput.focus();
+    (invalidInput.name === 'time' ? [timeHour, timeMinute, timePeriod].find((control) => !control.value) || timeHour : invalidInput).focus();
     return;
   }
   try {

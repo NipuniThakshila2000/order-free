@@ -321,6 +321,11 @@
 .field-validation{display:block;margin-top:7px;color:#aebed0;font-size:11px;font-weight:400;letter-spacing:normal;line-height:1.4;text-transform:none}
 .field-validation.is-valid{color:#a6e0bc}.field-validation.is-invalid{color:#ffb6a9}
 .form-grid input[aria-invalid="true"]{border-color:#ffb6a9}
+.time-field{min-width:0}.time-field .field-label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:#dfca9b}
+.time-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.time-controls select{min-width:0;padding:11px 7px;font-size:14px}
+.time-controls select[aria-invalid="true"]{border-color:#ffb6a9}
+.time-field input[type="hidden"]{display:none}
 @media(max-width:760px){
   .site-header{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;min-height:64px;padding:10px 20px}
   .site-header .brand{min-width:0;font-size:clamp(10px,2.2vw,12px);letter-spacing:.1em;white-space:nowrap}

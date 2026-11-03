@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="A free symbolic reading of your appointed seasons and guardian angel correspondences.">
   <title>Appointed Seasons | Your Reading</title>
-  <link rel="stylesheet" href="styles.css?v=23">
-  <script defer src="src/app.bundle.js?v=21"></script>
+  <link rel="stylesheet" href="styles.css?v=24">
+  <script defer src="src/app.bundle.js?v=22"></script>
 </head>
 <body>
   <header class="site-header">
@@ -40,7 +40,7 @@
           <label>Christian / given name(s) <input name="given" autocomplete="given-name" placeholder="e.g. William Ewart" aria-describedby="given-validation" required><span id="given-validation" class="field-validation" aria-live="polite">Use A–Z letters; spaces between names are welcome.</span></label>
           <label>Family name (father's surname) <input name="surname" autocomplete="family-name" placeholder="e.g. Gladstone" aria-describedby="surname-validation" required><span id="surname-validation" class="field-validation" aria-live="polite">Use A–Z letters; two-part family names are welcome.</span></label>
           <label>Date of birth <input name="date" type="date" aria-describedby="date-validation" required><span id="date-validation" class="field-validation" aria-live="polite">Choose a real date from 1600 through today.</span></label>
-          <label>Time of birth <input name="time" type="time" aria-describedby="time-validation" required><span id="time-validation" class="field-validation" aria-live="polite">Enter your local birth time in the format shown.</span></label>
+          <div class="time-field"><span class="field-label" id="time-label">Time of birth</span><div class="time-controls" role="group" aria-labelledby="time-label" aria-describedby="time-validation"><select id="time-hour" aria-label="Birth hour"><option value="">Hour</option></select><select id="time-minute" aria-label="Birth minute"><option value="">Minute</option></select><select id="time-period" aria-label="AM or PM"><option value="">AM/PM</option><option value="AM">AM</option><option value="PM">PM</option></select></div><input name="time" type="hidden"><span id="time-validation" class="field-validation" aria-live="polite">Choose hour, minute, and AM or PM.</span></div>
           <label>Place of birth (city) <input name="place" autocomplete="address-level2" placeholder="e.g. Colombo"><span class="field-hint">Recorded on your profile; local clock time is used.</span></label>
           <label>Show seasons from <select name="from" id="from-year"></select><span class="field-hint">Choose the first year to show in your reading.</span></label>
         </div>
