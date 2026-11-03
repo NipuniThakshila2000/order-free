@@ -7676,7 +7676,7 @@
   var programForm = document.querySelector("#program-registration-form");
   var programButton = programForm.querySelector('[type="submit"]');
   var programStatus = document.querySelector("#program-form-status");
-  fetch("/api/register").then((response) => response.json()).then(({ ready }) => {
+  fetch("api/register").then((response) => response.json()).then(({ ready }) => {
     if (!ready) return;
     programButton.disabled = false;
     programButton.textContent = "Register for the free program \u2197";
@@ -7689,7 +7689,7 @@
     programButton.disabled = true;
     programStatus.textContent = "Saving your registration\u2026";
     try {
-      const response = await fetch("/api/register", {
+      const response = await fetch("api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(Object.fromEntries(new FormData(programForm)))
@@ -7840,7 +7840,7 @@
     try {
       const place = placeInput.value.trim();
       if (place && timeCertainty.value === "exact" && (!selectedLocation || place !== locationQuery)) {
-        const response = await fetch(`/api/geocode?q=${encodeURIComponent(place)}`);
+        const response = await fetch(`api/geocode?q=${encodeURIComponent(place)}`);
         if (!response.ok) throw new Error("Birthplace lookup is unavailable. Try again, or leave the place blank for a symbolic reading only.");
         locationMatches = (await response.json()).results || [];
         locationQuery = place;
