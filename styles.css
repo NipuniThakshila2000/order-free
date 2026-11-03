@@ -326,6 +326,8 @@
 .time-controls select{min-width:0;padding:11px 7px;font-size:14px}
 .time-controls select[aria-invalid="true"]{border-color:#ffb6a9}
 .time-field input[type="hidden"]{display:none}
+.reading-citation{margin:20px 0 0;padding:12px 15px;border-left:2px solid rgba(214,174,88,.65);background:rgba(214,174,88,.07);color:#c8d1da;font-size:11px;line-height:1.65}
+.reading-citation strong{color:#efdaa8}.reading-citation cite{font-style:italic}.reading-citation a{color:#f0dcae;text-decoration:underline;text-underline-offset:2px}.reading-citation a:hover{color:#fff1ca}
 @media(max-width:760px){
   .site-header{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;min-height:64px;padding:10px 20px}
   .site-header .brand{min-width:0;font-size:clamp(10px,2.2vw,12px);letter-spacing:.1em;white-space:nowrap}
