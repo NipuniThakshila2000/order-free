@@ -316,3 +316,21 @@
 .season-scripture{margin:15px 0 0;font-family:var(--serif);font-size:18px;font-style:italic;line-height:1.45;color:#cbd4de}
 .recovery-dialog .dialog-scripture{margin:-9px 0 27px;padding-left:14px;border-left:2px solid var(--gold);font-family:var(--serif);font-size:17px;line-height:1.4;color:#e9dcbf}
 @media(max-width:600px){.hero-scripture{font-size:17px;margin-bottom:17px}.season-scripture{font-size:16px}}
+
+.nav-cta-short{display:none}
+@media(max-width:760px){
+  .site-header{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;min-height:64px;padding:10px 20px}
+  .site-header .brand{min-width:0;font-size:clamp(10px,2.2vw,12px);letter-spacing:.1em;white-space:nowrap}
+  .site-header .brand-mark{font-size:21px;margin-right:5px}
+  .site-header nav{width:auto;min-width:0;justify-content:flex-end;flex-shrink:0}
+  .site-header .nav-cta{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:42px;padding:8px 11px;white-space:nowrap;text-align:center}
+  .site-header .nav-cta span:last-child{margin-left:0}
+}
+@media(max-width:420px){
+  .site-header{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;flex-direction:row;flex-wrap:nowrap;gap:7px;padding:9px 14px}
+  .site-header nav{width:auto}
+  .site-header .brand{font-size:10px;letter-spacing:.065em}
+  .site-header .nav-cta{width:auto;font-size:10px;padding:7px 8px}
+  .nav-cta-long{display:none}
+  .nav-cta-short{display:inline}
+}
