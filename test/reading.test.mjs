@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {calculateReading, bookSun} from '../src/reading.mjs';
+import {ANGEL_NAMES} from '../src/source-data.mjs';
 
 test('reproduces Sepharial’s worked Gladstone example', () => {
   const reading = calculateReading({given:'William Ewart', surname:'Gladstone', date:'1809-12-29', time:'06:00'});
@@ -31,4 +32,34 @@ test('preserves the optional city without changing the calculation', () => {
   const withPlace = calculateReading({...input, place:'Colombo'});
   assert.equal(withPlace.person.place, 'Colombo');
   assert.equal(withPlace.method.key, withoutPlace.method.key);
+});
+
+test('reproduces the 1911 age-plus-year Tarot cycle example', () => {
+  const reading = calculateReading({given:'Anna', surname:'Smith', date:'1864-04-01', time:'08:00'});
+  const firstBirthday = reading.years.find((year) => year.year === 1865);
+  const secondBirthday = reading.years.find((year) => year.year === 1866);
+  assert.deepEqual([firstBirthday.ageAttained, firstBirthday.ageCycleSum, firstBirthday.agePointNumber], [1, 1866, 21]);
+  assert.deepEqual([secondBirthday.ageAttained, secondBirthday.ageCycleSum, secondBirthday.agePointDigitSum, secondBirthday.agePointNumber], [2, 1868, 23, 1]);
+});
+
+test('wraps an annual signature above the 22 Tarot points', () => {
+  const reading = calculateReading({given:'Anna', surname:'Smith', date:'1700-03-25', time:'08:00'});
+  const year = reading.years.find((item) => item.year === 1756);
+  assert.deepEqual([year.pointSum, year.pointDigitSum, year.pointNumber], [1769, 23, 1]);
+});
+
+test('assigns guardian angels from Lenain’s three birth-date and time tables', () => {
+  const reading = calculateReading({given:'Anna', surname:'Smith', date:'2000-03-25', time:'00:20'});
+  assert.equal(ANGEL_NAMES.length, 72);
+  assert.deepEqual(reading.guardianAngels.map((angel) => angel.name), ['Jeliel', 'Lelahel', 'Jeliel']);
+  assert.match(reading.guardianAngels[0].basis, /25 March–29 March/);
+  assert.match(reading.guardianAngels[1].basis, /position 6/);
+  assert.match(reading.guardianAngels[2].basis, /00:20–00:40/);
+});
+
+test('leaves Lenain’s unnumbered calendar dates unassigned', () => {
+  for (const date of ['2000-02-29', '2000-03-15']) {
+    const reading = calculateReading({given:'Anna', surname:'Smith', date, time:'23:59'});
+    assert.deepEqual(reading.guardianAngels.map((angel) => angel.name), [null, null, 'Mumiah']);
+  }
 });

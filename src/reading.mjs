@@ -1,11 +1,38 @@
-import {SIGNS, PORTRAIT, POINTS, HOUSE_PASS, RISING, LETTER, MONTH_START, DOUBLED, MN} from './source-data.mjs';
+import {SIGNS, PORTRAIT, POINTS, HOUSE_PASS, RISING, LETTER, MONTH_START, DOUBLED, MN, ANGEL_NAMES} from './source-data.mjs';
 
 const clampYear = (year) => Number.isInteger(year) && year >= 1600 && year <= new Date().getFullYear();
 const sumDigits = (value) => [...String(value)].reduce((sum, digit) => sum + Number(digit), 0);
+const cyclePoint = (value) => ((sumDigits(value) - 1) % 22) + 1;
+
+function guardianAngelsFor(person) {
+  // Lenain's date tables start on 20 March in a 360-day cycle. The remaining
+  // dates, including leap day, have no numbered date assignment in the tables.
+  const leapDay = person.month === 2 && person.day === 29;
+  const tableYear = person.month > 3 || (person.month === 3 && person.day >= 20) ? 2001 : 2002;
+  const dayOffset = leapDay ? 365 : Math.round((Date.UTC(tableYear, person.month - 1, person.day) - Date.UTC(2001, 2, 20)) / 86400000);
+  const hasDateAngel = dayOffset < 360;
+  const date = `${person.day} ${MN[person.month - 1]}`;
+  const makeAngel = (role, number, basis) => ({role, number, name: number ? ANGEL_NAMES[number - 1] : null, basis});
+  const clock = (minutes) => `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
+  const formatTableDate = (offset) => {
+    const day = new Date(Date.UTC(2001, 2, 20) + offset * 86400000);
+    return `${day.getUTCDate()} ${MN[day.getUTCMonth()]}`;
+  };
+  const intervalStart = Math.floor(dayOffset / 5) * 5;
+  const timeStart = Math.floor((person.hour * 60 + person.minute) / 20) * 20;
+  return [
+    makeAngel('Physical guardian angel', hasDateAngel ? Math.floor(dayOffset / 5) + 1 : null,
+      hasDateAngel ? `Born ${date}; the five-day interval is ${formatTableDate(intervalStart)}–${formatTableDate(intervalStart + 4)}.` : `${date} has no numbered birth-date correspondence.`),
+    makeAngel('Character guardian angel', hasDateAngel ? dayOffset % 72 + 1 : null,
+      hasDateAngel ? `Born ${date}; day ${dayOffset + 1} from 20 March gives position ${dayOffset % 72 + 1} in the repeating 72-day cycle.` : `${date} has no numbered birth-date correspondence.`),
+    makeAngel('Spirit guardian angel', Math.floor(timeStart / 20) + 1,
+      `Local birth time ${clock(person.hour * 60 + person.minute)} falls in the ${clock(timeStart)}–${clock(timeStart + 20)} interval.`)
+  ];
+}
 
 export function nameValue(name) {
   const letters = name.toUpperCase().replace(/[^A-Z]/g, '');
-  if (!letters) throw new Error('Names must contain Latin letters for the book’s English alphabet table.');
+  if (!letters) throw new Error('Names must contain A–Z letters for this calculation.');
   return [...letters].reduce((sum, letter, index) => sum + LETTER[letter] * (letters.length - index), 0);
 }
 
@@ -24,7 +51,7 @@ function validateInput(input) {
   const date = String(input.date || '');
   const time = String(input.time || '');
   if (!given || !surname || !date || !time) throw new Error('Enter your full given name, family name, birth date, and birth time.');
-  if (!/^[A-Za-z\s'-]+$/.test(given) || !/^[A-Za-z'-]+$/.test(surname)) throw new Error('The book’s name table supports A–Z letters. Use a Latin spelling of your birth names.');
+  if (!/^[A-Za-z\s'-]+$/.test(given) || !/^[A-Za-z'-]+$/.test(surname)) throw new Error('This name calculation supports A–Z letters. Use a Latin spelling of your birth names.');
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
   const clock = /^(\d{2}):(\d{2})$/.exec(time);
   if (!match || !clock) throw new Error('Enter a valid birth date and time.');
@@ -54,14 +81,22 @@ export function calculateReading(input) {
     const age = index + 1;
     const year = person.year + index;
     const pointYear = morning && person.month === 1 && person.day === 1 ? astroYear + index : year;
-    const pointNumber = sumDigits(pointYear + key);
-    const point = POINTS[pointNumber] || ['Point beyond the major series', 'Consult the extended tables in the book.', 'mixed'];
+    const pointSum = pointYear + key;
+    const pointDigitSum = sumDigits(pointSum);
+    const pointNumber = cyclePoint(pointSum);
+    const point = POINTS[pointNumber];
+    const ageAttained = index;
+    const ageCycleSum = year + ageAttained;
+    const agePointDigitSum = sumDigits(ageCycleSum);
+    const agePointNumber = cyclePoint(ageCycleSum);
+    const agePoint = POINTS[agePointNumber];
     const houseNumber = [1,12,11,10,9,8,7,6,5,4,3,2][index % 12];
     const house = HOUSE_PASS[houseNumber];
     const rising = SIGNS[(SIGNS.indexOf(sun.sign) + index) % 12];
     const risingData = RISING[rising];
     return {
-      age, year, pointYear, pointNumber, pointName: point[0], pointText: point[1], pointTone: point[2],
+      age, year, pointYear, pointSum, pointDigitSum, pointNumber, pointName: point[0], pointText: point[1], pointTone: point[2],
+      ageAttained, ageCycleSum, agePointDigitSum, agePointNumber, agePointName: agePoint[0], agePointText: agePoint[1], agePointTone: agePoint[2],
       house: houseNumber, houseText: house[1], rising, risingText: risingData.t,
       risingCaution: risingData.bad.includes(sun.sign)
     };
@@ -70,7 +105,8 @@ export function calculateReading(input) {
     person: {given: person.given, surname: person.surname, place: person.place, birthDate: `${person.year}-${String(person.month).padStart(2,'0')}-${String(person.day).padStart(2,'0')}`},
     method: {morning, astroDate: `${astroDate.getUTCDate()} ${MN[astroDate.getUTCMonth()]} ${astroYear}`, sun, names, keyString, key},
     portrait: PORTRAIT[sun.sign],
+    guardianAngels: guardianAngelsFor(person),
     years,
-    limits: 'This is a symbolic reading from Sepharial’s printed rules. These inputs cannot establish a death year or a sourced guardian angel assignment.'
+    limits: 'This symbolic reading cannot establish a death year, certain future events, or the existence of a personal guardian angel.'
   };
 }

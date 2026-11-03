@@ -16,28 +16,28 @@ Capricorn:["Unexpected sorrows; perils; many envious enemies; love of travel; co
 Aquarius:["Sorrows; fortune; small honours; trouble through relatives; faithful friends; helpful protectors.","Chaste, humane, kind, inclined to solitude, righteous, patient in work."],
 Pisces:["Good fortune; some strange troubles; honours and popularity; uncertain alliances.","Eloquent, spiritual, quick-minded, hard to know, gay, changeful, passionate."]};
 const POINTS={
-1:["The Beginning","Creative will; works in their beginnings; invention; building up.","good"],
-2:["The Hidden Door","Strife; enmity; dissension; perception of high truths.","bad"],
-3:["Fruitfulness","Perfection in love; harmony; marriage; fruitfulness; effort rewarded.","good"],
-4:["The Cornerstone","Realization; things accomplished; establishment; endurance; protection.","good"],
-5:["The Contest","Contests; pain; fire; unfortunate impulses; anger.","bad"],
-6:["The Two Ways","Uncertainty in marriage; danger of seduction; irregularities; a choice to be made.","bad"],
-7:["The Triumph","Triumph; honour; glory; reputation; success; victory.","good"],
-8:["The Balance","Moral liabilities; strife; ruptures; separation; breaking of ties; lawsuits.","bad"],
-9:["The Lamp","Authority and power by merit; experience; wisdom; prudence.","good"],
-10:["The Wheel","Elevation from a humbler place, or fall from a high one; reversals; a turning year.","mixed"],
-11:["The Lion Muzzled","Success in bold enterprises; courage; decision; energy.","good"],
-12:["The Sacrifice","Reversal of position; chastisement; loss of honour; catastrophe; danger to life.","bad"],
-13:["The Reaper","Ambitions and hopes deceived; destruction; undoing; death of a thing.","bad"],
-14:["The Two Urns","Dangers through lack of initiative; the force of the elements; temperance required.","bad"],
-15:["Typhon","Fate; the inevitable; the unexpected; dangers to offspring and marriage; luxury.","bad"],
-16:["The Blasted Tower","Overthrow; ruin; catastrophe; accidents; falls — the gravest of the points.","bad"],
-17:["The Star","Hope, favourable or the reverse; uncertainty; insight; visions.","mixed"],
-18:["The Twilight","Crosses in love; false security; hidden perils; treacheries; deceptions.","bad"],
-19:["The Resplendent Light","Good fortune; successful marriage; honours; glory; happy associations.","good"],
-20:["The Awakening","Continual hindrances yet unexpected elevation; a call to be ready.","mixed"],
-21:["The Crown","Dignities; honours; success; aspirations attained.","good"],
-22:["The Blind Fool","Blind presumption; success followed by loss; entrapment; final catastrophe.","bad"]};
+1:["The First Work","Creative will; works in their beginnings; invention; building up.","good"],
+2:["Hidden Conflict","A stronghold of strife; enmity and division; discerning difficult truths.","bad"],
+3:["Fruitful Union","Perfection in love; harmony; marriage; fruitfulness; effort rewarded.","good"],
+4:["The Established Foundation","Realization; things accomplished; establishment; endurance; protection.","good"],
+5:["The Fiery Trial","A fiery trial: conflict, pain, fire, rash impulses, and anger.","bad"],
+6:["The Crossroads","A crossroads in marriage; temptation, disorder, and a choice to be made.","bad"],
+7:["Victory","Triumph; honour; glory; reputation; success; victory.","good"],
+8:["The Reckoning","A reckoning over moral debts, strife, broken ties, separation, and legal disputes.","bad"],
+9:["Wise Counsel","Authority and power by merit; experience; wisdom; prudence.","good"],
+10:["The Turning Season","Elevation from a humbler place, or fall from a high one; reversals; a turning year.","mixed"],
+11:["Courage in Action","Success in bold enterprises; courage; decision; energy.","good"],
+12:["The Humbling Trial","A humbling trial: reversal of position, chastisement, loss of honour, catastrophe, and danger to life.","bad"],
+13:["The Bitter Harvest","A bitter harvest: ambitions and hopes deceived, destruction, undoing, and the end of a thing.","bad"],
+14:["Restraint Under Trial","A trial of restraint: danger through inaction, the force of the elements, and a need for temperance.","bad"],
+15:["The Stronghold of Excess","A stronghold of excess: inevitable and unexpected pressures, danger to children and marriage, and luxury.","bad"],
+16:["The Fallen Stronghold","A fallen stronghold: overthrow, ruin, catastrophe, accidents, and falls — the gravest of the points.","bad"],
+17:["Uncertain Hope","Hope, favourable or the reverse; uncertainty; insight; visions.","mixed"],
+18:["Hidden Deception","A snare of false security: trouble in love, hidden perils, treachery, and deception.","bad"],
+19:["A Season of Blessing","Good fortune; successful marriage; honours; glory; happy associations.","good"],
+20:["The Call to Readiness","Continual hindrances yet unexpected elevation; a call to be ready.","mixed"],
+21:["The Crown of Honour","Dignities; honours; success; aspirations attained.","good"],
+22:["The Trap of Presumption","The trap of presumption: success followed by loss, entrapment, and final catastrophe.","bad"]};
 const HOUSE_PASS={
 1:["I","Your birth sign returns to the first house: a year judged by your own sign and nature.","neutral"],
 12:["XII","Troubles hard to overcome; obstacles in all affairs; sickness; bad for travel, negotiation or contest; treachery among supposed friends; sorrows and persecutions.","bad"],
@@ -70,14 +70,53 @@ const DOUBLED={4:[21,31],5:[22],6:[23,31],7:[31]};
 const MN=["January","February","March","April","May","June","July","August","September","October","November","December"];
 const CYCLE_ORDER=["Saturn","Venus","Jupiter","Mercury","Mars","Moon","Sun"];
 const NATURAL=["Saturn","Jupiter","Mars","Sun","Venus","Mercury","Moon"];
+// Lenain, La Science Cabalistique (1823), 72-name order. See SOURCE_NOTES.md.
+const ANGEL_NAMES=[
+  'Vehuiah', 'Jeliel', 'Sitaël', 'Elemiah', 'Mahasiah', 'Lelahel', 'Achaiah', 'Cahethel',
+  'Haziel', 'Aladiah', 'Lauviah', 'Hahaiah', 'Iezalel', 'Mebahel', 'Hariel', 'Hakamiah',
+  'Lauviah', 'Caliel', 'Leuviah', 'Pahaliah', 'Nelchael', 'Ieiaiel', 'Melahel', 'Hahiuiah',
+  'Nith-Haiah', 'Haaiah', 'Ierathel', 'Séheiah', 'Reiiel', 'Omael', 'Lecabel', 'Vasariah',
+  'Iehuiah', 'Lehahiah', 'Chavakiah', 'Menadel', 'Aniel', 'Haamiah', 'Rehael', 'Ieiazel',
+  'Hahahel', 'Mikael', 'Veualiah', 'Ielahiah', 'Sealiah', 'Ariel', 'Asaliah', 'Mihael',
+  'Vehuel', 'Daniel', 'Hahasiah', 'Imamiah', 'Nanael', 'Nithael', 'Mebahiah', 'Poiel',
+  'Nemamiah', 'Ieialel', 'Harahel', 'Mitzrael', 'Umabel', 'Iah-hel', 'Anauel', 'Mehiel',
+  'Damabiah', 'Manakel', 'Eïael', 'Habuhiah', 'Rochel', 'Jabamiah', 'Haiaiel', 'Mumiah'
+];
 
 
 const clampYear = (year) => Number.isInteger(year) && year >= 1600 && year <= new Date().getFullYear();
 const sumDigits = (value) => [...String(value)].reduce((sum, digit) => sum + Number(digit), 0);
+const cyclePoint = (value) => ((sumDigits(value) - 1) % 22) + 1;
+
+function guardianAngelsFor(person) {
+  // Lenain's date tables start on 20 March in a 360-day cycle. The remaining
+  // dates, including leap day, have no numbered date assignment in the tables.
+  const leapDay = person.month === 2 && person.day === 29;
+  const tableYear = person.month > 3 || (person.month === 3 && person.day >= 20) ? 2001 : 2002;
+  const dayOffset = leapDay ? 365 : Math.round((Date.UTC(tableYear, person.month - 1, person.day) - Date.UTC(2001, 2, 20)) / 86400000);
+  const hasDateAngel = dayOffset < 360;
+  const date = `${person.day} ${MN[person.month - 1]}`;
+  const makeAngel = (role, number, basis) => ({role, number, name: number ? ANGEL_NAMES[number - 1] : null, basis});
+  const clock = (minutes) => `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
+  const formatTableDate = (offset) => {
+    const day = new Date(Date.UTC(2001, 2, 20) + offset * 86400000);
+    return `${day.getUTCDate()} ${MN[day.getUTCMonth()]}`;
+  };
+  const intervalStart = Math.floor(dayOffset / 5) * 5;
+  const timeStart = Math.floor((person.hour * 60 + person.minute) / 20) * 20;
+  return [
+    makeAngel('Physical guardian angel', hasDateAngel ? Math.floor(dayOffset / 5) + 1 : null,
+      hasDateAngel ? `Born ${date}; the five-day interval is ${formatTableDate(intervalStart)}–${formatTableDate(intervalStart + 4)}.` : `${date} has no numbered birth-date correspondence.`),
+    makeAngel('Character guardian angel', hasDateAngel ? dayOffset % 72 + 1 : null,
+      hasDateAngel ? `Born ${date}; day ${dayOffset + 1} from 20 March gives position ${dayOffset % 72 + 1} in the repeating 72-day cycle.` : `${date} has no numbered birth-date correspondence.`),
+    makeAngel('Spirit guardian angel', Math.floor(timeStart / 20) + 1,
+      `Local birth time ${clock(person.hour * 60 + person.minute)} falls in the ${clock(timeStart)}–${clock(timeStart + 20)} interval.`)
+  ];
+}
 
 function nameValue(name) {
   const letters = name.toUpperCase().replace(/[^A-Z]/g, '');
-  if (!letters) throw new Error('Names must contain Latin letters for the book’s English alphabet table.');
+  if (!letters) throw new Error('Names must contain A–Z letters for this calculation.');
   return [...letters].reduce((sum, letter, index) => sum + LETTER[letter] * (letters.length - index), 0);
 }
 
@@ -96,7 +135,7 @@ function validateInput(input) {
   const date = String(input.date || '');
   const time = String(input.time || '');
   if (!given || !surname || !date || !time) throw new Error('Enter your full given name, family name, birth date, and birth time.');
-  if (!/^[A-Za-z\s'-]+$/.test(given) || !/^[A-Za-z'-]+$/.test(surname)) throw new Error('The book’s name table supports A–Z letters. Use a Latin spelling of your birth names.');
+  if (!/^[A-Za-z\s'-]+$/.test(given) || !/^[A-Za-z'-]+$/.test(surname)) throw new Error('This name calculation supports A–Z letters. Use a Latin spelling of your birth names.');
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
   const clock = /^(\d{2}):(\d{2})$/.exec(time);
   if (!match || !clock) throw new Error('Enter a valid birth date and time.');
@@ -126,14 +165,22 @@ function calculateReading(input) {
     const age = index + 1;
     const year = person.year + index;
     const pointYear = morning && person.month === 1 && person.day === 1 ? astroYear + index : year;
-    const pointNumber = sumDigits(pointYear + key);
-    const point = POINTS[pointNumber] || ['Point beyond the major series', 'Consult the extended tables in the book.', 'mixed'];
+    const pointSum = pointYear + key;
+    const pointDigitSum = sumDigits(pointSum);
+    const pointNumber = cyclePoint(pointSum);
+    const point = POINTS[pointNumber];
+    const ageAttained = index;
+    const ageCycleSum = year + ageAttained;
+    const agePointDigitSum = sumDigits(ageCycleSum);
+    const agePointNumber = cyclePoint(ageCycleSum);
+    const agePoint = POINTS[agePointNumber];
     const houseNumber = [1,12,11,10,9,8,7,6,5,4,3,2][index % 12];
     const house = HOUSE_PASS[houseNumber];
     const rising = SIGNS[(SIGNS.indexOf(sun.sign) + index) % 12];
     const risingData = RISING[rising];
     return {
-      age, year, pointYear, pointNumber, pointName: point[0], pointText: point[1], pointTone: point[2],
+      age, year, pointYear, pointSum, pointDigitSum, pointNumber, pointName: point[0], pointText: point[1], pointTone: point[2],
+      ageAttained, ageCycleSum, agePointDigitSum, agePointNumber, agePointName: agePoint[0], agePointText: agePoint[1], agePointTone: agePoint[2],
       house: houseNumber, houseText: house[1], rising, risingText: risingData.t,
       risingCaution: risingData.bad.includes(sun.sign)
     };
@@ -142,15 +189,541 @@ function calculateReading(input) {
     person: {given: person.given, surname: person.surname, place: person.place, birthDate: `${person.year}-${String(person.month).padStart(2,'0')}-${String(person.day).padStart(2,'0')}`},
     method: {morning, astroDate: `${astroDate.getUTCDate()} ${MN[astroDate.getUTCMonth()]} ${astroYear}`, sun, names, keyString, key},
     portrait: PORTRAIT[sun.sign],
+    guardianAngels: guardianAngelsFor(person),
     years,
-    limits: 'This is a symbolic reading from Sepharial’s printed rules. These inputs cannot establish a death year or a sourced guardian angel assignment.'
+    limits: 'This symbolic reading cannot establish a death year, certain future events, or the existence of a personal guardian angel.'
   };
+}
+
+// Lenain, La Science Cabalistique (1823), chapter VI.
+// English translation by Magick.ly, CC BY 4.0: https://magick.ly/books/la-science-cabalistique/chapitre-6
+const ANGEL_QUALITIES = [
+  {
+    "attribute": "God elevated and exalted above all things",
+    "governs": "He governs the first ray of the Orient in the season of spring, that is the first five degrees of the sphere; he dwells in the region of fire, his sign is the Ram, and he presides over five days."
+  },
+  {
+    "attribute": "God who is helpful",
+    "governs": "This genius governs kings and princes; he keeps their subjects in obedience; he has influence over the generation of all beings existing within the animal kingdom; he restores peace between spouses and conjugal fidelity."
+  },
+  {
+    "attribute": "God, the hope of all creatures.",
+    "governs": "He rules over nobility, magnanimity and high offices; he protects against weapons and fierce beasts."
+  },
+  {
+    "attribute": "Hidden God",
+    "governs": "This genius governs voyages, maritime expeditions, and influences useful discoveries."
+  },
+  {
+    "attribute": "God the savior",
+    "governs": "The high sciences, occult philosophy, theology, and the liberal arts."
+  },
+  {
+    "attribute": "God praiseworthy",
+    "governs": "Love, renown, the sciences, the arts, and fortune."
+  },
+  {
+    "attribute": "Good and patient God",
+    "governs": "This genius governs patience; he uncovers the secrets of nature; he has influence over the spread of learning and over industry."
+  },
+  {
+    "attribute": "God adorable",
+    "governs": "All agricultural produce, especially that necessary for the existence of men and animals; he inspires man to raise himself toward God to thank him for all the goods he sends upon the earth."
+  },
+  {
+    "attribute": "God of mercy",
+    "governs": "He governs good faith and reconciliation."
+  },
+  {
+    "attribute": "God propitious",
+    "governs": "This genius rules against rabies and plague, and influences the curing of diseases."
+  },
+  {
+    "attribute": "God praised and exalted",
+    "governs": "This genius rules renown; he influences great personages, scholars, and all those who become famous through their talents."
+  },
+  {
+    "attribute": "God, refuge.",
+    "governs": "He governs dreams, and reveals mysteries hidden from mortals. He has influence over wise, clever and discreet persons."
+  },
+  {
+    "attribute": "God glorified above all things",
+    "governs": "Friendship, reconciliation, and conjugal fidelity."
+  },
+  {
+    "attribute": "God the preserver",
+    "governs": "He governs justice, truth and liberty; he delivers the oppressed and prisoners; he protects innocence and makes truth known."
+  },
+  {
+    "attribute": "God creator",
+    "governs": "This genius governs over the sciences and the arts; he influences useful discoveries and new methods."
+  },
+  {
+    "attribute": "God who erects the universe",
+    "governs": "This genius governs crowned heads and great captains; he gives victory, and prevents seditions; he has influence over iron, arsenals, and all that pertains to the art of war."
+  },
+  {
+    "attribute": "God admirable",
+    "governs": "He governs the high sciences and marvelous discoveries, and gives revelations in dreams."
+  },
+  {
+    "attribute": "God prompt to hear",
+    "governs": "Making the truth known in legal proceedings, causing innocence to triumph, and confounding the guilty and false witnesses."
+  },
+  {
+    "attribute": "God who hears sinners",
+    "governs": "This genius governs the memory and the intelligence of man, and rules the first ray of the south, from the 91st to the 95th degree of the sphere inclusively."
+  },
+  {
+    "attribute": "God the redeemer",
+    "governs": "This genius governs religion, theology and morals; it influences chastity and piety, and those whose calling is to the ecclesiastical state."
+  },
+  {
+    "attribute": "God alone and unique",
+    "governs": "This genius governs astronomy, mathematics, geography, and all the abstract sciences; he influences the learned and philosophers."
+  },
+  {
+    "attribute": "the right hand of God",
+    "governs": "This genius governs fortune, renown, diplomacy and commerce; he has influence over travels, discoveries, and maritime expeditions; he protects against storms and shipwrecks."
+  },
+  {
+    "attribute": "God who delivers from evils",
+    "governs": "This genius governs water, all the productions of the earth, and principally the plants that are necessary for the healing of illnesses."
+  },
+  {
+    "attribute": "God good by Himself",
+    "governs": "This genius rules over exiles, fugitive prisoners, and those condemned in absentia; he prevents the discovery of secret crimes, and those who committed them will escape the justice of men, provided they do not fall again into the same fault; he protects against harmful animals, and he preserves from thieves and murderers."
+  },
+  {
+    "attribute": "God who gives wisdom.",
+    "governs": "He rules all the occult sciences; he gives revelations in dreams, particularly to those born on the day he presides; he has influence over wise men who love peace and solitude, and over those who seek truth and practise the magic of the wise, which is that of God."
+  },
+  {
+    "attribute": "Hidden God",
+    "governs": "This genius protects all who seek the truth; he leads men to the contemplation of divine things; he governs politics, diplomats, plenipotentiaries, ambassadors, treaties of peace and commerce, and all conventions in general; he has influence over couriers, dispatches, agents, and secret expeditions."
+  },
+  {
+    "attribute": "God who punishes the wicked",
+    "governs": "Protects against those who provoke and unjustly attack us; governs the spread of learning, civilization, and liberty."
+  },
+  {
+    "attribute": "God who heals the sick",
+    "governs": "Protects against fires, ruin of buildings, falls, and illnesses; governs health and length of life."
+  },
+  {
+    "attribute": "God prompt to help",
+    "governs": "All religious sentiments, divine philosophy, and meditation."
+  },
+  {
+    "attribute": "God who is patient.",
+    "governs": "This genius rules over the animal kingdom; he watches over the generation of beings, so as to multiply their species and perpetuate their races; he has influence over chemists, physicians, and surgeons."
+  },
+  {
+    "attribute": "God who inspires.",
+    "governs": "Vegetation and agriculture."
+  },
+  {
+    "attribute": "God just.",
+    "governs": "This genius rules justice; he has influence over nobility, jurisconsults, magistrates and lawyers."
+  },
+  {
+    "attribute": "God who knows all things.",
+    "governs": "Protects all Christian princes and keeps their subjects in obedience."
+  },
+  {
+    "attribute": "Merciful God.",
+    "governs": "This genius rules over crowned heads, princes, and nobles; it maintains harmony, good understanding, and peace among them; and it influences the obedience of subjects towards their princes."
+  },
+  {
+    "attribute": "God who gives joy",
+    "governs": "Wills, successions, and all divisions of property made amicably; he maintains peace and harmony within families."
+  },
+  {
+    "attribute": "God adorable",
+    "governs": "He gives knowledge concerning absent persons from whom no news has been received for a long time, causes exiles to return to their homeland, and discovers goods lost or misappropriated."
+  },
+  {
+    "attribute": "God of virtues",
+    "governs": "He rules over the sciences and the arts; he reveals the secrets of nature, and inspires wise philosophers in their meditations."
+  },
+  {
+    "attribute": "God, the hope of all the children of the earth",
+    "governs": "He governs all religious worship and all that pertains to God; he protects all who seek the truth."
+  },
+  {
+    "attribute": "God who receives sinners",
+    "governs": "This genius governs health and length of life; he influences paternal and filial love, and the obedience and respect of children toward their parents."
+  },
+  {
+    "attribute": "God who gives joy",
+    "governs": "This genius governs printing and bookselling, and influences men of letters and artists."
+  },
+  {
+    "attribute": "God in three persons",
+    "governs": "Governs Christianity; protects missionaries and all disciples of Christ who proclaim the words of the Gospel to the nations; influences pious souls, prelates, clergymen, and all that pertains to the priesthood."
+  },
+  {
+    "attribute": "virtue of God, house of God, similar to God",
+    "governs": "This genius influences monarchs, princes, and nobles; he keeps their subjects in obedience, and uncovers conspiracies and all those who seek to destroy their persons and their governments."
+  },
+  {
+    "attribute": "Ruling King",
+    "governs": "This genius presides over peace, and influences the prosperity of empires; he strengthens tottering thrones and the power of kings."
+  },
+  {
+    "attribute": "Eternal God",
+    "governs": "This genius protects against weapons and gives victory."
+  },
+  {
+    "attribute": "Mover of all things.",
+    "governs": "He governs vegetation, bringing life and health into all that breathes, and influences the principal agents of nature."
+  },
+  {
+    "attribute": "God who reveals",
+    "governs": "This genius discovers hidden treasures, reveals nature's greatest secrets, and shows in dreams the objects one desires."
+  },
+  {
+    "attribute": "God just, who reveals the truth",
+    "governs": "This genius governs justice and makes the truth known in legal proceedings; he has influence over upright men, and over those who raise their mind to the contemplation of divine things."
+  },
+  {
+    "attribute": "God, helpful father",
+    "governs": "He governs the generation of beings, and he has influence over friendship and conjugal fidelity."
+  },
+  {
+    "attribute": "God great and exalted",
+    "governs": "This genius rules over great personages, and over all those who rise up and distinguish themselves by their talents and virtues."
+  },
+  {
+    "attribute": "The Sign of mercies, and according to others, the Angel of confessions",
+    "governs": "This genius governs justice, lawyers, attorneys, and all magistrates in general. He gives inspirations to those who are perplexed about several things and do not know which they ought to decide upon."
+  },
+  {
+    "attribute": "(Hidden God).",
+    "governs": "Chemistry and physics; he reveals the greatest secrets of nature, notably the philosopher's stone and the universal medicine."
+  },
+  {
+    "attribute": "God elevated above all things",
+    "governs": "He governs all journeys in general; he protects prisoners who have recourse to him and inspires in them the means to obtain their liberty; he influences all those who seek truth in good faith and return from their errors by a truly sincere return to God."
+  },
+  {
+    "attribute": "God who abases the proud",
+    "governs": "This genius rules over the high sciences; he influences clergymen, professors, magistrates, and men of law."
+  },
+  {
+    "attribute": "King of the Heavens",
+    "governs": "Emperors, kings, princes, and all civil and ecclesiastical dignities; he watches over legitimate dynasties and the stability of empires, gives a long and peaceful reign to princes who have recourse to him, and protects all who wish to keep their positions."
+  },
+  {
+    "attribute": "Eternal God",
+    "governs": "He governs morality and religion, influencing those who protect it with all their power and spread it by every possible means."
+  },
+  {
+    "attribute": "God who sustains the universe",
+    "governs": "This genius governs renown, fortune, and philosophy."
+  },
+  {
+    "attribute": "God praiseworthy",
+    "governs": "Great captains, admirals, generals, and all who fight for a just cause."
+  },
+  {
+    "attribute": "God who grants the prayers of the generations",
+    "governs": "This genius governs iron; he influences armourers, locksmiths, cutlers, and all who trade in it; he confounds the wicked and false witnesses."
+  },
+  {
+    "attribute": "God who knows all things",
+    "governs": "This genius governs treasures, stockbrokers, public funds, archives, libraries, and all rare and precious collections; it has influence over printing and bookselling, and over all who trade in them."
+  },
+  {
+    "attribute": "God who relieves the oppressed",
+    "governs": "He rules over illustrious persons distinguished by their talents and virtues, and influences the fidelity and obedience of subordinates towards their superiors."
+  },
+  {
+    "attribute": "God above all things",
+    "governs": "This genius governs astronomy and physics, and influences all who distinguish themselves in that field."
+  },
+  {
+    "attribute": "Supreme Being",
+    "governs": "Philosophers, the enlightened, and all who wish to withdraw from the world."
+  },
+  {
+    "attribute": "God infinitely good",
+    "governs": "Protects against accidents; preserves health and cures illnesses; governs commerce, bankers, business agents, and clerks."
+  },
+  {
+    "attribute": "God who gives life to all things",
+    "governs": "This genius protects against rabies and ferocious animals; he rules over scholars, professors, orators and authors; he has influence over printing and bookselling, and over all who trade in it."
+  },
+  {
+    "attribute": "God, fountain of wisdom",
+    "governs": "This genius governs the seas, rivers, springs, maritime expeditions, and shipbuilding; he influences sailors, pilots, fishing, and all who trade in it."
+  },
+  {
+    "attribute": "God who seconds and sustains all things",
+    "governs": "He governs vegetation and aquatic animals; he influences sleep and dreams."
+  },
+  {
+    "attribute": "God, delight of the children of men",
+    "governs": "This genius governs changes, the preservation of monuments, and longevity of life; he influences the occult sciences, and makes the truth known to those who have recourse to him in their labours."
+  },
+  {
+    "attribute": "God who gives with liberality.",
+    "governs": "This genius rules over agriculture and fecundity."
+  },
+  {
+    "attribute": "God who sees all",
+    "governs": "This genius governs renown, fortune and inheritances; he influences jurists, magistrates, attorneys, lawyers and notaries."
+  },
+  {
+    "attribute": "Word which produces all things",
+    "governs": "This genius governs the generation of beings and the phenomena of nature; he protects those who wish to regenerate themselves and re-establish within themselves the harmony broken by Adam's disobedience, which is done by exalting oneself toward God and purifying, through the elements, those things that compose the nature of man; it is then that the wise man re-enters into the principle of creation, recovers his rights and his first dignity, becomes again the master of nature, and enjoys all the prerogatives that God gave him in creating him."
+  },
+  {
+    "attribute": "God master of the universe",
+    "governs": "This genius protects all who have recourse to him; he gives victory and peace, and he has influence over iron, arsenals, fortified towns, and everything pertaining to military engineering."
+  },
+  {
+    "attribute": "His attribute is figured by the omega, which denotes the end of all things",
+    "governs": "This genius protects in mysterious operations; he makes one succeed in all things and brings every experiment to its conclusion; he governs chemistry, physics and medicine, and influences health and length of life."
+  }
+];
+
+
+const CONSTELLATIONS = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpius','Sagittarius','Capricornus','Aquarius','Pisces'];
+const SIGN_GLYPHS = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'].map((symbol) => `${symbol}\uFE0E`);
+const SIGN_PLANETS = ['Mars','Venus','Mercury','Moon','Sun','Mercury','Venus','Mars','Jupiter','Saturn','Saturn','Jupiter'];
+// The seven planet–angel pairs shown in the supplied Seven Spirits diagram.
+const PLANET_ANGELS = {Saturn:'Jegudiel',Venus:'Razael',Mars:'Uriel',Moon:'Raphael',Mercury:'Gabriel',Jupiter:'Michael',Sun:'Metatron'};
+const PLANET_GLYPHS = {Saturn:'♄',Venus:'♀',Mars:'♂',Moon:'☽',Mercury:'☿',Jupiter:'♃',Sun:'☉'};
+const PLANET_ORDER = ['Saturn','Venus','Mars','Moon','Mercury','Jupiter','Sun'];
+const CONSTELLATION_FIGURES = ['the Ram','the Bull','the Twins','the Crab','the Lion','the Maiden','the Scales','the Scorpion','the Archer','the Sea Goat','the Water Bearer','the Fishes'];
+const PLANET_THEMES = {Saturn:'fear of the Lord',Venus:'knowledge',Mars:'might',Moon:'counsel',Mercury:'understanding',Jupiter:'wisdom',Sun:'the Spirit of the Lord'};
+const clean = (value) => String(value).replace(/[&<>"']/g, (character) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
+const point = (radius, angle) => {
+  const radians = angle * Math.PI / 180;
+  return {x: 500 + radius * Math.cos(radians), y: 560 + radius * Math.sin(radians)};
+};
+const at = (radius, angle) => {
+  const {x,y} = point(radius, angle);
+  return `${x.toFixed(1)},${y.toFixed(1)}`;
+};
+
+function getHierarchySelection(reading) {
+  const signIndex = reading.method.sun.signNumber - 1;
+  if (signIndex < 0 || signIndex >= CONSTELLATIONS.length) throw new Error('Unknown sign correspondence.');
+  const planet = SIGN_PLANETS[signIndex];
+  return {
+    sign: reading.method.sun.sign,
+    signIndex,
+    constellation: CONSTELLATIONS[signIndex],
+    planet,
+    archangel: PLANET_ANGELS[planet],
+    angelNumbers: reading.guardianAngels.map((angel) => angel.number),
+    angelNames: reading.guardianAngels.map((angel) => angel.name || 'Unassigned')
+  };
+}
+
+function buildHierarchyMarkup(reading) {
+  const selected = getHierarchySelection(reading);
+  const activeAngels = new Set(selected.angelNumbers.filter(Number.isInteger));
+  const circles = [455,440,425,410,380,320,275,205,185,100].map((radius, index) =>
+    `<circle class="wheel-ring ${index < 4 ? 'wheel-outer-ring' : ''}" cx="500" cy="560" r="${radius}"/>`).join('');
+  const selectedPositions = [...activeAngels].sort((a,b) => a - b);
+  const angelMarks = ANGEL_NAMES.map((name, index) => {
+    const number = index + 1;
+    const angle = -90 + index * 5;
+    const active = activeAngels.has(number);
+    const marker = point(301, angle);
+    const label = point(297, angle);
+    if (!active) return `<g class="wheel-angel-position is-muted" data-hierarchy-info="angel:${index}" tabindex="-1" role="button" aria-label="${clean(name)}, position ${number}. Show qualities"><circle class="wheel-hit" cx="${label.x.toFixed(1)}" cy="${label.y.toFixed(1)}" r="12"/><text x="${label.x.toFixed(1)}" y="${(label.y + 3).toFixed(1)}" text-anchor="middle">${number}</text></g>`;
+    const closeBefore = selectedPositions.filter((other) => other < number && Math.min(number - other, 72 - number + other) <= 6).length;
+    const namePoint = point(344 + closeBefore * 23, angle);
+    const anchor = namePoint.x < 425 ? 'end' : namePoint.x > 575 ? 'start' : 'middle';
+    const nameX = namePoint.x + (anchor === 'start' ? 7 : anchor === 'end' ? -7 : 0);
+    return `<g class="wheel-angel-position is-active" data-hierarchy-info="angel:${index}" tabindex="0" role="button" aria-label="${clean(name)}, position ${number}. Show qualities"><circle class="wheel-hit" cx="${marker.x.toFixed(1)}" cy="${marker.y.toFixed(1)}" r="13"/><circle class="wheel-selected-dot" cx="${marker.x.toFixed(1)}" cy="${marker.y.toFixed(1)}" r="3"/><line class="wheel-selected-line" x1="${marker.x.toFixed(1)}" y1="${marker.y.toFixed(1)}" x2="${namePoint.x.toFixed(1)}" y2="${namePoint.y.toFixed(1)}"/><text class="wheel-selected-name" x="${nameX.toFixed(1)}" y="${(namePoint.y + 4).toFixed(1)}" text-anchor="${anchor}">${clean(name)}</text></g>`;
+  }).join('');
+  const archangels = PLANET_ORDER.map((planet, index) => {
+    const angle = -160 + index * (140 / 6);
+    const {x,y} = point(380, angle);
+    const active = planet === selected.planet;
+    return `<g class="wheel-archangel ${active ? 'is-active' : 'is-muted'}"><circle cx="${x.toFixed(1)}" cy="${(y - 22).toFixed(1)}" r="3"/><text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle">${clean(PLANET_ANGELS[planet])}</text></g>`;
+  }).join('');
+  const zodiacSeparators = Array.from({length:12}, (_, index) => {
+    const angle = -105 + index * 30;
+    return `<line class="wheel-sector" x1="${at(207,angle).replace(',', '" y1="')}" x2="${at(273,angle).replace(',', '" y2="')}"/>`;
+  }).join('');
+  const constellations = CONSTELLATIONS.map((name, index) => {
+    const {x,y} = point(238, -90 + index * 30);
+    const active = index === selected.signIndex;
+    return `<g class="wheel-constellation ${active ? 'is-active' : 'is-muted'}" data-hierarchy-info="constellation:${index}" tabindex="0" role="button" aria-label="${clean(name)} constellation. Show description"><circle class="wheel-hit" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="35"/><text class="wheel-glyph" x="${x.toFixed(1)}" y="${(y - 5).toFixed(1)}" text-anchor="middle">${SIGN_GLYPHS[index]}</text><text x="${x.toFixed(1)}" y="${(y + 16).toFixed(1)}" text-anchor="middle">${clean(name)}</text></g>`;
+  }).join('');
+  const planetSeparators = PLANET_ORDER.map((_, index) => {
+    const angle = -90 + (index + .5) * 360 / 7;
+    return `<line class="wheel-sector" x1="${at(102,angle).replace(',', '" y1="')}" x2="${at(183,angle).replace(',', '" y2="')}"/>`;
+  }).join('');
+  const planets = PLANET_ORDER.map((planet, index) => {
+    const {x,y} = point(148, -90 + index * 360 / 7);
+    const active = planet === selected.planet;
+    return `<g class="wheel-planet ${active ? 'is-active' : 'is-muted'}" data-hierarchy-info="planet:${planet}" tabindex="0" role="button" aria-label="${planet}. Show description"><circle class="wheel-hit" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="32"/><text class="wheel-glyph" x="${x.toFixed(1)}" y="${(y - 4).toFixed(1)}" text-anchor="middle">${PLANET_GLYPHS[planet]}</text><text x="${x.toFixed(1)}" y="${(y + 18).toFixed(1)}" text-anchor="middle">${planet}</text></g>`;
+  }).join('');
+  const fullName = `${reading.person.given} ${reading.person.surname}`;
+  const centerName = fullName.length > 19 ? `${reading.person.given.split(' ')[0].slice(0,15)}…` : fullName;
+  const svg = `<svg class="hierarchy-svg" viewBox="0 0 1000 1040" role="img" aria-labelledby="hierarchy-svg-title" xmlns="http://www.w3.org/2000/svg">
+    <title id="hierarchy-svg-title">Christ above all; ${clean(selected.constellation)}, ${clean(selected.planet)}, ${clean(selected.archangel)}, and ${selected.angelNames.map(clean).join(', ')} highlighted for ${clean(fullName)}.</title>
+    <rect width="1000" height="1040" fill="#0b1538"/>
+    <g fill="none">${circles}${zodiacSeparators}${planetSeparators}${angelMarks}</g>
+    <text class="wheel-christ" x="500" y="79" text-anchor="middle">✝ CHRIST · ABOVE ALL</text>
+    <text class="wheel-order" x="500" y="118" text-anchor="middle">CHERUBIM</text>
+    <text class="wheel-order" x="500" y="134" text-anchor="middle">SERAPHIM</text>
+    <text class="wheel-order" x="500" y="150" text-anchor="middle">THRONES</text>
+    ${archangels}${constellations}${planets}
+    <text class="wheel-center-label" x="500" y="550" text-anchor="middle">YOUR PLACE</text>
+    <text class="wheel-center-name" x="500" y="579" text-anchor="middle">${clean(centerName)}</text>
+  </svg>`;
+  const roster = `<div class="hierarchy-summary"><p><small>CONSTELLATION</small><strong>${clean(selected.constellation)}</strong></p><p><small>PLANET</small><strong>${clean(selected.planet)}</strong></p><p><small>ARCHANGEL</small><strong>${clean(selected.archangel)}</strong></p><p><small>THREE BIRTH CORRESPONDENCES</small><strong>${selected.angelNames.map(clean).join(' · ')}</strong></p></div>
+    <div class="hierarchy-roster"><div class="hierarchy-roster-heading"><h4>72 angels / genies</h4><p>Hover or focus for qualities; click or tap to keep details open. Gold names correspond to this reading.</p></div><div class="hierarchy-roster-grid" role="list">${ANGEL_NAMES.map((name, index) => `<span role="listitem"><button type="button" class="${activeAngels.has(index + 1) ? 'is-active' : 'is-muted'}" data-hierarchy-info="angel:${index}" aria-label="${clean(name)}. Show qualities">${clean(name)}</button></span>`).join('')}</div></div>`;
+  return {svg, roster};
+}
+
+function renderCelestialHierarchy(reading) {
+  const {svg, roster} = buildHierarchyMarkup(reading);
+  document.querySelector('#celestial-map').innerHTML = svg;
+  document.querySelector('#celestial-details').innerHTML = roster;
+  bindHierarchyInteractions();
+}
+
+function getHierarchyInfo(key) {
+  const [kind, value] = String(key).split(':');
+  if (kind === 'angel') {
+    const index = Number(value);
+    if (!Number.isInteger(index) || index < 0 || index >= ANGEL_NAMES.length) return null;
+    const quality = ANGEL_QUALITIES[index];
+    return {eyebrow:`ANGEL ${index + 1} OF 72`, title:ANGEL_NAMES[index], subtitle:`Attribute: ${quality.attribute}`, body:quality.governs};
+  }
+  if (kind === 'constellation') {
+    const index = Number(value);
+    if (!Number.isInteger(index) || index < 0 || index >= CONSTELLATIONS.length) return null;
+    return {eyebrow:'CONSTELLATION', title:CONSTELLATIONS[index], subtitle:CONSTELLATION_FIGURES[index], body:`The traditional namesake of the ${SIGNS[index]} sign. This figure names a region of the sky; the reading does not calculate its position at birth.`};
+  }
+  if (kind === 'planet' && PLANET_ANGELS[value]) {
+    return {eyebrow:'CLASSICAL PLANET', title:value, subtitle:`Paired angel: ${PLANET_ANGELS[value]}`, body:`Its associated theme is ${PLANET_THEMES[value]}. The Sun and Moon are included among the seven classical lights.`};
+  }
+  return null;
+}
+
+let hierarchyListenersBound = false;
+let hierarchyTrigger = null;
+let hierarchyPinned = false;
+
+function closeHierarchyInfo() {
+  if (hierarchyTrigger) hierarchyTrigger.setAttribute('aria-expanded', 'false');
+  hierarchyTrigger = null;
+  hierarchyPinned = false;
+  document.querySelector('#hierarchy-popover').hidden = true;
+}
+
+function positionHierarchyInfo(trigger) {
+  const popover = document.querySelector('#hierarchy-popover');
+  const rect = trigger.getBoundingClientRect();
+  const width = popover.offsetWidth;
+  const height = popover.offsetHeight;
+  const left = Math.max(12, Math.min(rect.left + rect.width / 2 - width / 2, window.innerWidth - width - 12));
+  const below = rect.bottom + 10;
+  const top = below + height < window.innerHeight - 12 ? below : Math.max(12, rect.top - height - 10);
+  popover.style.left = `${left}px`;
+  popover.style.top = `${top}px`;
+}
+
+function showHierarchyInfo(trigger, pin = false) {
+  const info = getHierarchyInfo(trigger.dataset.hierarchyInfo);
+  if (!info) return;
+  if (hierarchyTrigger && hierarchyTrigger !== trigger) hierarchyTrigger.setAttribute('aria-expanded', 'false');
+  hierarchyTrigger = trigger;
+  hierarchyPinned = pin;
+  trigger.setAttribute('aria-expanded', 'true');
+  const popover = document.querySelector('#hierarchy-popover');
+  popover.innerHTML = `<button class="hierarchy-popover-close" type="button" aria-label="Close details">×</button><span class="hierarchy-popover-kicker">${clean(info.eyebrow)}</span><h4>${clean(info.title)}</h4><strong>${clean(info.subtitle)}</strong><p>${clean(info.body)}</p>`;
+  popover.hidden = false;
+  positionHierarchyInfo(trigger);
+}
+
+function hierarchyTarget(event) {
+  return event.target.closest?.('[data-hierarchy-info]');
+}
+
+function bindHierarchyInteractions() {
+  if (hierarchyListenersBound) {
+    closeHierarchyInfo();
+    return;
+  }
+  hierarchyListenersBound = true;
+  const section = document.querySelector('.celestial-section');
+  const map = document.querySelector('#celestial-map');
+  const viewToggle = document.querySelector('#hierarchy-view-toggle');
+  const setFitMode = (fitted) => {
+    map.classList.toggle('is-fit', fitted);
+    viewToggle.setAttribute('aria-pressed', String(fitted));
+    viewToggle.textContent = fitted ? 'Read labels' : 'Fit whole wheel';
+    document.querySelector('.celestial-swipe').textContent = fitted ? 'Tap “Read labels” to enlarge the wheel.' : 'Swipe to explore the whole wheel →';
+    map.scrollLeft = 0;
+  };
+  if (window.matchMedia('(max-width: 600px)').matches) setFitMode(true);
+  section.addEventListener('pointerover', (event) => {
+    if (event.pointerType === 'touch' || hierarchyPinned) return;
+    const trigger = hierarchyTarget(event);
+    if (trigger && trigger !== hierarchyTrigger) showHierarchyInfo(trigger);
+  });
+  section.addEventListener('pointerout', (event) => {
+    if (hierarchyPinned) return;
+    const trigger = hierarchyTarget(event);
+    if (trigger && !trigger.contains(event.relatedTarget)) closeHierarchyInfo();
+  });
+  section.addEventListener('focusin', (event) => {
+    const trigger = hierarchyTarget(event);
+    if (trigger && !hierarchyPinned) showHierarchyInfo(trigger);
+  });
+  section.addEventListener('focusout', (event) => {
+    if (hierarchyPinned) return;
+    const trigger = hierarchyTarget(event);
+    if (trigger && !trigger.contains(event.relatedTarget)) closeHierarchyInfo();
+  });
+  section.addEventListener('click', (event) => {
+    if (event.target.closest('.hierarchy-popover-close')) {
+      closeHierarchyInfo();
+      return;
+    }
+    const trigger = hierarchyTarget(event);
+    if (!trigger) return;
+    if (hierarchyPinned && hierarchyTrigger === trigger) closeHierarchyInfo();
+    else showHierarchyInfo(trigger, true);
+  });
+  section.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeHierarchyInfo();
+    const trigger = hierarchyTarget(event);
+    if (trigger && trigger.namespaceURI === 'http://www.w3.org/2000/svg' && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault();
+      showHierarchyInfo(trigger, true);
+    }
+  });
+  document.addEventListener('pointerdown', (event) => {
+    const popover = document.querySelector('#hierarchy-popover');
+    if (hierarchyPinned && hierarchyTrigger && !hierarchyTrigger.contains(event.target) && !popover.contains(event.target)) closeHierarchyInfo();
+  });
+  window.addEventListener('resize', () => {
+    if (hierarchyTrigger) positionHierarchyInfo(hierarchyTrigger);
+  });
+  viewToggle.addEventListener('click', () => {
+    setFitMode(!map.classList.contains('is-fit'));
+    closeHierarchyInfo();
+  });
 }
 
 
 const form = document.querySelector('#reading-form');
 const result = document.querySelector('#result');
 const error = document.querySelector('#form-error');
+const loader = document.querySelector('#reading-loader');
+const submitButton = form.querySelector('[type="submit"]');
 const select = document.querySelector('#year-select');
 const fromYear = document.querySelector('#from-year');
 const dateInput = form.elements.date;
@@ -165,16 +738,15 @@ const signGlyphs = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑',
 const signElements = ['Fire','Earth','Air','Water','Fire','Earth','Air','Water','Fire','Earth','Air','Water'];
 const toneLabel = {bad:'Watchful', mixed:'Mixed', good:'Favourable', neutral:'Steady'};
 const toneClass = (tone) => ['bad','mixed','good'].includes(tone) ? tone : 'neutral';
+const timelineTrack = document.querySelector('#timeline-track');
+const timelineScroll = document.querySelector('#timeline-scroll');
+const timelinePreview = document.querySelector('#timeline-preview');
+let previewedMark = null;
 const recoveryDialog = document.querySelector('#recovery-dialog');
 document.querySelector('#recovery-open').addEventListener('click', () => recoveryDialog.showModal());
 document.querySelector('#recovery-close').addEventListener('click', () => recoveryDialog.close());
 recoveryDialog.addEventListener('click', (event) => {
   if (event.target === recoveryDialog) recoveryDialog.close();
-});
-document.querySelector('#recovery-cta').addEventListener('click', () => {
-  recoveryDialog.close();
-  document.querySelector('#reading').scrollIntoView({behavior:'smooth'});
-  form.elements.given.focus({preventScroll:true});
 });
 
 function updateFromYears() {
@@ -192,42 +764,120 @@ function updateFromYears() {
 dateInput.addEventListener('change', updateFromYears);
 updateFromYears();
 
-form.addEventListener('submit', (event) => {
+form.addEventListener('submit', async (event) => {
   event.preventDefault();
+  if (submitButton.disabled) return;
   error.hidden = true;
   try {
     reading = calculateReading(Object.fromEntries(new FormData(form)));
+    loader.hidden = false;
+    form.setAttribute('aria-busy', 'true');
+    submitButton.disabled = true;
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      await new Promise((resolve) => setTimeout(resolve, 550));
+    }
     renderReading();
     result.hidden = false;
-    result.scrollIntoView({behavior:'smooth'});
+    requestAnimationFrame(() => centerTimelineMark(Number(select.value)));
+    result.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
   } catch (problem) {
     error.textContent = problem.message;
     error.hidden = false;
+  } finally {
+    loader.hidden = true;
+    form.removeAttribute('aria-busy');
+    submitButton.disabled = false;
   }
 });
 
 document.querySelector('#print-button').addEventListener('click', () => window.print());
 select.addEventListener('change', () => showYear(Number(select.value)));
 
+function hideTimelinePreview() {
+  timelinePreview.hidden = true;
+  previewedMark?.removeAttribute('aria-describedby');
+  previewedMark = null;
+}
+
+function showTimelinePreview(mark) {
+  if (!reading || !mark) return;
+  const year = reading.years[Number(mark.dataset.index)];
+  if (!year) return;
+  if (previewedMark !== mark) hideTimelinePreview();
+  previewedMark = mark;
+  const tone = year.risingCaution ? 'bad' : toneClass(year.pointTone);
+  timelinePreview.innerHTML = `<small>AGE ${year.age} · ${year.year}–${year.year + 1}</small><strong>${escapeHtml(year.pointName)}</strong><span class="season-badge ${tone}">${toneLabel[tone]}</span><p>${escapeHtml(year.pointText)}</p><em>Select to open this year's reading</em>`;
+  timelinePreview.hidden = false;
+  mark.setAttribute('aria-describedby', 'timeline-preview');
+  const markBox = mark.getBoundingClientRect();
+  const previewBox = timelinePreview.getBoundingClientRect();
+  const left = Math.max(12, Math.min(window.innerWidth - previewBox.width - 12, markBox.left + markBox.width / 2 - previewBox.width / 2));
+  const above = markBox.top - previewBox.height - 12;
+  timelinePreview.style.left = `${left}px`;
+  timelinePreview.style.top = `${above >= 12 ? above : Math.min(window.innerHeight - previewBox.height - 12, markBox.bottom + 12)}px`;
+}
+
+timelineTrack.addEventListener('mouseover', (event) => {
+  const mark = event.target.closest('.timeline-mark');
+  if (mark && mark !== previewedMark) showTimelinePreview(mark);
+});
+timelineTrack.addEventListener('mouseleave', hideTimelinePreview);
+timelineTrack.addEventListener('focusin', (event) => {
+  const mark = event.target.closest('.timeline-mark');
+  if (mark) showTimelinePreview(mark);
+});
+timelineTrack.addEventListener('focusout', (event) => {
+  if (!timelineTrack.contains(event.relatedTarget)) hideTimelinePreview();
+});
+timelineTrack.addEventListener('click', (event) => {
+  const mark = event.target.closest('.timeline-mark');
+  if (!mark) return;
+  hideTimelinePreview();
+  showYear(Number(mark.dataset.index));
+  document.querySelector('#year-detail').scrollIntoView({behavior:'smooth', block:'start'});
+});
+timelineScroll.addEventListener('scroll', hideTimelinePreview, {passive:true});
+window.addEventListener('resize', hideTimelinePreview);
+
+function renderTimeline(years) {
+  hideTimelinePreview();
+  timelineTrack.style.setProperty('--year-count', years.length);
+  const marks = years.map((year, index) => {
+    const tone = year.risingCaution ? 'bad' : toneClass(year.pointTone);
+    return `<button type="button" class="timeline-mark ${tone}" data-index="${index}" aria-label="Age ${year.age}, ${year.year} to ${year.year + 1}, ${escapeHtml(year.pointName)}, ${toneLabel[tone]}"><span aria-hidden="true"></span></button>`;
+  }).join('');
+  const labels = years.map((year, index) => (index === 0 || year.age % 10 === 0 || index === years.length - 1)
+    ? `<span style="grid-column:${index + 1}">${year.age}</span>` : '').join('');
+  timelineTrack.innerHTML = `<div class="timeline-marks" aria-label="Years of life">${marks}</div><div class="timeline-axis" aria-hidden="true">${labels}</div>`;
+}
+
+function centerTimelineMark(index) {
+  const mark = timelineTrack.querySelector(`.timeline-mark[data-index="${index}"]`);
+  if (!mark) return;
+  const markLeft = mark.getBoundingClientRect().left - timelineScroll.getBoundingClientRect().left + timelineScroll.scrollLeft;
+  timelineScroll.scrollLeft = Math.max(0, markLeft - (timelineScroll.clientWidth - mark.clientWidth) / 2);
+}
+
 function renderReading() {
   const {person, method, portrait, years} = reading;
   document.querySelector('#result-title').textContent = `${person.given}’s appointed seasons`;
+  renderCelestialHierarchy(reading);
   const signIndex = method.sun.signNumber - 1;
   document.querySelector('#governance-sign').innerHTML = `
     <h4>Your governing sign</h4>
     <div class="sign-hero"><span class="sign-glyph" aria-hidden="true">${signGlyphs[signIndex]}</span><div><strong>${escapeHtml(method.sun.sign)}</strong><span>${signElements[signIndex]} · ${method.morning ? 'Morning' : 'Evening'} birth</span></div></div>
-    <div class="governance-facts"><div><small>Sign of the Sun</small><strong>${escapeHtml(method.sun.sign)} ${method.sun.degree}°</strong><span>Sepharial’s fixed calendar</span></div><div><small>Astrological date</small><strong>${escapeHtml(method.astroDate)}</strong><span>${method.morning ? 'Reckoned to the previous noon' : 'Reckoned from this noon'}</span></div><div><small>Birth place</small><strong>${escapeHtml(person.place || 'Not supplied')}</strong><span>Recorded on your profile</span></div></div>
-    <p class="governance-source">Source: Sepharial, chapter I</p>`;
+    <div class="governance-facts"><div><small>Sign of the Sun</small><strong>${escapeHtml(method.sun.sign)} ${method.sun.degree}°</strong><span>The reading’s calendar</span></div><div><small>Calculation date</small><strong>${escapeHtml(method.astroDate)}</strong><span>${method.morning ? 'Reckoned to the previous noon' : 'Reckoned from this noon'}</span></div><div><small>Birth place</small><strong>${escapeHtml(person.place || 'Not supplied')}</strong><span>Recorded on your profile</span></div></div>`;
   document.querySelector('#summary-content').innerHTML = `
     <h4>Portrait of your sign</h4>
     <p><b>Your fortunes</b> ${escapeHtml(portrait[0])}</p><p><b>Your nature</b> ${escapeHtml(portrait[1])}</p>
     <div class="birth-seal"><small>Your key number</small><strong>${method.key}</strong><span>From your birth names, ${method.sun.degree}° of ${escapeHtml(method.sun.sign)}, and sign number ${method.sun.signNumber}</span></div>
-    <div class="calculation"><strong>How it was calculated</strong><span>${method.names.map((item) => `${escapeHtml(item.name)} = ${item.value}`).join(' · ')}</span><span>${escapeHtml(method.keyString)} → digit sum ${method.key}</span></div>
-    <p class="governance-source">Source: Sepharial, chapters III and VII</p>`;
+    <div class="calculation"><strong>How it was calculated</strong><span>${method.names.map((item) => `${escapeHtml(item.name)} = ${item.value}`).join(' · ')}</span><span>${escapeHtml(method.keyString)} → digit sum ${method.key}</span></div>`;
   select.innerHTML = years.map((year, index) => `<option value="${index}">${year.year} · age ${year.age}</option>`).join('');
   const requested = Number(fromYear.value);
   const startIndex = years.findIndex((year) => year.year >= requested);
   windowStartIndex = startIndex < 0 ? years.length - 1 : startIndex;
+  renderGuardianAngels();
+  renderTimeline(years);
   showYear(windowStartIndex);
   document.querySelector('#limit-text').textContent = reading.limits;
 }
@@ -248,41 +898,29 @@ function showYear(index) {
   document.querySelectorAll('.year-card').forEach((button) => button.addEventListener('click', () => showYear(Number(button.dataset.age) - 1)));
   select.value = String(index);
   const year = years[index];
-  renderAngelCards(year);
   const tone = year.risingCaution ? 'bad' : toneClass(year.pointTone);
+  timelineTrack.querySelector('.timeline-mark.active')?.classList.remove('active');
+  const activeMark = timelineTrack.querySelector(`.timeline-mark[data-index="${index}"]`);
+  if (activeMark) {
+    activeMark.classList.add('active');
+    if (!result.hidden) centerTimelineMark(index);
+  }
+  document.querySelector('#timeline-selected').textContent = `Age ${year.age} · ${year.year}–${year.year + 1}`;
   document.querySelector('#year-detail').innerHTML = `
-    <div class="year-detail-title"><span class="section-number">${year.year}–${year.year + 1} / YEAR ${year.age} OF LIFE</span><h4>${escapeHtml(year.pointName)} <em class="season-badge ${tone}">${toneLabel[tone]}</em></h4><p>From your birthday in ${year.year} to your birthday in ${year.year + 1}</p></div>
-    <div class="rising-note ${year.risingCaution ? 'watchful' : ''}"><b>${year.risingCaution ? 'A watchful passage' : 'The rising sign'}</b><span>${escapeHtml(year.rising)} rises. ${escapeHtml(year.risingText)}${year.risingCaution ? ` Sepharial marks this pairing with ${escapeHtml(reading.method.sun.sign)} as difficult.` : ''}</span></div>
+    <div class="year-detail-title"><div class="year-detail-topline"><span class="section-number">${year.year}–${year.year + 1} / YEAR ${year.age} OF LIFE</span><a class="button button-gold year-change-cta" href="https://order.wowlife.lk/">What can I do about this? <span aria-hidden="true">↗</span></a></div><h4>${escapeHtml(year.pointName)} <em class="season-badge ${tone}">${toneLabel[tone]}</em></h4><p>From your birthday in ${year.year} to your birthday in ${year.year + 1}</p></div>
+    <div class="rising-note ${year.risingCaution ? 'watchful' : ''}"><b>${year.risingCaution ? 'A season of resistance' : 'The rising sign'}</b><span>${escapeHtml(year.rising)} rises. ${escapeHtml(year.risingText)}${year.risingCaution ? ` This pairing with ${escapeHtml(reading.method.sun.sign)} is marked as difficult.` : ''}</span></div>
     <div class="detail-grid">
-      <div><small>01 / SEAL OF THE YEAR</small><h5>${year.pointYear + reading.method.key} → ${year.pointNumber}</h5><p>${escapeHtml(year.pointText)}</p><span>${year.pointYear} + key ${reading.method.key}; digit sum ${year.pointNumber}</span></div>
+      <div><small>01 / SEAL OF THE YEAR</small><h5>${year.pointSum} → ${year.pointNumber}</h5><p>${escapeHtml(year.pointText)}</p><span>${year.pointYear} + key ${reading.method.key} = ${year.pointSum}; digit sum ${year.pointDigitSum}${year.pointDigitSum > 22 ? `, wrapped to ${year.pointNumber}` : ''}</span></div>
       <div><small>02 / YOUR SIGN'S HOUSE</small><h5>House ${year.house}</h5><p>${escapeHtml(year.houseText)}</p><span>One house of passage per year of life</span></div>
       <div><small>03 / PROCESSIONAL SIGN</small><h5>${escapeHtml(year.rising)}</h5><p>${escapeHtml(year.risingText)}</p><span>Read alongside the annual point and house.</span></div>
-    </div><p class="detail-source">Source: Sepharial, <i>Kabalistic Astrology</i>, chapter XV. These are symbolic interpretations from the text, not certain events.</p>`;
+    </div>
+    <div class="age-cycle-note"><b>Age-cycle pattern · ${escapeHtml(year.agePointName)}</b><span>${year.year} + age ${year.ageAttained} = ${year.ageCycleSum}; digit sum ${year.agePointDigitSum}${year.agePointDigitSum > 22 ? `, wrapped to point ${year.agePointNumber}` : `, point ${year.agePointNumber}`}.</span><p>${escapeHtml(year.agePointText)}</p></div>`;
 }
 
-function renderAngelCards(year) {
-  const {method, portrait} = reading;
-  const candidates = [
-    ((method.key - 1) % 72 + 72) % 72 + 1,
-    (method.sun.signNumber - 1) * 6 + Math.ceil(method.sun.degree / 5),
-    ((year.pointNumber * 7 + year.age - 1) % 72) + 1
-  ];
-  const used = new Set();
-  const numbers = candidates.map((candidate) => {
-    let number = candidate;
-    while (used.has(number)) number = number % 72 + 1;
-    used.add(number);
-    return number;
-  });
-  const cards = [
-    {role:'Your name number', title:`Key ${method.key}`, insight:`The values of your birth names form key number ${method.key} in Sepharial’s method.`, source:'Chapter III'},
-    {role:'Your birth sign', title:`${method.sun.sign} ${method.sun.degree}°`, insight:portrait[1], source:'Chapters I and VII'},
-    {role:'Your selected year', title:`${year.year} · Point ${year.pointNumber}`, insight:year.pointText, source:'Chapter XV'}
-  ];
-  angelCards.innerHTML = cards.map((card, index) => `<article class="angel-card">
-    <div class="angel-number" aria-hidden="true">${String(numbers[index]).padStart(2, '0')}</div>
-    <img src="${artPath(numbers[index])}" alt="Illustrative angel portrait for ${escapeHtml(card.role.toLowerCase())}" width="720" height="1080">
-    <div class="angel-card-copy"><span class="card-role"><i></i>${escapeHtml(card.role)}</span><h4>${escapeHtml(card.title)}</h4><p>${escapeHtml(card.insight)}</p><small>Reading insight: Sepharial, ${escapeHtml(card.source)}. Portrait selection is illustrative.</small></div>
+function renderGuardianAngels() {
+  angelCards.innerHTML = reading.guardianAngels.map((angel) => `<article class="angel-card">
+    ${angel.number ? `<div class="angel-name">${escapeHtml(angel.name)}</div><img src="${artPath(angel.number)}" alt="Illustrative artwork paired with ${escapeHtml(angel.name)}" width="720" height="1080">` : '<div class="angel-unassigned" aria-hidden="true">No date assignment</div>'}
+    <div class="angel-card-copy"><span class="card-role"><i></i>${escapeHtml(angel.role)}</span><h4>${escapeHtml(angel.name || 'No date assignment')}</h4><p>${escapeHtml(angel.basis)}</p><small>The portrait is illustrative.</small></div>
   </article>`).join('');
 }
 

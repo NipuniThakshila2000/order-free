@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="A free, source-aware reading from Sepharial's Kabalistic Astrology and William Lilly's Christian Astrology.">
-  <title>Appointed Seasons | A Reading from the Old Books</title>
-  <link rel="stylesheet" href="styles.css?v=9">
-  <script defer src="src/app.bundle.js?v=7"></script>
+  <meta name="description" content="A free symbolic reading of your appointed seasons and guardian angel correspondences.">
+  <title>Appointed Seasons | Your Reading</title>
+  <link rel="stylesheet" href="styles.css?v=21">
+  <script defer src="src/app.bundle.js?v=18"></script>
 </head>
 <body>
   <header class="site-header">
@@ -16,24 +16,25 @@
   <main id="top">
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-copy">
-        <p class="eyebrow"><span class="eyebrow-line"></span> A free reading, grounded in the old texts</p>
+        <p class="eyebrow"><span class="eyebrow-line"></span> A free symbolic reading</p>
         <h1 id="hero-title">There is a season<br>for <em>everything.</em></h1>
-        <p class="hero-lead">Enter your birth names, date, and time to explore a symbolic reading drawn from Sepharial’s <i>Kabalistic Astrology</i>. See the rule behind every result.</p>
+        <p class="hero-scripture">“To every thing there is a season, and a time to every purpose under the heaven:” <span>Ecclesiastes 3:1 · KJV</span></p>
+        <p class="hero-lead">Enter your birth names, date, and time to explore your appointed seasons. See how every result is calculated.</p>
         <div class="hero-actions"><a class="button button-gold" href="#reading">Discover your seasons <span aria-hidden="true">↗</span></a><a class="text-link" href="#method">How the reading works <span aria-hidden="true">↓</span></a></div>
         <p class="hero-note">Free to explore · No account · Your details are not stored</p>
       </div>
       <div class="hero-art" role="img" aria-label="Traditional gold sun and stars on a deep blue sky"></div>
     </section>
     <section class="intro-band" id="method" aria-labelledby="method-title">
-      <div class="section-heading"><span class="section-number">01 / THE METHOD</span><h2 id="method-title">A reading you can <em>trace.</em></h2><p>Each part follows a named rule in the supplied books. The page shows its arithmetic and the source behind the interpretation.</p></div>
+      <div class="section-heading"><span class="section-number">01 / THE METHOD</span><h2 id="method-title">A reading you can <em>trace.</em></h2><p>Each part follows a defined rule. The page shows the arithmetic behind the interpretation.</p></div>
       <div class="method-grid">
-        <article class="method-card"><span class="method-icon">Ⅰ</span><h3>Your name in numbers</h3><p>Each letter receives the value in Sepharial’s English alphabet table. The letter’s position in each birth name changes its contribution.</p><small>SEPHARIAL · CHAPTER III</small></article>
-        <article class="method-card"><span class="method-icon">Ⅱ</span><h3>The birth sign</h3><p>The book’s calendar gives the Sun’s symbolic degree. Its day begins at noon, so morning births use the previous date.</p><small>SEPHARIAL · CHAPTER I</small></article>
-        <article class="method-card"><span class="method-icon">Ⅲ</span><h3>The years of life</h3><p>The key number, annual point, and the passage of the natal sign through the houses form a year by year reading.</p><small>SEPHARIAL · CHAPTER XV</small></article>
+        <article class="method-card"><span class="method-icon">Ⅰ</span><h3>Your name in numbers</h3><p>Each letter receives a value. Its position in each birth name changes its contribution.</p><small>NAME VALUES</small></article>
+        <article class="method-card"><span class="method-icon">Ⅱ</span><h3>The birth sign</h3><p>The reading’s calendar gives the Sun’s symbolic degree. Its day begins at noon, so morning births use the previous date.</p><small>BIRTH DATE</small></article>
+        <article class="method-card"><span class="method-icon">Ⅲ</span><h3>The years of life</h3><p>The yearly point, your sign’s passage through the houses, and an age-plus-year cycle offer separate views of each year.</p><small>YEARLY PATTERNS</small></article>
       </div>
     </section>
     <section class="reading-section" id="reading" aria-labelledby="reading-title">
-      <div class="reading-intro"><span class="section-number">02 / YOUR READING</span><h2 id="reading-title">Begin with your <em>beginning.</em></h2><p>Use your birth names as written in the book’s method. The time determines whether the previous noon is used.</p></div>
+      <div class="reading-intro"><span class="section-number">02 / YOUR READING</span><h2 id="reading-title">Begin with your <em>beginning.</em></h2><p>Use your birth names as given. The time determines whether the previous noon is used.</p></div>
       <form id="reading-form" class="reading-form" novalidate>
         <div class="form-grid">
           <label>Christian / given name(s) <input name="given" autocomplete="given-name" placeholder="e.g. William Ewart" required></label>
@@ -44,28 +45,52 @@
           <label>Show seasons from <select name="from" id="from-year"></select><span class="field-hint">Choose the first year to show in your reading.</span></label>
         </div>
         <div class="form-footer"><button class="button button-gold" type="submit">Reveal my reading <span aria-hidden="true">↗</span></button><p>Calculated on this page. No account or payment needed.</p></div>
+        <div id="reading-loader" class="reading-loader" role="status" aria-live="polite" hidden>
+          <div class="mouse-runway" aria-hidden="true">
+            <svg class="loading-mouse mouse-one" viewBox="0 0 100 60"><path class="mouse-tail" d="M22 42C10 43 8 54 18 54c6 0 8-5 6-8"/><ellipse class="mouse-body" cx="49" cy="38" rx="27" ry="15"/><circle class="mouse-ear" cx="63" cy="19" r="10"/><circle class="mouse-ear-inner" cx="63" cy="19" r="5"/><circle class="mouse-head" cx="72" cy="35" r="15"/><circle class="mouse-eye" cx="77" cy="30" r="2"/><circle class="mouse-nose" cx="87" cy="38" r="2.5"/><path class="mouse-feet" d="M35 51v4m22-4v4"/></svg>
+            <svg class="loading-mouse mouse-two" viewBox="0 0 100 60"><path class="mouse-tail" d="M22 42C10 43 8 54 18 54c6 0 8-5 6-8"/><ellipse class="mouse-body" cx="49" cy="38" rx="27" ry="15"/><circle class="mouse-ear" cx="63" cy="19" r="10"/><circle class="mouse-ear-inner" cx="63" cy="19" r="5"/><circle class="mouse-head" cx="72" cy="35" r="15"/><circle class="mouse-eye" cx="77" cy="30" r="2"/><circle class="mouse-nose" cx="87" cy="38" r="2.5"/><path class="mouse-feet" d="M35 51v4m22-4v4"/></svg>
+          </div>
+          <span>Gathering your appointed seasons…</span>
+        </div>
         <p id="form-error" class="error" role="alert" hidden></p>
       </form>
     </section>
     <section id="result" class="results" aria-live="polite" hidden>
       <div class="result-head"><div><span class="section-number">03 / YOUR RESULTS</span><h2 id="result-title">Your appointed seasons</h2></div><button id="print-button" class="button button-outline" type="button">Print reading ↗</button></div>
+      <section class="celestial-section" aria-labelledby="celestial-title">
+        <div class="celestial-heading"><span class="section-number">THE HEAVENLY ORDER</span><h3 id="celestial-title">Christ above <em>all things.</em></h3><p>“And he is before all things, and by him all things consist.” <span>Colossians 1:17 · KJV</span></p></div>
+        <div class="hierarchy-controls"><span>Explore the wheel</span><button id="hierarchy-view-toggle" type="button" aria-pressed="false">Fit whole wheel</button></div>
+        <div id="celestial-map" class="celestial-map"></div>
+        <p class="celestial-swipe">Swipe to explore the whole wheel <span aria-hidden="true">→</span></p>
+        <div id="celestial-details" class="celestial-details"></div>
+        <div id="hierarchy-popover" class="hierarchy-popover" role="dialog" aria-label="Celestial detail" aria-modal="false" hidden></div>
+        <p class="celestial-note">The constellation is the traditional counterpart of your calculated sign. This symbolic diagram does not chart the physical sky at birth.</p>
+      </section>
       <section class="result-chapter" aria-labelledby="angel-title">
-        <div class="chapter-heading"><span>I</span><h3 id="angel-title">Three portraits for your reading</h3></div>
-        <p class="chapter-lead">Your name number, birth sign, and selected year, presented with illustrative angel art.</p>
+        <div class="chapter-heading"><span>I</span><h3 id="angel-title">Your guardian angels</h3></div>
+        <p class="chapter-lead">These guardian angel correspondences use your birth date and local birth time. The portraits are illustrative.</p>
         <div id="angel-cards" class="angel-cards"></div>
       </section>
       <section class="result-chapter" aria-labelledby="governance-title">
         <div class="chapter-heading"><span>II</span><h3 id="governance-title">The heavens at your birth</h3></div>
-        <p class="chapter-lead">Your sign and key number follow the printed rules in Sepharial’s <i>Kabalistic Astrology</i>.</p>
+        <p class="chapter-lead">Your sign and key number are calculated from your birth details.</p>
         <div class="governance-grid"><div id="governance-sign" class="governance-panel"></div><div id="summary-content" class="governance-panel"></div></div>
       </section>
       <section class="result-chapter" aria-labelledby="seasons-title">
       <div class="chapter-heading"><span>III</span><h3 id="seasons-title">Your seasons, year by year</h3></div>
-      <div class="year-heading"><div><p>Browse ten years from the year you chose. A year of life begins on a birthday.</p></div><label class="year-jump">Jump to year <select id="year-select"></select></label></div>
+      <p class="season-scripture">“So teach us to number our days, that we may apply our hearts unto wisdom.” <span>Psalm 90:12 · KJV</span></p>
+      <div class="year-heading"><div><p>The timeline covers every year of life; the cards below show ten at a time. Each year begins on a birthday.</p></div><label class="year-jump">Jump to year <select id="year-select"></select></label></div>
+      <div class="life-timeline" aria-labelledby="timeline-title">
+        <div class="timeline-heading"><div><span class="section-number">YOUR LIFETIME AT A GLANCE</span><h4 id="timeline-title">Timeline</h4></div><strong id="timeline-selected"></strong></div>
+        <p class="timeline-instruction">Age runs from left to right. Hover or focus on a mark for a preview; select it to open that birthday-year breakdown.</p>
+        <div id="timeline-scroll" class="timeline-scroll" tabindex="0" aria-label="Scroll through the ages on the timeline"><div id="timeline-track" class="timeline-track"></div></div>
+        <div class="timeline-legend" aria-label="Timeline colours"><span><i class="good"></i>Favourable</span><span><i class="mixed"></i>Mixed</span><span><i class="bad"></i>Watchful</span><span><i class="neutral"></i>Steady</span></div>
+        <div id="timeline-preview" class="timeline-preview" role="tooltip" hidden></div>
+      </div>
       <div id="year-grid" class="year-grid"></div>
       <article id="year-detail" class="year-detail"></article>
       </section>
-      <div class="source-limit"><strong>About the limits of this reading</strong><p id="limit-text"></p><p>The supplied texts do not establish a three-angel assignment from these inputs. No angel names or portraits are presented as book-derived results.</p></div>
+      <div class="source-limit"><strong>About the limits of this reading</strong><p id="limit-text"></p><p>These correspondences are symbolic, and the art is illustrative. Birth dates from 15–19 March and 29 February have no numbered date assignment.</p></div>
     </section>
     <section class="recovery-section" id="recovery" aria-labelledby="recovery-title">
       <button id="recovery-open" class="recovery-card" type="button" aria-haspopup="dialog" aria-controls="recovery-dialog">
@@ -74,7 +99,7 @@
           <span class="section-number">04 / CHANGE YOUR LIFE</span>
           <span class="lock-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg> Locked content</span>
           <span id="recovery-title" class="recovery-title">Change the path of Your Life</span>
-          <span class="recovery-teaser">Learn how to change the course of your appointment and appointed parts and break strongholds that have already been decided for you; learn how to break curses.</span>
+          <span class="recovery-teaser">Learn how to change the course of your appointment and appointed parts and break strongholds that have already been decided for you; learn how to break curses. At the upcoming Architecture of Freedom Program.</span>
           <span class="recovery-hint">Learn How <span aria-hidden="true">↗</span></span>
         </span>
       </button>
@@ -85,9 +110,10 @@
     <div class="modal-emblem" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
     <span class="section-number">CHANGE YOUR LIFE / PREVIEW</span>
     <h2 id="recovery-dialog-title">How to change your course</h2>
-    <p id="recovery-dialog-text">Learn how to change the course of your appointment and appointed parts and break strongholds that have already been decided for you; learn how to break curses.</p>
-    <button id="recovery-cta" class="button button-gold" type="button">Begin with your reading <span aria-hidden="true">↗</span></button>
+    <p id="recovery-dialog-text">Learn how to change the course of your appointment and appointed parts and break strongholds that have already been decided for you; learn how to break curses. At the upcoming Architecture of Freedom Program.</p>
+    <p class="dialog-scripture">“mighty through God to the pulling down of strong holds” <span>2 Corinthians 10:4 · KJV</span></p>
+    <a id="recovery-cta" class="button button-gold" href="https://order.wowlife.lk/">Begin with your reading <span aria-hidden="true">↗</span></a>
   </dialog>
-  <footer class="site-footer"><span>✦ APPOINTED SEASONS</span><p>A historical, symbolic reading from the supplied texts. It does not determine health outcomes, life span, or a date of death.</p><a href="#top">Back to top ↑</a></footer>
+  <footer class="site-footer"><span>✦ APPOINTED SEASONS</span><p>A symbolic reading. It does not determine health outcomes, life span, or a date of death.</p><a href="#top">Back to top ↑</a></footer>
 </body>
 </html>
