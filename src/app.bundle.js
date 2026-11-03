@@ -130,12 +130,12 @@ function bookSun(month, day) {
 
 function validateInput(input) {
   const given = String(input.given || '').trim().replace(/\s+/g, ' ');
-  const surname = String(input.surname || '').trim();
+  const surname = String(input.surname || '').trim().replace(/\s+/g, ' ');
   const place = String(input.place || '').trim();
   const date = String(input.date || '');
   const time = String(input.time || '');
   if (!given || !surname || !date || !time) throw new Error('Enter your full given name, family name, birth date, and birth time.');
-  if (!/^[A-Za-z\s'-]+$/.test(given) || !/^[A-Za-z'-]+$/.test(surname)) throw new Error('This name calculation supports A–Z letters. Use a Latin spelling of your birth names.');
+  if (!/^[A-Za-z\s'-]+$/.test(given) || !/^[A-Za-z\s'-]+$/.test(surname)) throw new Error('This name calculation supports A–Z letters. Use a Latin spelling of your birth names.');
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
   const clock = /^(\d{2}):(\d{2})$/.exec(time);
   if (!match || !clock) throw new Error('Enter a valid birth date and time.');

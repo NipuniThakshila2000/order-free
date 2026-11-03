@@ -26,6 +26,14 @@ test('rejects impossible dates', () => {
   assert.throws(() => calculateReading({given:'Anna', surname:'Smith', date:'2001-02-29', time:'08:00'}), /real birth date/);
 });
 
+test('accepts a family name with two parts', () => {
+  const input = {given:'Anna', surname:'Smith Jones', date:'2000-01-01', time:'08:00'};
+  const reading = calculateReading(input);
+  const hyphenated = calculateReading({...input, surname:'Smith-Jones'});
+  assert.equal(reading.person.surname, 'Smith Jones');
+  assert.equal(reading.method.key, hyphenated.method.key);
+});
+
 test('preserves the optional city without changing the calculation', () => {
   const input = {given:'William Ewart', surname:'Gladstone', date:'1809-12-29', time:'06:00'};
   const withoutPlace = calculateReading(input);
