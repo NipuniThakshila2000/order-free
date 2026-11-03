@@ -1,10 +1,11 @@
-// Paste into a Google Apps Script project. Set SHEET_ID and REGISTRATION_TOKEN
+// Paste into this Google Sheet's Apps Script project. Set REGISTRATION_TOKEN
 // in Project Settings > Script Properties, then deploy as a web app.
+const REGISTRATION_SHEET_ID = '18Nh09g0nwYdh3Xo7UdNUzXXV_rclv3XgTpvNoJgFEd4';
 function doPost(e) {
   try {
     const properties = PropertiesService.getScriptProperties();
     const expectedToken = properties.getProperty('REGISTRATION_TOKEN');
-    const sheetId = properties.getProperty('SHEET_ID');
+    const sheetId = REGISTRATION_SHEET_ID;
     const data = JSON.parse(e.postData.contents);
     if (!expectedToken || !sheetId || data.token !== expectedToken) throw new Error('Unauthorized');
     const firstName = String(data.firstName || '').trim();
