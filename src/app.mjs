@@ -381,9 +381,15 @@ function showYear(index) {
 function renderGuardianAngels() {
   angelCards.innerHTML = reading.guardianAngels.map((angel) => {
     const info = angel.number ? getHierarchyInfo(`angel:${angel.number - 1}`) : null;
+    const needsBirthTime = angel.role === 'Spirit guardian angel' && !angel.number;
+    const hourOnly = needsBirthTime && angel.candidates?.length > 0;
+    const unassignedTitle = needsBirthTime ? (hourOnly ? 'Birth minute needed' : 'Birth time needed') : 'No date assignment';
+    const unassignedDescription = needsBirthTime
+      ? (hourOnly ? 'The birth hour covers three possible 20-minute intervals. In Time of birth, choose Known to the minute and add the birth minute to identify one angel.' : 'This guardian angel is identified from a 20-minute birth-time interval. In Time of birth, choose Known to the minute and enter the hour, minute, and AM/PM if known.')
+      : angel.basis;
     return `<article class="angel-card">
-    ${angel.number ? `<div class="angel-name">${escapeHtml(angel.name)}</div><img src="${artPath(angel.number)}" alt="Illustrative artwork paired with ${escapeHtml(angel.name)}" width="720" height="1080">` : '<div class="angel-unassigned" aria-hidden="true">No date assignment</div>'}
-    <div class="angel-card-copy"><span class="card-role"><i></i>${escapeHtml(angel.role)}</span><h4>${escapeHtml(angel.name || 'No date assignment')}</h4>${info ? `<p class="angel-attribute">${escapeHtml(info.subtitle)}</p><p class="angel-description">${escapeHtml(info.body)}</p>` : '<p>No unique correspondence is assigned for the available details.</p>'}<small>The portrait is illustrative.</small></div>
+    ${angel.number ? `<div class="angel-name">${escapeHtml(angel.name)}</div><img src="${artPath(angel.number)}" alt="Illustrative artwork paired with ${escapeHtml(angel.name)}" width="720" height="1080">` : `<div class="angel-unassigned" aria-hidden="true">${unassignedTitle}</div>`}
+    <div class="angel-card-copy"><span class="card-role"><i></i>${escapeHtml(angel.role)}</span><h4>${escapeHtml(angel.name || unassignedTitle)}</h4>${info ? `<p class="angel-attribute">${escapeHtml(info.subtitle)}</p><p class="angel-description">${escapeHtml(info.body)}</p>` : `<p>${escapeHtml(unassignedDescription)}</p>`}${angel.number ? '<small>The portrait is illustrative.</small>' : ''}</div>
   </article>`;
   }).join('');
 }
