@@ -7,6 +7,7 @@
   <title>Appointed Seasons | Your Reading</title>
   <link rel="stylesheet" href="styles.css?v=26">
   <script defer src="src/app.bundle.js?v=24"></script>
+  <script defer src="src/registration-secondary.js?v=1"></script>
 </head>
 <body>
   <header class="site-header">
@@ -130,10 +131,13 @@
           <span class="section-number">04 / CHANGE YOUR LIFE</span>
           <span class="lock-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg> Locked content</span>
           <span id="recovery-title" class="recovery-title">Change the path of Your Life</span>
-          <span class="recovery-teaser">Learn how to change the course of your appointment and appointed parts and break strongholds that have already been decided for you; learn how to break curses. At the upcoming Architecture of Freedom Program.</span>
-          <span class="recovery-hint">Learn How <span aria-hidden="true">↗</span></span>
+          <span class="recovery-hint">Register for the free program <span aria-hidden="true">↗</span></span>
         </span>
       </button>
+      <div class="program-registration program-registration--recovery" id="recovery-registration">
+        <div class="program-registration-copy"><span class="section-number">FREE PROGRAM · 11 NOVEMBER 2026</span><h3>Register to attend</h3><p>Choose how you plan to join the workshop.</p></div>
+        <div id="recovery-registration-form-mount"></div>
+      </div>
     </section>
   </main>
   <dialog id="recovery-dialog" class="recovery-dialog" aria-labelledby="recovery-dialog-title" aria-describedby="recovery-dialog-text">
@@ -141,9 +145,9 @@
     <div class="modal-emblem" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
     <span class="section-number">CHANGE YOUR LIFE / PREVIEW</span>
     <h2 id="recovery-dialog-title">How to change your course</h2>
-    <p id="recovery-dialog-text">Learn how to change the course of your appointment and appointed parts and break strongholds that have already been decided for you; learn how to break curses. At the upcoming Architecture of Freedom Program.</p>
+    <p id="recovery-dialog-text">Join the free program on 11 November. Choose online attendance or join us in person at EPIC Sri Lanka.</p>
     <p class="dialog-scripture">“mighty through God to the pulling down of strong holds” <span>2 Corinthians 10:4 · KJV</span></p>
-    <a id="recovery-cta" class="button button-gold" href="https://order.wowlife.lk/" target="_blank" rel="noopener noreferrer">Begin with your reading <span aria-hidden="true">↗</span></a>
+    <a id="recovery-cta" class="button button-gold" href="#recovery-registration">Register below <span aria-hidden="true">↓</span></a>
   </dialog>
   <footer class="site-footer"><span>✦ APPOINTED SEASONS</span><p>A symbolic reading. It does not determine health outcomes, life span, or a date of death.</p><a href="#top">Back to top ↑</a></footer>
 </body>
