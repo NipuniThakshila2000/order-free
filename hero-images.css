@@ -1,0 +1,17 @@
+.hero-art{
+  width:100%;
+  min-height:0;
+  aspect-ratio:1672/941;
+  align-self:center;
+  border:1px solid rgba(237,202,136,.7);
+  border-radius:8px;
+  background:#0b2441 url('Theme/ChatGPT Image 3 Nov 2026, 14_49_28 (1).png') center/cover no-repeat;
+}
+.recovery-card,.recovery-card:hover,.recovery-card:focus-visible{filter:none}
+.recovery-art{
+  background:#0b2441 url('Theme/ChatGPT Image 3 Nov 2026, 14_49_51.png') center/contain no-repeat;
+}
+@media(max-width:760px){
+  .hero-art{display:block;width:100%;min-height:0;aspect-ratio:1672/941}
+  .recovery-art{min-height:0;aspect-ratio:1672/941}
+}
