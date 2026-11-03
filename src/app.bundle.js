@@ -8084,7 +8084,6 @@
         <blockquote>${lillyPassage ? escapeHtml(lillyPassage) : "The source moves directly from the tenth to the twelfth house. Lilly supplies no eleventh-house passage in this chapter."}</blockquote>
         <p class="lilly-future-transition">The profection then enters ${escapeHtml(displaySign(lillyYear.nextSign))}, ruled by ${escapeHtml(lillyYear.nextRuler)}, within this annual period.</p>` : `<h5>Birth place and exact time needed</h5><p>Lilly's Ascendant profection requires a resolved birth place and exact birth time.</p>`}
       <p class="lilly-future-limit">${escapeHtml(LILLY_JUDGEMENT_LIMIT)}</p>
-      <a href="https://www.worldastrology.net/wp-content/uploads/2008/12/CA-III.pdf" target="_blank" rel="noopener noreferrer">Read Lilly's Book III source \u2197</a>
     </div>
     <div class="age-cycle-note"><b>Reflection in Christ</b><p>Christ is supreme over every age, sign, and symbolic point. These historical classifications cannot determine your life in him.</p></div>`;
   }

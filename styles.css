@@ -121,7 +121,6 @@
 .lilly-future p{font-size:14px;line-height:1.6;margin:10px 0}
 .lilly-future blockquote{margin:15px 0;padding:14px 18px;border-left:2px solid var(--gold);background:rgba(214,174,88,.08);font-family:var(--serif);font-size:17px;line-height:1.55}
 .lilly-future .lilly-future-limit{font-size:12px;color:#b4c8d9}
-.lilly-future a{color:#f1cf85;font-size:12px;text-underline-offset:3px}
 @media(max-width:1000px){.result-chapter .year-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:760px){.results{padding:55px 25px}.result-chapter{margin-top:43px}.chapter-heading{gap:11px}.chapter-heading::before{display:none}.chapter-heading h3{font-size:30px}.governance-grid{grid-template-columns:1fr}.result-chapter .angel-card img{aspect-ratio:2/3}.result-chapter .angel-card-copy p{min-height:0}.result-chapter .year-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.result-chapter .year-card{min-height:190px}.result-chapter .detail-grid{grid-template-columns:1fr}}
 @media(max-width:460px){.governance-panel{padding:20px}.governance-facts{grid-template-columns:1fr}.result-chapter .year-card strong{font-size:20px}.result-chapter .year-card{padding:12px;min-height:195px}.result-chapter .year-card i{font-size:14px}}
