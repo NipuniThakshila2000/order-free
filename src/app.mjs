@@ -365,7 +365,7 @@ function showYear(index) {
     <div class="detail-grid">
       <div><small>01 / YEAR-PLUS-AGE POINT</small><h5>Point ${year.pointNumber}</h5><p>${escapeHtml(year.pointText)}</p><span>${escapeHtml(year.pointName)} · ${toneLabel[tone]}</span></div>
       <div><small>02 / SEPHARIAL'S HOUSE CORRESPONDENCE</small><h5>${year.house ? `House ${year.house}` : 'Birth time needed'}</h5><p>${year.house ? escapeHtml(year.houseText) : 'This correspondence requires a birth time.'}</p></div>
-      <div><small>03 / SEPHARIAL'S PROCESSIONAL SIGN</small><h5>${year.rising ? `${escapeHtml(displaySign(year.rising))} → ${escapeHtml(displaySign(year.risingNext))}` : 'Birth time needed'}</h5><p>${year.rising ? escapeHtml(year.risingText) : 'This sequence requires a birth time.'}</p></div>
+      <div><small>03 / SEPHARIAL</small><h5>${year.rising ? `${escapeHtml(displaySign(year.rising))} → ${escapeHtml(displaySign(year.risingNext))}` : 'Birth time needed'}</h5><p>${year.rising ? escapeHtml(year.risingText) : 'This sequence requires a birth time.'}</p></div>
     </div>
     <div class="lilly-future"><small>WILLIAM LILLY · CHRISTIAN ASTROLOGY, BOOK III, CHAPTER CLXIX</small>
       ${lillyYear ? `<h5>Annual profection: ${escapeHtml(displaySign(lillyYear.sign))} · ${escapeHtml(lillyYear.ruler)} · natal house ${lillyYear.profectionHouse}</h5>
