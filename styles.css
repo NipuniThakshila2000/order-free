@@ -328,6 +328,25 @@
 .time-field input[type="hidden"]{display:none}
 .reading-citation{margin:20px 0 0;padding:12px 15px;border-left:2px solid rgba(214,174,88,.65);background:rgba(214,174,88,.07);color:#c8d1da;font-size:11px;line-height:1.65}
 .reading-citation strong{color:#efdaa8}.reading-citation cite{font-style:italic}.reading-citation a{color:#f0dcae;text-decoration:underline;text-underline-offset:2px}.reading-citation a:hover{color:#fff1ca}
+.program-section{padding:clamp(58px,7vw,96px) clamp(20px,7vw,110px);background:linear-gradient(145deg,#081c35,#102e50);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.program-inner{max-width:1240px;margin:auto;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(30px,5vw,72px);align-items:center}
+.program-copy h2{font-size:clamp(39px,4vw,61px);line-height:1.04;margin:18px 0 22px}.program-copy p{font-size:15px;line-height:1.75;color:#d1dbe4;margin-bottom:17px}.program-copy p:last-child{margin-bottom:0}
+.program-video{position:relative;display:block;min-width:0;overflow:hidden;border:1px solid rgba(214,174,88,.55);box-shadow:0 20px 48px rgba(0,0,0,.28)}
+.program-video img{display:block;width:100%;height:auto;aspect-ratio:1672/941;object-fit:cover}.program-video:focus-visible{outline:3px solid var(--light-gold);outline-offset:4px}
+.program-play{position:absolute;top:50%;left:50%;display:grid;place-items:center;width:72px;height:72px;padding-left:5px;border:2px solid #f4dfa6;border-radius:50%;background:rgba(4,21,41,.8);color:#f4dfa6;font-size:28px;transform:translate(-50%,-50%);transition:background .2s,scale .2s}.program-video:hover .program-play{background:#071c37;scale:1.08}
+.program-watch{position:absolute;left:0;right:0;bottom:0;padding:15px 18px;background:linear-gradient(transparent,rgba(4,16,33,.92));color:#fff0c5;font-size:13px;font-weight:700}
+@media(max-width:900px){.program-inner{grid-template-columns:1fr}.program-copy{max-width:720px}}
+@media(max-width:600px){.program-section{padding:50px 20px}.program-copy h2{font-size:clamp(37px,9vw,48px)}.program-copy p{font-size:14px}.program-play{width:57px;height:57px;font-size:22px}}
+.program-registration{max-width:1240px;margin:58px auto 0;padding:32px;display:grid;grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);gap:40px;border:1px solid rgba(214,174,88,.4);background:#0b2747}
+.program-registration-copy h3{font-size:clamp(36px,4vw,54px);line-height:1.05;margin:15px 0 9px}.program-registration-copy p{color:#c7d3df;font-size:14px;line-height:1.6}
+.program-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.program-form label,.program-form legend{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#dfca9b}
+.program-form input:not([type="radio"]){display:block;width:100%;min-width:0;min-height:46px;margin-top:8px;padding:12px 14px;border:1px solid #45607a;border-radius:2px;background:#102f52;color:#f4ede1;font-size:15px;letter-spacing:normal;text-transform:none}
+.program-form input:focus-visible{outline:2px solid var(--light-gold);outline-offset:2px}.program-email{grid-column:1/-1}
+.program-form fieldset{display:flex;flex-wrap:wrap;gap:14px 24px;margin:20px 0 24px;padding:0;border:0}.program-form legend{margin-bottom:12px}.program-form fieldset label{display:inline-flex;align-items:center;gap:9px;min-height:30px;font-size:13px;letter-spacing:normal;text-transform:none;color:#e9e1d2;cursor:pointer}.program-form input[type="radio"]{accent-color:var(--gold);width:18px;height:18px;margin:0}
+.program-form-status{min-height:1.4em;margin:12px 0 0;color:#d6e2ed;font-size:12px;line-height:1.4}
+.program-form .button:disabled{opacity:.6;cursor:not-allowed}
+@media(max-width:900px){.program-registration{grid-template-columns:1fr;gap:20px}}
+@media(max-width:600px){.program-registration{margin-top:38px;padding:23px 20px}.program-form-grid{grid-template-columns:1fr}.program-email{grid-column:auto}.program-form .button{width:100%}}
 @media(max-width:760px){
   .site-header{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;min-height:64px;padding:10px 20px}
   .site-header .brand{min-width:0;font-size:clamp(10px,2.2vw,12px);letter-spacing:.1em;white-space:nowrap}

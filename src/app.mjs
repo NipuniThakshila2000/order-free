@@ -2,6 +2,11 @@ import {calculateReading} from './reading.mjs';
 import {renderCelestialHierarchy} from './hierarchy.mjs';
 
 const form = document.querySelector('#reading-form');
+const programForm = document.querySelector('#program-registration-form');
+programForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  document.querySelector('#program-form-status').textContent = 'Registration is being set up. Your details have not been sent.';
+});
 const result = document.querySelector('#result');
 const error = document.querySelector('#form-error');
 const loader = document.querySelector('#reading-loader');
