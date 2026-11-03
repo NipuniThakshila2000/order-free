@@ -60,6 +60,9 @@
 .sign-glyph{display:grid;place-items:center;width:76px;height:76px;flex:none;border:1px solid rgba(214,174,88,.55);border-radius:50%;font-size:42px;color:#f4dfa6;background:radial-gradient(circle at 40% 30%,rgba(214,174,88,.18),transparent 70%)}
 .sign-hero strong{display:block;font-family:var(--serif);font-size:37px;font-weight:500;color:#f4dfb2;line-height:1}
 .sign-hero span:last-child{font-family:var(--serif);font-size:17px;font-style:italic;color:#c4cbd1}
+.sign-hero .tribe-copy small{display:block;margin-bottom:5px;color:#dec78f;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.sign-hero .tribe-copy p{margin:4px 0;color:#e6edf2;font-size:14px;line-height:1.45}
+.sign-hero .tribe-copy p strong{display:inline;font-family:var(--serif);font-size:18px;color:#f4dfb2}
 .tribe-answer{margin:-5px 0 20px;padding:12px 16px;border-left:3px solid var(--gold);background:rgba(214,174,88,.09);border-radius:0 7px 7px 0}
 .tribe-answer small{display:block;margin-bottom:5px;color:#dec78f;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
 .tribe-answer>strong{display:block;color:#ffe6a8;font-family:var(--serif);font-size:30px;line-height:1.1}
