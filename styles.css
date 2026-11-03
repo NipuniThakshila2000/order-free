@@ -318,6 +318,9 @@
 @media(max-width:600px){.hero-scripture{font-size:17px;margin-bottom:17px}.season-scripture{font-size:16px}}
 
 .nav-cta-short{display:none}
+.field-validation{display:block;margin-top:7px;color:#aebed0;font-size:11px;font-weight:400;letter-spacing:normal;line-height:1.4;text-transform:none}
+.field-validation.is-valid{color:#a6e0bc}.field-validation.is-invalid{color:#ffb6a9}
+.form-grid input[aria-invalid="true"]{border-color:#ffb6a9}
 @media(max-width:760px){
   .site-header{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;min-height:64px;padding:10px 20px}
   .site-header .brand{min-width:0;font-size:clamp(10px,2.2vw,12px);letter-spacing:.1em;white-space:nowrap}

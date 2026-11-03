@@ -764,10 +764,43 @@ function updateFromYears() {
 dateInput.addEventListener('change', updateFromYears);
 updateFromYears();
 
+function validateField(input) {
+  const value = input.value.trim();
+  let message = '';
+  if (!value) message = 'This field is required.';
+  else if (input.name === 'given' || input.name === 'surname') {
+    if (!/^[A-Za-z\s'-]+$/.test(value)) message = 'Use A–Z letters, spaces, apostrophes, or hyphens.';
+    else if (!/[A-Za-z]/.test(value)) message = 'Enter at least one letter.';
+  } else if (input.name === 'date') {
+    const parts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+    const date = parts && new Date(Date.UTC(Number(parts[1]), Number(parts[2]) - 1, Number(parts[3])));
+    if (!parts || Number(parts[1]) < 1600 || date.getUTCFullYear() !== Number(parts[1]) || date.getUTCMonth() !== Number(parts[2]) - 1 || date.getUTCDate() !== Number(parts[3]) || date > new Date()) message = 'Choose a real date from 1600 through today.';
+  } else if (input.name === 'time' && !/^([01]\d|2[0-3]):[0-5]\d$/.test(value)) {
+    message = 'Enter a valid local birth time.';
+  }
+  const note = document.querySelector(`#${input.name}-validation`);
+  note.textContent = message || `${input.name === 'date' ? 'Date' : input.name === 'time' ? 'Time' : 'Name'} looks correct.`;
+  note.classList.toggle('is-invalid', Boolean(message));
+  note.classList.toggle('is-valid', !message);
+  input.setAttribute('aria-invalid', String(Boolean(message)));
+  return !message;
+}
+const validatedInputs = ['given', 'surname', 'date', 'time'].map((name) => form.elements[name]);
+validatedInputs.forEach((input) => {
+  input.addEventListener('blur', () => validateField(input));
+  input.addEventListener('input', () => validateField(input));
+  input.addEventListener('change', () => validateField(input));
+});
+
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
   if (submitButton.disabled) return;
   error.hidden = true;
+  const invalidInput = validatedInputs.filter((input) => !validateField(input))[0];
+  if (invalidInput) {
+    invalidInput.focus();
+    return;
+  }
   try {
     reading = calculateReading(Object.fromEntries(new FormData(form)));
     loader.hidden = false;

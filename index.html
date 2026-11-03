@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="A free symbolic reading of your appointed seasons and guardian angel correspondences.">
   <title>Appointed Seasons | Your Reading</title>
-  <link rel="stylesheet" href="styles.css?v=22">
-  <script defer src="src/app.bundle.js?v=20"></script>
+  <link rel="stylesheet" href="styles.css?v=23">
+  <script defer src="src/app.bundle.js?v=21"></script>
 </head>
 <body>
   <header class="site-header">
@@ -37,10 +37,10 @@
       <div class="reading-intro"><span class="section-number">02 / YOUR READING</span><h2 id="reading-title">Begin with your <em>beginning.</em></h2><p>Use your birth names as given. The time determines whether the previous noon is used.</p></div>
       <form id="reading-form" class="reading-form" novalidate>
         <div class="form-grid">
-          <label>Christian / given name(s) <input name="given" autocomplete="given-name" placeholder="e.g. William Ewart" required></label>
-          <label>Family name (father's surname) <input name="surname" autocomplete="family-name" placeholder="e.g. Gladstone" required></label>
-          <label>Date of birth <input name="date" type="date" required></label>
-          <label>Time of birth <input name="time" type="time" required></label>
+          <label>Christian / given name(s) <input name="given" autocomplete="given-name" placeholder="e.g. William Ewart" aria-describedby="given-validation" required><span id="given-validation" class="field-validation" aria-live="polite">Use A–Z letters; spaces between names are welcome.</span></label>
+          <label>Family name (father's surname) <input name="surname" autocomplete="family-name" placeholder="e.g. Gladstone" aria-describedby="surname-validation" required><span id="surname-validation" class="field-validation" aria-live="polite">Use A–Z letters; two-part family names are welcome.</span></label>
+          <label>Date of birth <input name="date" type="date" aria-describedby="date-validation" required><span id="date-validation" class="field-validation" aria-live="polite">Choose a real date from 1600 through today.</span></label>
+          <label>Time of birth <input name="time" type="time" aria-describedby="time-validation" required><span id="time-validation" class="field-validation" aria-live="polite">Enter your local birth time in the format shown.</span></label>
           <label>Place of birth (city) <input name="place" autocomplete="address-level2" placeholder="e.g. Colombo"><span class="field-hint">Recorded on your profile; local clock time is used.</span></label>
           <label>Show seasons from <select name="from" id="from-year"></select><span class="field-hint">Choose the first year to show in your reading.</span></label>
         </div>
