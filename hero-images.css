@@ -1,6 +1,21 @@
-.hero-art{
-  background-image:url('Theme/ChatGPT Image 3 Nov 2026, 14_49_28 (1).png');
+.hero{
+  display:flex;
+  align-items:center;
+  gap:0;
+  min-height:clamp(600px,48vw,760px);
+  padding:clamp(56px,7vw,108px) clamp(26px,8vw,132px);
+  background-image:linear-gradient(90deg,rgba(4,18,38,.94) 0%,rgba(4,19,39,.86) 35%,rgba(5,22,43,.43) 75%,rgba(5,22,43,.19) 100%),linear-gradient(0deg,rgba(4,17,35,.5),transparent 45%),url('Theme/ChatGPT Image 3 Nov 2026, 14_49_28 (1).png');
+  background-position:center;
   background-size:cover;
+}
+.hero::before{display:none}
+.hero-copy{max-width:760px;padding:0}
+.hero-art{display:none}
+@media(max-width:900px){
+  .hero{display:flex;padding:64px clamp(26px,6vw,55px);background-position:58% center}
+}
+@media(max-width:600px){
+  .hero{min-height:680px;padding:48px 22px;background-image:linear-gradient(90deg,rgba(4,18,38,.89),rgba(4,19,39,.72)),url('Theme/ChatGPT Image 3 Nov 2026, 14_49_28 (1).png');background-position:57% center}
 }
 .recovery-card,.recovery-card:hover,.recovery-card:focus-visible{filter:none}
 .recovery-art{
