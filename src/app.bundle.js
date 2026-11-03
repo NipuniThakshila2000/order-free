@@ -8071,7 +8071,7 @@
     }
     document.querySelector("#timeline-selected").textContent = `${year.year} \xB7 Age ${year.ageAttained} \xB7 Point ${year.pointNumber}`;
     document.querySelector("#year-detail").innerHTML = `
-    <div class="year-detail-title"><div class="year-detail-topline"><span class="section-number">${year.year} \xB7 AGE ${year.ageAttained} \xB7 POINT ${year.pointNumber}</span><a class="button button-gold year-change-cta" href="https://order.wowlife.lk/" target="_blank" rel="noopener noreferrer">What can I do about this? <span aria-hidden="true">\u2197</span></a></div><h4>${escapeHtml(year.pointName)} <em class="season-badge ${tone}">${toneLabel[tone]}</em></h4></div>
+    <div class="year-detail-title"><div class="year-detail-topline"><span class="section-number">${year.year} \xB7 AGE ${year.ageAttained} \xB7 POINT ${year.pointNumber}</span><a class="button button-gold year-change-cta" href="https://order.wowlife.lk/RedeemingTheSeasons" target="_blank" rel="noopener noreferrer">What can I do about this? <span aria-hidden="true">\u2197</span></a></div><h4>${escapeHtml(year.pointName)} <em class="season-badge ${tone}">${toneLabel[tone]}</em></h4></div>
     <div class="rising-note"><b>Christ above every season</b><span>These historical symbols invite reflection; they do not determine your future or your redemption in Christ.</span></div>
     <div class="detail-grid">
       <div><small>01 / YEAR-PLUS-AGE POINT</small><h5>Point ${year.pointNumber}</h5><p>${escapeHtml(year.pointText)}</p><span>${escapeHtml(year.pointName)} \xB7 ${toneLabel[tone]}</span></div>
