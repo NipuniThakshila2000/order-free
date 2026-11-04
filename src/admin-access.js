@@ -14,7 +14,6 @@ const generatedReport = document.querySelector('#generated-report');
 const metricsStatus = document.querySelector('#page-metrics-status');
 const metricsCards = document.querySelector('#page-metrics-cards');
 const metricsChart = document.querySelector('#page-metrics-chart');
-const metricsSites = document.querySelector('#page-metrics-sites');
 let generatedOffset = 0;
 let selectedRecord = null;
 
@@ -69,7 +68,6 @@ async function loadMetrics() {
     metricsChart.innerHTML = days.map((day, index) => `<div class="metric-day" title="${day.key}: ${count(day.views)} page loads"><div class="metric-bar" style="height:${Math.max(2, Math.round(day.views / Math.max(1, peak) * 100))}%"></div>${index % 5 === 0 || index === 29 ? `<small>${day.key.slice(5)}</small>` : '<small aria-hidden="true">&nbsp;</small>'}</div>`).join('');
     metricsChart.setAttribute('aria-label', `Daily page loads over the last 30 days. Total: ${count(summary.last_thirty_days)}. Highest day: ${count(peak)}.`);
 
-    metricsSites.innerHTML = data.sites.length ? data.sites.map((item) => `<div><span>${escapeHtml(item.site)}</span><strong>${count(item.views)}</strong></div>`).join('') : '<p>No page loads recorded yet.</p>';
     metricsStatus.textContent = summary.first_day ? `Counting since ${summary.first_day}.` : 'Counting starts with the first page load after deployment.';
   } catch (error) { metricsStatus.textContent = error.message; }
 }
