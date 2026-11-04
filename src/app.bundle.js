@@ -7759,6 +7759,7 @@
     const loginMessage = document.querySelector("#access-login-message");
     const accessButton = document.querySelector("#access-open");
     const headerLogin = document.querySelector("#header-login");
+    const heroLogin = document.querySelector("#hero-login");
     const gate = document.querySelector("#demo-gate");
     const recoveryNav = document.querySelector('.site-header nav a[href="#recovery"]');
     if (recoveryNav) recoveryNav.href = "#reading";
@@ -7782,6 +7783,7 @@
         unlock(data.email);
         accessButton.textContent = "Sign out";
         headerLogin.textContent = "Sign out";
+        heroLogin.textContent = "View my reports";
         if (recoveryNav) recoveryNav.href = "#recovery";
       }
     }).catch(() => {
@@ -7797,6 +7799,7 @@
     }
     accessButton.addEventListener("click", () => approved ? signOut() : open("apply"));
     headerLogin.addEventListener("click", () => approved ? signOut() : open("login"));
+    heroLogin.addEventListener("click", () => approved ? document.querySelector("#saved-experiences").scrollIntoView({ behavior: "smooth", block: "start" }) : open("login"));
     document.querySelector("#demo-apply").addEventListener("click", () => open("apply"));
     document.querySelector("#demo-signin").addEventListener("click", () => open("login"));
     document.querySelector("#access-show-login").addEventListener("click", () => open("login"));
@@ -7868,6 +7871,7 @@
         unlock(loginForm.elements.email.value.trim().toLowerCase());
         accessButton.textContent = "Sign out";
         headerLogin.textContent = "Sign out";
+        heroLogin.textContent = "View my reports";
         if (recoveryNav) recoveryNav.href = "#recovery";
         dialog.close();
         document.querySelector("#reading-form").scrollIntoView({ behavior: "smooth", block: "start" });

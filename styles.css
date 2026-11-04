@@ -410,10 +410,14 @@
 .hero h1{max-width:750px;margin:28px 0 24px;font-size:clamp(63px,6.25vw,102px);line-height:.94;letter-spacing:-.04em;white-space:normal;text-wrap:balance;color:#faf3e8}
 .hero h1 em{color:#f0c77a;text-shadow:0 2px 32px rgba(233,174,79,.16)}
 .hero-lead{max-width:560px;margin:0;font-size:clamp(16px,1.35vw,18px);line-height:1.68;color:#d8e1e8}
-.hero-actions{gap:27px;margin-top:32px}
+.hero-actions{gap:15px;margin-top:32px}
 .hero-actions .button-gold{min-height:54px;padding:15px 24px;background:linear-gradient(135deg,#f0d592,#cda35c);border-color:#e7c47b;box-shadow:0 12px 26px rgba(0,0,0,.2);color:#132743}
 .hero-actions .button-gold:hover{background:#f4dca5}
 .hero-actions .text-link{color:#f5e6c7}
+.hero-actions .button-login{min-height:54px;padding:13px 18px;border:2px solid #f0d592;background:#143c61;box-shadow:0 10px 25px rgba(0,0,0,.28),inset 0 0 0 1px rgba(255,255,255,.1);color:#fff5dc;font-size:12px;white-space:nowrap}
+.hero-actions .button-login:hover{background:#f0d592;color:#132743}
+.hero-actions .button-login:focus-visible{outline:2px solid #fff;outline-offset:3px}
+@media(max-width:600px){.hero-actions .button-login{white-space:normal}}
 .hero-scripture{max-width:570px;margin:43px 0 0;padding:21px 0 0;border-left:0;border-top:1px solid rgba(227,195,130,.38);font-size:clamp(18px,1.65vw,22px);line-height:1.37;color:#f1e4cb}
 .hero-scripture span{margin-top:10px;color:#dabb7e}
 .hero-note{margin:20px 0 0;font-size:11px;letter-spacing:.035em;color:#b7c6d3}
