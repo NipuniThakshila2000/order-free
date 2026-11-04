@@ -46,6 +46,7 @@ const experienceSaveStatus = document.querySelector('#experience-save-status');
 const savedExperiences = document.querySelector('#saved-experiences');
 const savedExperiencesList = document.querySelector('#saved-experiences-list');
 const savedExperiencesStatus = document.querySelector('#saved-experiences-status');
+const refreshSavedExperiences = document.querySelector('#refresh-saved-experiences');
 const deleteAllExperiences = document.querySelector('#delete-all-experiences');
 const submitButton = form.querySelector('[type="submit"]');
 const select = document.querySelector('#year-select');
@@ -114,21 +115,24 @@ function updateFromYears() {
 async function loadSavedExperiences() {
   if (!accessApproved) return;
   savedExperiences.hidden = false;
+  savedExperiencesStatus.textContent = 'Loading saved reports…';
   try {
     const response = await fetch('api/experience-data?action=mine', {credentials:'same-origin',cache:'no-store'});
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Saved experiences are unavailable.');
     const records = data.records || [];
     deleteAllExperiences.hidden = records.length === 0;
-    savedExperiencesStatus.textContent = records.length ? `${records.length} saved experience${records.length === 1 ? '' : 's'}.` : 'No saved experiences yet.';
+    savedExperiencesStatus.textContent = records.length ? `${records.length} saved experience${records.length === 1 ? '' : 's'}.` : 'No saved reports yet. Generate a report and agree to the Terms and Conditions to save it.';
     savedExperiencesList.innerHTML = records.map((item) => `<div class="saved-experience-card">
       <div><strong>${escapeHtml(item.birthName)}</strong><small>${escapeHtml(item.birthDate)} · ${escapeHtml(item.birthplace || 'Place not supplied')} · Saved ${new Date(item.createdAt).toLocaleDateString()}</small></div>
       <div class="saved-experience-actions"><button type="button" data-action="view" data-id="${escapeHtml(item.id)}">View results</button><button type="button" data-action="delete" data-id="${escapeHtml(item.id)}">Delete</button></div>
     </div>`).join('');
   } catch (problem) {
-    savedExperiencesStatus.textContent = problem.message;
+    savedExperiencesStatus.textContent = `${problem.message} Select Refresh reports to try again.`;
   }
 }
+
+refreshSavedExperiences.addEventListener('click', loadSavedExperiences);
 
 savedExperiencesList.addEventListener('click', async (event) => {
   const button = event.target.closest('button[data-action]');
@@ -318,6 +322,7 @@ form.addEventListener('submit', async (event) => {
     (invalidInput.name === 'time' ? [timeHour, timeMinute, timePeriod].find((control) => !control.disabled && !control.value) || timeCertainty : invalidInput).focus();
     return;
   }
+  let reportRendered = false;
   try {
     const place = placeInput.value.trim();
     if (place && timeCertainty.value === 'exact' && (!selectedLocation || place !== locationQuery)) {
@@ -349,6 +354,11 @@ form.addEventListener('submit', async (event) => {
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       await new Promise((resolve) => setTimeout(resolve, 550));
     }
+    renderReading();
+    result.hidden = false;
+    reportRendered = true;
+    requestAnimationFrame(() => centerTimelineMark(Number(select.value)));
+    result.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
     if (experienceConsent.checked) {
       const response = await fetch('api/experience-data', {
         method:'POST', credentials:'same-origin',
@@ -358,17 +368,13 @@ form.addEventListener('submit', async (event) => {
       const saved = await response.json().catch(() => ({}));
       if (!response.ok || !saved.saved) throw new Error(saved.error || 'Your results could not be saved. Please try again.');
       experienceSaveStatus.textContent = 'Saved to your account.';
-      loadSavedExperiences();
+      await loadSavedExperiences();
     } else {
       experienceSaveStatus.textContent = 'These results are shown in your browser only and were not saved.';
     }
     experienceSaveStatus.hidden = false;
-    renderReading();
-    result.hidden = false;
-    requestAnimationFrame(() => centerTimelineMark(Number(select.value)));
-    result.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
   } catch (problem) {
-    error.textContent = problem.message;
+    error.textContent = reportRendered ? `Your report is shown below, but it was not saved: ${problem.message}` : problem.message;
     error.hidden = false;
   } finally {
     loader.hidden = true;

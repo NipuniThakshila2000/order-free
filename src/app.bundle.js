@@ -7921,6 +7921,7 @@
   var savedExperiences = document.querySelector("#saved-experiences");
   var savedExperiencesList = document.querySelector("#saved-experiences-list");
   var savedExperiencesStatus = document.querySelector("#saved-experiences-status");
+  var refreshSavedExperiences = document.querySelector("#refresh-saved-experiences");
   var deleteAllExperiences = document.querySelector("#delete-all-experiences");
   var submitButton = form.querySelector('[type="submit"]');
   var select = document.querySelector("#year-select");
@@ -7986,21 +7987,23 @@
   async function loadSavedExperiences() {
     if (!accessApproved) return;
     savedExperiences.hidden = false;
+    savedExperiencesStatus.textContent = "Loading saved reports\u2026";
     try {
       const response = await fetch("api/experience-data?action=mine", { credentials: "same-origin", cache: "no-store" });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Saved experiences are unavailable.");
       const records = data.records || [];
       deleteAllExperiences.hidden = records.length === 0;
-      savedExperiencesStatus.textContent = records.length ? `${records.length} saved experience${records.length === 1 ? "" : "s"}.` : "No saved experiences yet.";
+      savedExperiencesStatus.textContent = records.length ? `${records.length} saved experience${records.length === 1 ? "" : "s"}.` : "No saved reports yet. Generate a report and agree to the Terms and Conditions to save it.";
       savedExperiencesList.innerHTML = records.map((item) => `<div class="saved-experience-card">
       <div><strong>${escapeHtml(item.birthName)}</strong><small>${escapeHtml(item.birthDate)} \xB7 ${escapeHtml(item.birthplace || "Place not supplied")} \xB7 Saved ${new Date(item.createdAt).toLocaleDateString()}</small></div>
       <div class="saved-experience-actions"><button type="button" data-action="view" data-id="${escapeHtml(item.id)}">View results</button><button type="button" data-action="delete" data-id="${escapeHtml(item.id)}">Delete</button></div>
     </div>`).join("");
     } catch (problem) {
-      savedExperiencesStatus.textContent = problem.message;
+      savedExperiencesStatus.textContent = `${problem.message} Select Refresh reports to try again.`;
     }
   }
+  refreshSavedExperiences.addEventListener("click", loadSavedExperiences);
   savedExperiencesList.addEventListener("click", async (event) => {
     const button = event.target.closest("button[data-action]");
     if (!button) return;
@@ -8193,6 +8196,7 @@
       (invalidInput.name === "time" ? [timeHour, timeMinute, timePeriod].find((control) => !control.disabled && !control.value) || timeCertainty : invalidInput).focus();
       return;
     }
+    let reportRendered = false;
     try {
       const place = placeInput.value.trim();
       if (place && timeCertainty.value === "exact" && (!selectedLocation || place !== locationQuery)) {
@@ -8224,6 +8228,11 @@
       if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         await new Promise((resolve) => setTimeout(resolve, 550));
       }
+      renderReading();
+      result.hidden = false;
+      reportRendered = true;
+      requestAnimationFrame(() => centerTimelineMark(Number(select.value)));
+      result.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
       if (experienceConsent.checked) {
         const response = await fetch("api/experience-data", {
           method: "POST",
@@ -8234,17 +8243,13 @@
         const saved = await response.json().catch(() => ({}));
         if (!response.ok || !saved.saved) throw new Error(saved.error || "Your results could not be saved. Please try again.");
         experienceSaveStatus.textContent = "Saved to your account.";
-        loadSavedExperiences();
+        await loadSavedExperiences();
       } else {
         experienceSaveStatus.textContent = "These results are shown in your browser only and were not saved.";
       }
       experienceSaveStatus.hidden = false;
-      renderReading();
-      result.hidden = false;
-      requestAnimationFrame(() => centerTimelineMark(Number(select.value)));
-      result.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
     } catch (problem) {
-      error.textContent = problem.message;
+      error.textContent = reportRendered ? `Your report is shown below, but it was not saved: ${problem.message}` : problem.message;
       error.hidden = false;
     } finally {
       loader.hidden = true;
