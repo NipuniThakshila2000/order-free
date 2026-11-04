@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
   <title>Experience applications | Redeeming the Seasons</title>
-  <link rel="stylesheet" href="admin-access.css">
-  <script defer src="src/admin-access.js"></script>
+  <link rel="stylesheet" href="admin-access.css?v=2">
+  <script type="module" src="src/admin-access.js?v=2"></script>
 </head>
 <body>
   <main>
@@ -34,7 +34,7 @@
         <p id="generated-status" role="status" aria-live="polite"></p>
         <div class="table-wrap"><table><thead><tr><th>Account</th><th>Birth details</th><th>Signs</th><th>Angels</th><th>Saved</th><th>Action</th></tr></thead><tbody id="generated-body"></tbody></table></div>
         <div class="generated-pagination"><button id="generated-previous" type="button">Previous</button><span id="generated-page"></span><button id="generated-next" type="button">Next</button></div>
-        <div id="generated-detail" class="generated-detail" hidden><h3>Full stored record</h3><button id="generated-download" type="button">Download JSON</button><pre id="generated-json"></pre></div>
+        <div id="generated-detail" class="generated-detail" hidden><div class="generated-detail-tools"><h3>Saved experience report</h3><button id="generated-download" type="button">Download data (JSON)</button></div><div id="generated-report"></div></div>
       </section>
     </section>
   </main>

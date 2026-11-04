@@ -1,3 +1,5 @@
+import {renderExperienceReport, renderYearDetail} from './experience-report.mjs';
+
 const base = '/api/access';
 const loginPanel = document.querySelector('#admin-login');
 const dashboard = document.querySelector('#admin-dashboard');
@@ -8,7 +10,7 @@ const tbody = document.querySelector('#applications-body');
 const generatedBody = document.querySelector('#generated-body');
 const generatedStatus = document.querySelector('#generated-status');
 const generatedDetail = document.querySelector('#generated-detail');
-const generatedJson = document.querySelector('#generated-json');
+const generatedReport = document.querySelector('#generated-report');
 const metricsStatus = document.querySelector('#page-metrics-status');
 const metricsCards = document.querySelector('#page-metrics-cards');
 const metricsChart = document.querySelector('#page-metrics-chart');
@@ -105,7 +107,7 @@ async function loadGenerated(offset = generatedOffset) {
       <td>${escapeHtml(item.symbolicSunSign || '—')}<br>${escapeHtml(item.astronomicalSunSign || '—')}</td>
       <td>${escapeHtml((item.angels || []).map((angel) => angel.name).filter(Boolean).join(', ') || '—')}</td>
       <td>${new Date(item.createdAt).toLocaleString()}</td>
-      <td><div class="decision"><button type="button" data-record="${escapeHtml(item.id)}">View full data</button><button type="button" class="reject" data-delete-record="${escapeHtml(item.id)}">Delete</button></div></td>
+      <td><div class="decision"><button type="button" data-record="${escapeHtml(item.id)}">View report</button><button type="button" class="reject" data-delete-record="${escapeHtml(item.id)}">Delete</button></div></td>
     </tr>`).join('') : '<tr><td colspan="6">No saved experiences yet.</td></tr>';
     document.querySelector('#generated-page').textContent = total ? `${offset + 1}–${offset + records.length} of ${total}` : '0 records';
     document.querySelector('#generated-previous').disabled = offset === 0;
@@ -124,6 +126,7 @@ generatedBody.addEventListener('click', async (event) => {
     try {
       await experienceApi('record', {id:remove.dataset.deleteRecord, method:'DELETE'});
       generatedDetail.hidden = true;
+      selectedRecord = null;
       await loadGenerated(generatedOffset);
     } catch (error) { generatedStatus.textContent = error.message; }
     return;
@@ -132,10 +135,25 @@ generatedBody.addEventListener('click', async (event) => {
   try {
     const {record} = await experienceApi('record', {id:view.dataset.record});
     selectedRecord = record;
-    generatedJson.textContent = JSON.stringify(record, null, 2);
+    generatedReport.innerHTML = renderExperienceReport(record);
     generatedDetail.hidden = false;
+    generatedReport.querySelector('.report-year-list .active')?.scrollIntoView({block:'nearest', inline:'center'});
     generatedDetail.scrollIntoView({behavior:'smooth',block:'start'});
   } catch (error) { generatedStatus.textContent = error.message; }
+});
+
+generatedDetail.addEventListener('click', (event) => {
+  const button = event.target.closest('button[data-report-year]');
+  if (!button || !selectedRecord) return;
+  const years = selectedRecord.result?.years;
+  const index = Number(button.dataset.reportYear);
+  if (!Array.isArray(years) || !Number.isInteger(index) || index < 0 || index >= years.length) return;
+  generatedDetail.querySelectorAll('button[data-report-year]').forEach((item) => {
+    const active = item === button;
+    item.classList.toggle('active', active);
+    item.setAttribute('aria-pressed', String(active));
+  });
+  generatedDetail.querySelector('#generated-year-detail').innerHTML = renderYearDetail(years[index]);
 });
 
 document.querySelector('#generated-download').addEventListener('click', () => {
