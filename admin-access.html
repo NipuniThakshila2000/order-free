@@ -4,23 +4,38 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
-  <title>Reading applications | Redeeming the Seasons</title>
+  <title>Experience applications | Redeeming the Seasons</title>
   <link rel="stylesheet" href="admin-access.css">
   <script defer src="src/admin-access.js"></script>
 </head>
 <body>
   <main>
-    <header><span>REDEEMING THE SEASONS</span><h1>Reading applications</h1><p>Review each request and grant access to the full reading.</p></header>
+    <header><span>REDEEMING THE SEASONS</span><h1>Experience applications</h1><p>Review each request and grant access to the full experience.</p></header>
     <section id="admin-login" class="panel" aria-labelledby="admin-login-title">
       <h2 id="admin-login-title">Admin sign in</h2>
-      <p>Enter your reading dashboard token. The existing WOWLife customer dashboard token also works.</p>
+      <p>Enter your experience dashboard token. The existing WOWLife customer dashboard token also works.</p>
       <form id="admin-token-form"><label>Dashboard token<input name="token" type="password" autocomplete="current-password" required></label><button type="submit">Sign in</button></form>
       <p id="admin-login-status" role="status" aria-live="polite"></p>
     </section>
     <section id="admin-dashboard" hidden>
       <div class="toolbar"><div id="admin-counts" aria-live="polite"></div><div><button id="admin-refresh" type="button">Refresh</button><button id="admin-logout" type="button">Sign out</button></div></div>
       <p id="admin-status" role="status" aria-live="polite"></p>
-      <div class="table-wrap"><table><thead><tr><th>Applicant</th><th>Years at WOWLife Church</th><th>How they found the teachings</th><th>Submitted</th><th>Status</th><th>Action</th></tr></thead><tbody id="applications-body"></tbody></table></div>
+      <section class="page-metrics" aria-labelledby="page-metrics-title">
+        <div class="metrics-heading"><div><h2 id="page-metrics-title">Page metrics</h2><p>Redeeming the Seasons page loads across the published site addresses.</p></div><span>Asia/Colombo time</span></div>
+        <p id="page-metrics-status" role="status" aria-live="polite">Loading page metrics…</p>
+        <div id="page-metrics-cards" class="metrics-cards"></div>
+        <div class="metrics-panels"><div class="metrics-panel"><h3>Last 30 days</h3><div id="page-metrics-chart" class="metrics-chart" role="img" aria-label="Daily page loads over the last 30 days"></div></div><div class="metrics-panel"><h3>Page loads by address</h3><div id="page-metrics-sites" class="metrics-sites"></div></div></div>
+        <p class="metrics-note">A page load is counted when the page runs in a browser. These are aggregate counts, not unique visitors. Counts begin when tracking was enabled.</p>
+      </section>
+      <div class="table-wrap"><table><thead><tr><th>Applicant</th><th>Phone</th><th>Country</th><th>Years at WOWLife Church</th><th>How they found the teachings</th><th>Recommended by</th><th>Submitted</th><th>Status</th><th>Action</th></tr></thead><tbody id="applications-body"></tbody></table></div>
+      <section class="generated-admin" aria-labelledby="generated-title">
+        <h2 id="generated-title">Stored experiences</h2>
+        <p>Birth details and full generated results are kept in the separate experience database.</p>
+        <p id="generated-status" role="status" aria-live="polite"></p>
+        <div class="table-wrap"><table><thead><tr><th>Account</th><th>Birth details</th><th>Signs</th><th>Angels</th><th>Saved</th><th>Action</th></tr></thead><tbody id="generated-body"></tbody></table></div>
+        <div class="generated-pagination"><button id="generated-previous" type="button">Previous</button><span id="generated-page"></span><button id="generated-next" type="button">Next</button></div>
+        <div id="generated-detail" class="generated-detail" hidden><h3>Full stored record</h3><button id="generated-download" type="button">Download JSON</button><pre id="generated-json"></pre></div>
+      </section>
     </section>
   </main>
 </body>

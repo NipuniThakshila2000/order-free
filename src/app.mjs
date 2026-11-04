@@ -40,6 +40,13 @@ programForm.addEventListener('submit', async (event) => {
 const result = document.querySelector('#result');
 const error = document.querySelector('#form-error');
 const loader = document.querySelector('#reading-loader');
+const experienceConsentRow = document.querySelector('#experience-consent-row');
+const experienceConsent = document.querySelector('#experience-consent');
+const experienceSaveStatus = document.querySelector('#experience-save-status');
+const savedExperiences = document.querySelector('#saved-experiences');
+const savedExperiencesList = document.querySelector('#saved-experiences-list');
+const savedExperiencesStatus = document.querySelector('#saved-experiences-status');
+const deleteAllExperiences = document.querySelector('#delete-all-experiences');
 const submitButton = form.querySelector('[type="submit"]');
 const select = document.querySelector('#year-select');
 const fromYear = document.querySelector('#from-year');
@@ -104,10 +111,87 @@ function updateFromYears() {
   }).join('');
 }
 
+async function loadSavedExperiences() {
+  if (!accessApproved) return;
+  savedExperiences.hidden = false;
+  try {
+    const response = await fetch('api/experience-data?action=mine', {credentials:'same-origin',cache:'no-store'});
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Saved experiences are unavailable.');
+    const records = data.records || [];
+    deleteAllExperiences.hidden = records.length === 0;
+    savedExperiencesStatus.textContent = records.length ? `${records.length} saved experience${records.length === 1 ? '' : 's'}.` : 'No saved experiences yet.';
+    savedExperiencesList.innerHTML = records.map((item) => `<div class="saved-experience-card">
+      <div><strong>${escapeHtml(item.birthName)}</strong><small>${escapeHtml(item.birthDate)} · ${escapeHtml(item.birthplace || 'Place not supplied')} · Saved ${new Date(item.createdAt).toLocaleDateString()}</small></div>
+      <div class="saved-experience-actions"><button type="button" data-action="view" data-id="${escapeHtml(item.id)}">View results</button><button type="button" data-action="delete" data-id="${escapeHtml(item.id)}">Delete</button></div>
+    </div>`).join('');
+  } catch (problem) {
+    savedExperiencesStatus.textContent = problem.message;
+  }
+}
+
+savedExperiencesList.addEventListener('click', async (event) => {
+  const button = event.target.closest('button[data-action]');
+  if (!button) return;
+  const id = button.dataset.id;
+  if (button.dataset.action === 'delete') {
+    if (!window.confirm('Delete this saved experience and its birth details?')) return;
+    const response = await fetch(`api/experience-data?action=record&id=${encodeURIComponent(id)}`, {method:'DELETE',credentials:'same-origin'});
+    const data = await response.json().catch(() => ({}));
+    savedExperiencesStatus.textContent = response.ok ? 'Saved data deleted.' : data.error || 'Could not delete this experience.';
+    if (response.ok) await loadSavedExperiences();
+    return;
+  }
+  try {
+    const response = await fetch(`api/experience-data?action=record&id=${encodeURIComponent(id)}`, {credentials:'same-origin',cache:'no-store'});
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Could not open this experience.');
+    const details = data.record.input;
+    reading = data.record.result;
+    form.elements.given.value = details.given || '';
+    form.elements.surname.value = details.surname || '';
+    birthCalendar.value = details.calendar || 'gregorian';
+    dateInput.type = birthCalendar.value === 'julian' ? 'text' : 'date';
+    dateInput.value = details.date || '';
+    timeCertainty.value = details.timeCertainty || 'unknown';
+    if (details.time) {
+      const [hour, minute] = details.time.split(':').map(Number);
+      timeHour.value = String(hour % 12 || 12);
+      timeMinute.value = String(minute).padStart(2, '0');
+      timePeriod.value = hour >= 12 ? 'PM' : 'AM';
+    }
+    updateTime();
+    placeInput.value = details.place || '';
+    selectedLocation = details.location || null;
+    locationQuery = placeInput.value;
+    updateFromYears();
+    fromYear.value = details.from || fromYear.value;
+    experienceConsent.checked = false;
+    renderReading();
+    result.hidden = false;
+    result.scrollIntoView({behavior:'smooth',block:'start'});
+  } catch (problem) {
+    savedExperiencesStatus.textContent = problem.message;
+  }
+});
+
+deleteAllExperiences.addEventListener('click', async () => {
+  if (!window.confirm('Delete all your saved birth details and generated results?')) return;
+  const response = await fetch('api/experience-data?action=all', {method:'DELETE',credentials:'same-origin'});
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    savedExperiencesStatus.textContent = data.error || 'Could not delete saved data.';
+    return;
+  }
+  await loadSavedExperiences();
+});
+
 initializeReadingAccess({
   form,
   result,
   showSample() {
+    experienceConsentRow.hidden = true;
+    experienceSaveStatus.hidden = true;
     form.elements.given.value = 'Grace';
     form.elements.surname.value = 'Anderson';
     birthCalendar.value = 'gregorian';
@@ -131,7 +215,7 @@ initializeReadingAccess({
     form.querySelectorAll('input:not([type="hidden"])').forEach((input) => { input.readOnly = true; });
     form.querySelectorAll('select').forEach((input) => { input.disabled = true; });
     submitButton.disabled = true;
-    submitButton.textContent = 'Sample reading shown below';
+    submitButton.textContent = 'Sample experience shown below';
   },
   unlock(email) {
     accessApproved = true;
@@ -140,6 +224,9 @@ initializeReadingAccess({
     form.querySelectorAll('input:not([type="hidden"])').forEach((input) => { input.readOnly = false; });
     form.querySelectorAll('select').forEach((input) => { input.disabled = false; });
     form.reset();
+    experienceConsentRow.hidden = false;
+    experienceConsent.checked = false;
+    experienceSaveStatus.hidden = true;
     selectedLocation = null;
     locationQuery = '';
     locationChoice.hidden = true;
@@ -152,6 +239,7 @@ initializeReadingAccess({
     submitButton.innerHTML = 'Begin My Reflection in Christ <span aria-hidden="true">↗</span>';
     document.querySelector('#access-status').textContent = `Signed in as ${email}. Enter your own details to begin.`;
     document.querySelector('#access-preview-note').hidden = true;
+    loadSavedExperiences();
   }
 });
 dateInput.addEventListener('change', updateFromYears);
@@ -183,7 +271,10 @@ function validateField(input) {
       const monthDays=[31,leap?29:28,31,30,31,30,31,31,30,31,30,31];
       const actual=birthCalendar.value === 'julian' ? julianRecordToGregorian({year,month,day}) : {year,month,day};
       const date=new Date(Date.UTC(actual.year,actual.month-1,actual.day));
+      const adultCutoff = new Date();
+      adultCutoff.setFullYear(adultCutoff.getFullYear() - 18);
       if (year<1600 || year>todayYear || month<1 || month>12 || day<1 || day>monthDays[month-1] || date>new Date()) message='Choose a real birth-record date from 1600 through today.';
+      else if (date > adultCutoff) message = 'This experience is for adults aged 18 or older.';
     }
   } else if (input.name === 'time' && !/^([01]\d|2[0-3]):[0-5]\d$/.test(value)) {
     message = 'Enter a valid local birth time.';
@@ -221,6 +312,7 @@ form.addEventListener('submit', async (event) => {
   if (!accessApproved) return;
   if (submitButton.disabled) return;
   error.hidden = true;
+  experienceSaveStatus.hidden = true;
   const invalidInput = validatedInputs.filter((input) => !validateField(input))[0];
   if (invalidInput) {
     (invalidInput.name === 'time' ? [timeHour, timeMinute, timePeriod].find((control) => !control.disabled && !control.value) || timeCertainty : invalidInput).focus();
@@ -243,7 +335,8 @@ form.addEventListener('submit', async (event) => {
       }
     }
     if (place && timeCertainty.value === 'exact' && !selectedLocation) throw new Error('Choose the matching birthplace.');
-    reading = calculateReading({...Object.fromEntries(new FormData(form)),location:selectedLocation,utcOffsetMinutes:offsetResult.value === '' ? undefined : Number(offsetResult.value)});
+    const details = {...Object.fromEntries(new FormData(form)),location:selectedLocation,utcOffsetMinutes:offsetResult.value === '' ? undefined : Number(offsetResult.value)};
+    reading = calculateReading(details);
     if (reading.lilly.offsetCandidates && offsetResult.value === '') {
       offsetResult.innerHTML = '<option value="">Choose the offset used at birth</option>' + reading.lilly.offsetCandidates.map((minutes) => `<option value="${minutes}">UTC ${minutes < 0 ? '−' : '+'}${Math.floor(Math.abs(minutes)/60)}:${String(Math.round(Math.abs(minutes)%60)).padStart(2,'0')}</option>`).join('');
       offsetChoice.hidden = false;
@@ -256,6 +349,20 @@ form.addEventListener('submit', async (event) => {
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       await new Promise((resolve) => setTimeout(resolve, 550));
     }
+    if (experienceConsent.checked) {
+      const response = await fetch('api/experience-data', {
+        method:'POST', credentials:'same-origin',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({consent:true, details, result:reading})
+      });
+      const saved = await response.json().catch(() => ({}));
+      if (!response.ok || !saved.saved) throw new Error(saved.error || 'Your results could not be saved. Please try again.');
+      experienceSaveStatus.textContent = 'Saved to your account.';
+      loadSavedExperiences();
+    } else {
+      experienceSaveStatus.textContent = 'These results are shown in your browser only and were not saved.';
+    }
+    experienceSaveStatus.hidden = false;
     renderReading();
     result.hidden = false;
     requestAnimationFrame(() => centerTimelineMark(Number(select.value)));

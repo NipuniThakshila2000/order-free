@@ -27,6 +27,7 @@ export function initializeReadingAccess({showSample, unlock}) {
   const applyError = document.querySelector('#access-apply-error');
   const loginMessage = document.querySelector('#access-login-message');
   const accessButton = document.querySelector('#access-open');
+  const headerLogin = document.querySelector('#header-login');
   const gate = document.querySelector('#demo-gate');
   const recoveryNav = document.querySelector('.site-header nav a[href="#recovery"]');
   if (recoveryNav) recoveryNav.href = '#reading';
@@ -52,20 +53,19 @@ export function initializeReadingAccess({showSample, unlock}) {
       approved = true;
       unlock(data.email);
       accessButton.textContent = 'Sign out';
+      headerLogin.textContent = 'Sign out';
       if (recoveryNav) recoveryNav.href = '#recovery';
     }
   }).catch(() => {
     document.querySelector('#access-status').textContent = 'Sign-in is temporarily unavailable. The sample remains open.';
   });
 
-  accessButton.addEventListener('click', async () => {
-    if (approved) {
-      try { await post('logout', {}); window.location.reload(); }
-      catch { document.querySelector('#access-status').textContent = 'Could not sign out. Please try again.'; }
-      return;
-    }
-    open('apply');
-  });
+  async function signOut() {
+    try { await post('logout', {}); window.location.reload(); }
+    catch { document.querySelector('#access-status').textContent = 'Could not sign out. Please try again.'; }
+  }
+  accessButton.addEventListener('click', () => approved ? signOut() : open('apply'));
+  headerLogin.addEventListener('click', () => approved ? signOut() : open('login'));
   document.querySelector('#demo-apply').addEventListener('click', () => open('apply'));
   document.querySelector('#demo-signin').addEventListener('click', () => open('login'));
   document.querySelector('#access-show-login').addEventListener('click', () => open('login'));
@@ -133,6 +133,7 @@ export function initializeReadingAccess({showSample, unlock}) {
       approved = true;
       unlock(loginForm.elements.email.value.trim().toLowerCase());
       accessButton.textContent = 'Sign out';
+      headerLogin.textContent = 'Sign out';
       if (recoveryNav) recoveryNav.href = '#recovery';
       dialog.close();
       document.querySelector('#reading-form').scrollIntoView({behavior:'smooth',block:'start'});

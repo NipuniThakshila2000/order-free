@@ -5,15 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Explore historical symbolic methods under the headship of Christ and reflect on your appointed seasons.">
   <title>Redeeming the Seasons | A Reflection in Christ</title>
-  <link rel="stylesheet" href="styles.css?v=38">
+  <link rel="stylesheet" href="styles.css?v=42">
   <link rel="stylesheet" href="hero-images.css?v=3">
-  <script defer src="src/app.bundle.js?v=38"></script>
+  <script defer src="src/app.bundle.js?v=42"></script>
   <script defer src="src/recovery-cta.js?v=1"></script>
+  <script defer src="src/page-metrics.js?v=1"></script>
+  <script defer src="src/privacy-statement.js?v=1"></script>
 </head>
 <body>
   <header class="site-header">
     <a class="brand" href="#top"><span class="brand-mark">✦</span> Redeeming the Seasons</a>
-    <nav aria-label="Main navigation"><a href="#method">Historical sources</a><a href="#recovery">Change your life</a><a class="nav-cta" href="#reading"><span class="nav-cta-long">Begin your reflection</span><span class="nav-cta-short">Begin</span><span aria-hidden="true">↗</span></a></nav>
+    <nav aria-label="Main navigation"><a href="#method">Historical sources</a><a href="#recovery">Change your life</a><button id="header-login" class="header-login" type="button">User login</button><a class="nav-cta" href="#reading"><span class="nav-cta-long">Begin your reflection</span><span class="nav-cta-short">Begin</span><span aria-hidden="true">↗</span></a></nav>
   </header>
   <main id="top">
     <section class="hero" aria-labelledby="hero-title">
@@ -25,7 +27,7 @@
         <div class="hero-actions"><a class="button button-gold" href="#reading">Begin your reflection <span aria-hidden="true">↗</span></a><a class="text-link" href="#method">Explore the sources <span aria-hidden="true">↓</span></a></div>
         <p class="hero-scripture">“To every thing there is a season, and a time to every purpose under the heaven:” <span>Ecclesiastes 3:1 · KJV</span></p>
         <p class="hero-genesis">“As long as the earth remains, seedtime and harvest, cold and heat, summer and winter, day and night will continue.” <span>GENESIS 8:22 · PARAPHRASE</span></p>
-        <p class="hero-note">Explore the sample freely · Approval required for a personal reading · Birth details are not stored</p>
+        <p class="hero-note">Explore the sample freely · Approval required for your personal experience · Your details are stored with your consent</p>
       </div>
     </section>
     <section class="appointed-statement" aria-labelledby="appointed-title"><h2 id="appointed-title">This is your appointed time…</h2></section>
@@ -63,7 +65,7 @@
       </div>
     </section>
     <section class="reading-section" id="reading" aria-labelledby="reading-title">
-      <div class="reading-intro"><span class="section-number">02 / YOUR REFLECTION</span><h2 id="reading-title">Begin with your <em>beginning.</em></h2><p>Use your birth names as given. Your details help distinguish the historical methods; Christ remains above them all.</p><p id="access-preview-note" class="access-preview-note">A sample reading is ready below. Apply for access to enter your own details and explore the full reading.</p><button id="access-open" class="button button-outline" type="button">Apply or sign in</button><p id="access-status" class="access-status" role="status" aria-live="polite"></p></div>
+      <div class="reading-intro"><span class="section-number">02 / YOUR REFLECTION</span><h2 id="reading-title">Begin with your <em>beginning.</em></h2><p>Use your birth names as given. Your details help distinguish the historical methods; Christ remains above them all.</p><p id="access-preview-note" class="access-preview-note">A sample experience is ready below. Apply for access to enter your own details and explore the full experience.</p><button id="access-open" class="button button-outline" type="button">Apply or sign in</button><p id="access-status" class="access-status" role="status" aria-live="polite"></p></div>
       <form id="reading-form" class="reading-form" novalidate>
         <div class="form-grid">
           <label>Christian / given name(s) <input name="given" autocomplete="given-name" placeholder="e.g. William Ewart" aria-describedby="given-validation" required><span id="given-validation" class="field-validation" aria-live="polite">Use A–Z letters; spaces between names are welcome.</span></label>
@@ -76,7 +78,9 @@
           <div class="location-choice" id="offset-choice" hidden><label for="offset-result">Choose the historical clock offset</label><select id="offset-result"><option value="">Choose the offset used at birth</option></select><small>This local time occurred twice during a clock change.</small></div>
           <label>Show seasons from <select name="from" id="from-year"></select><span class="field-hint">Choose the first year to show in your results.</span></label>
         </div>
-        <div class="form-footer"><button class="button button-gold" type="submit">Begin My Reflection in Christ <span aria-hidden="true">↗</span></button><p>Personal readings are available after approval. Birth details are calculated on this page.</p></div>
+        <div id="experience-consent-row" class="experience-consent" hidden><label><input id="experience-consent" type="checkbox"><span>I agree to the <a href="#privacy-statement">Terms and Conditions</a></span></label></div>
+        <div class="form-footer"><button class="button button-gold" type="submit">Begin My Reflection in Christ <span aria-hidden="true">↗</span></button><p>Personal experiences are available after approval. Your details and results are saved only when you agree.</p></div>
+        <p id="experience-save-status" class="experience-save-status" role="status" aria-live="polite" hidden></p>
         <div id="reading-loader" class="reading-loader" role="status" aria-live="polite" hidden>
           <div class="mouse-runway" aria-hidden="true">
             <svg class="loading-mouse mouse-one" viewBox="0 0 100 60"><path class="mouse-tail" d="M22 42C10 43 8 54 18 54c6 0 8-5 6-8"/><ellipse class="mouse-body" cx="49" cy="38" rx="27" ry="15"/><circle class="mouse-ear" cx="63" cy="19" r="10"/><circle class="mouse-ear-inner" cx="63" cy="19" r="5"/><circle class="mouse-head" cx="72" cy="35" r="15"/><circle class="mouse-eye" cx="77" cy="30" r="2"/><circle class="mouse-nose" cx="87" cy="38" r="2.5"/><path class="mouse-feet" d="M35 51v4m22-4v4"/></svg>
@@ -87,11 +91,16 @@
         <p id="form-error" class="error" role="alert" hidden></p>
       </form>
     </section>
+    <section id="saved-experiences" class="saved-experiences" hidden aria-labelledby="saved-experiences-title">
+      <div class="saved-experiences-head"><div><span class="section-number">YOUR ACCOUNT</span><h2 id="saved-experiences-title">Saved experiences</h2></div><button id="delete-all-experiences" class="button button-outline" type="button">Delete all saved data</button></div>
+      <p id="saved-experiences-status" role="status" aria-live="polite"></p>
+      <div id="saved-experiences-list" class="saved-experiences-list"></div>
+    </section>
     <section id="result" class="results" aria-live="polite" hidden>
-      <div class="result-head"><div><span class="section-number">03 / YOUR RESULTS</span><h2 id="result-title">Your Results</h2><p id="demo-result-note" class="demo-result-note" hidden>Sample details for Grace Anderson. Apply for access to create your own reading.</p></div><button id="print-button" class="button button-outline" type="button">Print results ↗</button></div>
+      <div class="result-head"><div><span class="section-number">03 / YOUR RESULTS</span><h2 id="result-title">Your Results</h2><p id="demo-result-note" class="demo-result-note" hidden>Sample details for Grace Anderson. Apply for access to create your own experience.</p></div><button id="print-button" class="button button-outline" type="button">Print results ↗</button></div>
       <section class="celestial-section" aria-labelledby="celestial-title">
         <div class="celestial-heading"><span class="section-number">THE HEAVENLY ORDER</span><h3 id="celestial-title">Christ above <em>all things.</em></h3><p>“And he is before all things, and by him all things consist.” <span>COLOSSIANS 1:17 · KJV</span></p><p class="ephesians-scripture">“Far above all principality, and power, and might, and dominion, and every name that is named, not only in this world, but also in that which is to come:<br><br>And hath put all things under his feet, and gave him to be the head over all things to the church,” <span>EPHESIANS 1:21–22 · KJV</span></p></div>
-        <div id="demo-gate" class="demo-gate"><span class="section-number">CONTINUE YOUR REFLECTION</span><h4>See your own full reading</h4><p>Apply for access or sign in after approval to enter your own birth details and explore every section.</p><div><button id="demo-apply" class="button button-gold" type="button">Apply for access</button><button id="demo-signin" class="button button-outline" type="button">Already approved? Sign in</button></div></div>
+        <div id="demo-gate" class="demo-gate"><span class="section-number">CONTINUE YOUR REFLECTION</span><h4>Explore your full experience</h4><p>Apply for access or sign in after approval to enter your own birth details and explore every section.</p><div><button id="demo-apply" class="button button-gold" type="button">Apply for access</button><button id="demo-signin" class="button button-outline" type="button">Already approved? Sign in</button></div></div>
         <div class="hierarchy-controls"><span>Explore the wheel</span><button id="hierarchy-view-toggle" type="button" aria-pressed="false">Fit whole wheel</button></div>
         <div id="celestial-map" class="celestial-map"></div>
         <p class="celestial-swipe">Swipe to explore the whole wheel <span aria-hidden="true">→</span></p>
@@ -145,10 +154,10 @@
   <dialog id="access-dialog" class="access-dialog" aria-labelledby="access-dialog-title">
     <button id="access-close" class="modal-close" type="button" aria-label="Close access form">×</button>
     <div id="access-apply-panel"><span class="section-number">REDEEMING THE SEASONS</span><h2 id="access-dialog-title">Apply for full access</h2><p>Share a few details so the team can review your request.</p>
-      <form id="access-apply-form"><label>Full Name<input name="fullName" autocomplete="name" maxlength="120" required></label><label>Email Address<input name="email" type="email" autocomplete="email" maxlength="254" required></label><label>How many years have you been at WOWLife Church?<input name="yearsAtChurch" inputmode="numeric" maxlength="60" required></label><label>How did you come across WOWLife teachings?<input name="discovery" maxlength="500" required></label><input name="website" class="access-honeypot" tabindex="-1" autocomplete="off" aria-hidden="true"><button class="button button-gold" type="submit">Submit application</button><p id="access-apply-error" class="access-error" role="alert" hidden></p></form><button id="access-show-login" class="access-text-button" type="button">Already approved? Sign in</button>
+      <form id="access-apply-form"><label>Full Name<input name="fullName" autocomplete="name" maxlength="120" required></label><label>Email Address<input name="email" type="email" autocomplete="email" maxlength="254" required></label><label>Phone number<input name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="30" required></label><label>Country you're accessing from<input name="country" autocomplete="country-name" maxlength="100" required></label><label>How many years have you been at WOWLife Church?<input name="yearsAtChurch" inputmode="numeric" maxlength="60" required></label><label>How did you come across WOWLife teachings?<input name="discovery" maxlength="500" required></label><label>Who recommended you to WOWLife Church?<input name="recommendedBy" maxlength="120" required></label><label class="application-consent"><input name="applicationConsent" type="checkbox" value="yes" required><span>I am 18 or older and explicitly consent to WOWLife Church using these details, including my church connection, to review my application.</span></label><input name="website" class="access-honeypot" tabindex="-1" autocomplete="off" aria-hidden="true"><button class="button button-gold" type="submit">Submit application</button><p id="access-apply-error" class="access-error" role="alert" hidden></p></form><button id="access-show-login" class="access-text-button" type="button">Already approved? Sign in</button>
     </div>
     <div id="access-login-panel" hidden><span class="section-number">REDEEMING THE SEASONS</span><h2>Sign in with your email</h2><p>Approved applicants receive a one-time code by email.</p><form id="access-login-form"><label>Email Address<input name="email" type="email" autocomplete="email" maxlength="254" required></label><button class="button button-gold" type="submit">Send sign-in code</button></form><form id="access-code-form" hidden><label>Six-digit code<input name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required></label><button class="button button-gold" type="submit">Verify and continue</button></form><p id="access-login-message" class="access-message" role="status" aria-live="polite"></p><button id="access-show-apply" class="access-text-button" type="button">Need access? Apply now</button></div>
-    <div id="access-success-panel" hidden><span class="section-number">APPLICATION RECEIVED</span><h2>Thank you for registering!</h2><p>Your application has been successfully submitted and is currently pending review. You will receive an update or access details via email within the next 48 hours.</p><button id="access-done" class="button button-outline" type="button">Continue viewing the sample</button></div>
+    <div id="access-success-panel" hidden><span class="section-number">APPLICATION RECEIVED</span><h2>Thank you for registering!</h2><p>Your application has been successfully submitted and is currently pending review. You will receive an update or access details <strong class="access-email-highlight">via email</strong> within the next 24 hours.</p><button id="access-done" class="button button-outline" type="button">Continue viewing the sample</button></div>
   </dialog>
   <dialog id="recovery-dialog" class="recovery-dialog" aria-labelledby="recovery-dialog-title" aria-describedby="recovery-dialog-text">
     <button id="recovery-close" class="modal-close" type="button" aria-label="Close recovery preview">×</button>
@@ -159,6 +168,32 @@
     <p class="dialog-scripture">“mighty through God to the pulling down of strong holds” <span>2 Corinthians 10:4 · KJV</span></p>
     <a id="recovery-cta" class="button button-gold" href="https://order.wowlife.lk/" target="_blank" rel="noopener noreferrer">Register to attend <span aria-hidden="true">↗</span></a>
   </dialog>
-  <footer class="site-footer"><span>✦ Redeeming the Seasons</span><p>Historical symbols do not determine health, life span, redemption, or a person’s standing in Christ.</p><a href="#top">Back to top ↑</a></footer>
+  <footer class="site-footer">
+    <div class="footer-main"><span>✦ Redeeming the Seasons</span><p>Historical symbols do not determine health, life span, redemption, or a person’s standing in Christ.</p><a href="#top">Back to top ↑</a></div>
+    <details id="privacy-statement" class="privacy-statement">
+      <summary>Terms and Conditions · Privacy Statement</summary>
+      <div class="privacy-content">
+        <h2>Privacy Statement — Redeeming the Seasons</h2>
+        <p><small>Last updated: 4 November 2026</small></p>
+        <p><strong>Who we are.</strong> This site is operated by WOWLife Church, Sri Lanka. Questions about your data: <a href="mailto:info@wowlife.lk">info@wowlife.lk</a>.</p>
+        <h3>What we collect and why.</h3>
+        <p><strong>Birth details and reflection results.</strong> When you use your personal reflection, we collect your given name(s) and family name, date of birth, the calendar you selected, time of birth (to the minute, hour only, or unknown), and place of birth. We use these to run the historical calculations shown on the page. We store these details and the resulting reflection (guardian angel, chart and year-by-year seasons) in your account so you can return to them without re-entering them. Without consent, the calculation runs in your browser and nothing is saved.</p>
+        <p><strong>Access application.</strong> To request full access we collect your full name, email address, phone number, the country you are accessing from, how long you have attended WOWLife Church, how you came across WOWLife teachings, and who recommended WOWLife Church to you. We use these to review your application and contact you about the outcome. Information about your connection with the church may indicate your religious beliefs; we collect it only with your explicit consent and use it only for this purpose.</p>
+        <p><strong>Workshop registration.</strong> To register for Architecture of Freedom we collect your first and last name, email address and whether you will attend online or in person. We use these to run the event and send you joining details.</p>
+        <p><strong>Account.</strong> If your application is approved we create a login for you and store the credentials needed to secure it.</p>
+        <p><strong>Page metrics.</strong> We count page loads in daily totals to understand site use. These counters do not contain names, birth details, account IDs, or visitor identifiers.</p>
+        <h3>What we do not do.</h3>
+        <p>We do not sell your data. We do not use your birth details for marketing or profiling, and we do not share them with third parties except the hosting and email providers that run this site on our behalf under contract. We do not use historical symbolic results to make any decision about you.</p>
+        <h3>How long we keep it.</h3>
+        <p>Birth details and reflection results: until you delete them or close your account. Access applications: 12 months after a decision. Workshop registrations: 6 months after the event. Account records: while the account is active, then deleted within 30 days of closure.</p>
+        <h3>Your rights.</h3>
+        <p>You may ask us at any time to see the data we hold about you, correct it, delete it, or withdraw your consent, and we will act on the request within one month. Withdrawing consent means your stored birth details and reflection will be deleted. Contact <a href="mailto:info@wowlife.lk">info@wowlife.lk</a>. If you are in Sri Lanka you may also complain to the Data Protection Authority; if you are in the EU or UK, to your local supervisory authority.</p>
+        <h3>Children.</h3>
+        <p>This service is for people aged 18 and over. We do not knowingly collect data from anyone younger.</p>
+        <h3>Changes.</h3>
+        <p>We will post any changes here with a new date, and tell account holders by email if the changes are significant.</p>
+      </div>
+    </details>
+  </footer>
 </body>
 </html>
