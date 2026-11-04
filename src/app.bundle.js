@@ -7731,6 +7731,153 @@
   });
   var LILLY_JUDGEMENT_LIMIT = "Lilly says profections must be judged with directions, natal conditions, planetary strength and the annual revolution. This page has not calculated those additional judgements, so the passage is historical source text, not a personal prediction.";
 
+  // src/access.mjs
+  var endpoint = "api/access";
+  async function request(action, options = {}) {
+    const response = await fetch(`${endpoint}?action=${action}`, {
+      credentials: "same-origin",
+      cache: "no-store",
+      ...options,
+      headers: options.body ? { "Content-Type": "application/json" } : void 0
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || "Please try again.");
+    return data;
+  }
+  function post(action, data) {
+    return request(action, { method: "POST", body: JSON.stringify(data) });
+  }
+  function initializeReadingAccess({ showSample, unlock }) {
+    const dialog = document.querySelector("#access-dialog");
+    const applyPanel = document.querySelector("#access-apply-panel");
+    const loginPanel = document.querySelector("#access-login-panel");
+    const successPanel = document.querySelector("#access-success-panel");
+    const applyForm = document.querySelector("#access-apply-form");
+    const loginForm = document.querySelector("#access-login-form");
+    const codeForm = document.querySelector("#access-code-form");
+    const applyError = document.querySelector("#access-apply-error");
+    const loginMessage = document.querySelector("#access-login-message");
+    const accessButton = document.querySelector("#access-open");
+    const gate = document.querySelector("#demo-gate");
+    const recoveryNav = document.querySelector('.site-header nav a[href="#recovery"]');
+    if (recoveryNav) recoveryNav.href = "#reading";
+    let approved = false;
+    let prompted = false;
+    function panel(name) {
+      applyPanel.hidden = name !== "apply";
+      loginPanel.hidden = name !== "login";
+      successPanel.hidden = name !== "success";
+      dialog.setAttribute("aria-label", name === "apply" ? "Apply for full access" : name === "login" ? "Sign in" : "Application received");
+    }
+    function open(name = "apply") {
+      panel(name);
+      if (!dialog.open) dialog.showModal();
+      (name === "apply" ? applyForm.elements.fullName : name === "login" ? loginForm.elements.email : document.querySelector("#access-done")).focus();
+    }
+    showSample();
+    request("session").then((data) => {
+      if (data.authenticated && data.purpose === "reader") {
+        approved = true;
+        unlock(data.email);
+        accessButton.textContent = "Sign out";
+        if (recoveryNav) recoveryNav.href = "#recovery";
+      }
+    }).catch(() => {
+      document.querySelector("#access-status").textContent = "Sign-in is temporarily unavailable. The sample remains open.";
+    });
+    accessButton.addEventListener("click", async () => {
+      if (approved) {
+        try {
+          await post("logout", {});
+          window.location.reload();
+        } catch {
+          document.querySelector("#access-status").textContent = "Could not sign out. Please try again.";
+        }
+        return;
+      }
+      open("apply");
+    });
+    document.querySelector("#demo-apply").addEventListener("click", () => open("apply"));
+    document.querySelector("#demo-signin").addEventListener("click", () => open("login"));
+    document.querySelector("#access-show-login").addEventListener("click", () => open("login"));
+    document.querySelector("#access-show-apply").addEventListener("click", () => open("apply"));
+    document.querySelector("#access-close").addEventListener("click", () => dialog.close());
+    document.querySelector("#access-done").addEventListener("click", () => dialog.close());
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries) => {
+        if (!approved && !prompted && entries.some((entry) => entry.isIntersecting)) {
+          prompted = true;
+          open("apply");
+          observer.disconnect();
+        }
+      }, { threshold: 0.3 });
+      observer.observe(gate);
+    }
+    applyForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!applyForm.reportValidity()) return;
+      applyError.hidden = true;
+      const button = applyForm.querySelector('[type="submit"]');
+      button.disabled = true;
+      try {
+        const data = await post("apply", Object.fromEntries(new FormData(applyForm)));
+        if (data.alreadyApproved) {
+          loginForm.elements.email.value = applyForm.elements.email.value;
+          loginMessage.textContent = "This email is already approved. Request a sign-in code below.";
+          open("login");
+        } else {
+          applyForm.reset();
+          panel("success");
+        }
+      } catch (error2) {
+        applyError.textContent = error2.message;
+        applyError.hidden = false;
+      } finally {
+        button.disabled = false;
+      }
+    });
+    loginForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!loginForm.reportValidity()) return;
+      const button = loginForm.querySelector('[type="submit"]');
+      button.disabled = true;
+      loginMessage.textContent = "Sending your sign-in code\u2026";
+      try {
+        await post("request-code", { email: loginForm.elements.email.value, purpose: "reader" });
+        codeForm.hidden = false;
+        loginMessage.textContent = "If this email is approved, a six-digit sign-in code is on its way. Check your inbox and spam folder.";
+        codeForm.elements.code.focus();
+      } catch (error2) {
+        loginMessage.textContent = error2.message;
+      } finally {
+        button.disabled = false;
+      }
+    });
+    codeForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!codeForm.reportValidity()) return;
+      const button = codeForm.querySelector('[type="submit"]');
+      button.disabled = true;
+      loginMessage.textContent = "Checking your code\u2026";
+      try {
+        await post("verify-code", { email: loginForm.elements.email.value, code: codeForm.elements.code.value, purpose: "reader" });
+        approved = true;
+        unlock(loginForm.elements.email.value.trim().toLowerCase());
+        accessButton.textContent = "Sign out";
+        if (recoveryNav) recoveryNav.href = "#recovery";
+        dialog.close();
+        document.querySelector("#reading-form").scrollIntoView({ behavior: "smooth", block: "start" });
+      } catch (error2) {
+        loginMessage.textContent = error2.message;
+      } finally {
+        button.disabled = false;
+      }
+    });
+  }
+
   // src/app.mjs
   var form = document.querySelector("#reading-form");
   var programForm = document.querySelector("#program-registration-form");
@@ -7799,6 +7946,7 @@
   var angelCards = document.querySelector("#angel-cards");
   var reading;
   var windowStartIndex = 0;
+  var accessApproved = false;
   var escapeHtml = (text) => String(text).replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
   var todayYear = (/* @__PURE__ */ new Date()).getFullYear();
   var artPath = (number) => `assets/angels/angel-${String(number).padStart(2, "0")}.webp?v=3`;
@@ -7827,6 +7975,64 @@
       return `<option value="${year}"${year === selected ? " selected" : ""}>${year}</option>`;
     }).join("");
   }
+  initializeReadingAccess({
+    form,
+    result,
+    showSample() {
+      form.elements.given.value = "Grace";
+      form.elements.surname.value = "Anderson";
+      birthCalendar.value = "gregorian";
+      dateInput.value = "1990-05-15";
+      timeCertainty.value = "exact";
+      timeHour.value = "10";
+      timeMinute.value = "30";
+      timePeriod.value = "AM";
+      placeInput.value = "Colombo, Sri Lanka";
+      selectedLocation = { id: "sample-colombo", label: "Colombo, Sri Lanka", latitude: 6.9271, longitude: 79.8612, timezone: "Asia/Colombo" };
+      locationQuery = placeInput.value;
+      updateFromYears();
+      fromYear.value = "2025";
+      updateTime();
+      reading = calculateReading({ ...Object.fromEntries(new FormData(form)), location: selectedLocation });
+      renderReading();
+      result.hidden = false;
+      document.querySelector("#result-title").textContent = "Sample Results";
+      document.querySelector("#demo-result-note").hidden = false;
+      form.classList.add("is-sample");
+      form.querySelectorAll('input:not([type="hidden"])').forEach((input) => {
+        input.readOnly = true;
+      });
+      form.querySelectorAll("select").forEach((input) => {
+        input.disabled = true;
+      });
+      submitButton.disabled = true;
+      submitButton.textContent = "Sample reading shown below";
+    },
+    unlock(email) {
+      accessApproved = true;
+      document.body.classList.add("access-approved");
+      form.classList.remove("is-sample");
+      form.querySelectorAll('input:not([type="hidden"])').forEach((input) => {
+        input.readOnly = false;
+      });
+      form.querySelectorAll("select").forEach((input) => {
+        input.disabled = false;
+      });
+      form.reset();
+      selectedLocation = null;
+      locationQuery = "";
+      locationChoice.hidden = true;
+      offsetChoice.hidden = true;
+      updateFromYears();
+      updateTime();
+      result.hidden = true;
+      document.querySelector("#demo-result-note").hidden = true;
+      submitButton.disabled = false;
+      submitButton.innerHTML = 'Begin My Reflection in Christ <span aria-hidden="true">\u2197</span>';
+      document.querySelector("#access-status").textContent = `Signed in as ${email}. Enter your own details to begin.`;
+      document.querySelector("#access-preview-note").hidden = true;
+    }
+  });
   dateInput.addEventListener("change", updateFromYears);
   birthCalendar.addEventListener("change", () => {
     dateInput.type = birthCalendar.value === "julian" ? "text" : "date";
@@ -7889,6 +8095,7 @@
   updateTime();
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (!accessApproved) return;
     if (submitButton.disabled) return;
     error.hidden = true;
     const invalidInput = validatedInputs.filter((input) => !validateField(input))[0];

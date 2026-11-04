@@ -479,6 +479,41 @@
 .appointed-statement{padding:clamp(48px,6vw,82px) 20px;text-align:center;background:#0b2543;border-block:1px solid var(--line)}
 .appointed-statement h2{max-width:1240px;margin:0 auto;font-size:clamp(43px,5.3vw,78px);line-height:1.04;color:#f4e8ca}
 .celestial-heading .ephesians-scripture{margin-top:19px;padding-top:17px;border-top:1px solid rgba(235,217,169,.28)}
+
+/* Reading access and the public sample. */
+.access-preview-note,.demo-result-note{margin:22px 0 0;color:#e4c987!important;font-size:14px;line-height:1.6}
+.reading-intro #access-open{margin-top:18px;padding:13px 20px}
+.access-status{font-size:13px;color:#c4d0dc!important;margin-top:14px}
+.reading-form.is-sample input[readonly],.reading-form.is-sample select:disabled{opacity:1;color:#f4ede1;cursor:default}
+.reading-form.is-sample button[type=submit]{cursor:default;opacity:.72}
+.demo-result-note{max-width:520px}
+.demo-gate{text-align:center;padding:30px 24px;margin:28px auto 4px;max-width:650px;border:1px solid rgba(214,174,88,.45);background:rgba(214,174,88,.07);border-radius:8px}
+.demo-gate h4{font-family:var(--serif);font-size:clamp(30px,4vw,43px);font-weight:500;color:var(--cream);margin:10px 0}
+.demo-gate p{color:#c8d2dc;font-size:14px;line-height:1.6;max-width:490px;margin:0 auto 22px}
+.demo-gate>div{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.demo-gate .button{padding:13px 18px}
+body:not(.access-approved) #result .celestial-section>:not(.celestial-heading):not(.demo-gate),
+body:not(.access-approved) #result>.result-chapter,
+body:not(.access-approved) #result>.source-limit,
+body:not(.access-approved) .recovery-section,
+body:not(.access-approved) #print-button{display:none!important}
+body.access-approved .demo-gate{display:none}
+.access-dialog{width:min(100% - 32px,540px);max-height:min(90vh,760px);overflow:auto;border:1px solid var(--gold);border-radius:10px;padding:36px;background:#0b2442;color:var(--cream);box-shadow:0 25px 80px rgba(0,0,0,.6)}
+.access-dialog::backdrop{background:rgba(3,12,25,.82);backdrop-filter:blur(5px)}
+.access-dialog h2{font-family:var(--serif);font-size:clamp(34px,5vw,48px);font-weight:500;line-height:1.05;margin:10px 35px 12px 0}
+.access-dialog p{font-size:14px;line-height:1.6;color:#c6d1dc}
+.access-dialog form{display:grid;gap:14px;margin-top:23px}
+.access-dialog label{display:grid;gap:7px;color:var(--light-gold);font-size:12px;font-weight:700;letter-spacing:.04em}
+.access-dialog input{width:100%;min-height:46px;padding:11px 13px;border:1px solid #526b83;border-radius:3px;background:#102f52;color:#fff;font-size:15px;letter-spacing:normal}
+.access-dialog input:focus{outline:2px solid var(--light-gold);outline-offset:2px}
+.access-dialog form .button{justify-self:start;margin-top:5px}
+.access-dialog .access-honeypot{position:absolute;left:-10000px;width:1px;height:1px;opacity:0}
+.access-text-button{display:inline-block;margin-top:18px;padding:0;border:0;background:none;color:var(--light-gold);text-decoration:underline;font-size:13px}
+.access-error{color:#ffb6a9!important;margin:0}
+.access-message{min-height:22px}
+.access-dialog .modal-close{top:18px;right:18px}
+@media(max-width:600px){.access-dialog{padding:28px 22px}.demo-gate{padding:25px 17px}.demo-gate .button{width:100%}}
+@media print{body:not(.access-approved) #result{display:none!important}}
 .tribe-answer>span{display:block;margin-top:6px}
 .section-heading small a{text-decoration:underline;text-underline-offset:2px}
 @media(prefers-reduced-motion:reduce){.hero-appointment{animation:none;opacity:1;transform:none}}

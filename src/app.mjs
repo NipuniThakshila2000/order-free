@@ -4,6 +4,7 @@ import {julianRecordToGregorian} from './lilly.mjs';
 import {renderCelestialHierarchy, getHierarchyInfo} from './hierarchy.mjs';
 import {displaySign, birthSunLabels} from './display.mjs';
 import {ASCENDANT_PROFECTION_PASSAGES, LILLY_JUDGEMENT_LIMIT} from './lilly-passages.mjs';
+import {initializeReadingAccess} from './access.mjs';
 
 const form = document.querySelector('#reading-form');
 const programForm = document.querySelector('#program-registration-form');
@@ -71,6 +72,7 @@ timeMinute.insertAdjacentHTML('beforeend', Array.from({length:60}, (_, index) =>
 const angelCards = document.querySelector('#angel-cards');
 let reading;
 let windowStartIndex = 0;
+let accessApproved = false;
 
 const escapeHtml = (text) => String(text).replace(/[&<>"']/g, (character) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
 const todayYear = new Date().getFullYear();
@@ -101,6 +103,57 @@ function updateFromYears() {
     return `<option value="${year}"${year === selected ? ' selected' : ''}>${year}</option>`;
   }).join('');
 }
+
+initializeReadingAccess({
+  form,
+  result,
+  showSample() {
+    form.elements.given.value = 'Grace';
+    form.elements.surname.value = 'Anderson';
+    birthCalendar.value = 'gregorian';
+    dateInput.value = '1990-05-15';
+    timeCertainty.value = 'exact';
+    timeHour.value = '10';
+    timeMinute.value = '30';
+    timePeriod.value = 'AM';
+    placeInput.value = 'Colombo, Sri Lanka';
+    selectedLocation = {id:'sample-colombo', label:'Colombo, Sri Lanka', latitude:6.9271, longitude:79.8612, timezone:'Asia/Colombo'};
+    locationQuery = placeInput.value;
+    updateFromYears();
+    fromYear.value = '2025';
+    updateTime();
+    reading = calculateReading({...Object.fromEntries(new FormData(form)), location:selectedLocation});
+    renderReading();
+    result.hidden = false;
+    document.querySelector('#result-title').textContent = 'Sample Results';
+    document.querySelector('#demo-result-note').hidden = false;
+    form.classList.add('is-sample');
+    form.querySelectorAll('input:not([type="hidden"])').forEach((input) => { input.readOnly = true; });
+    form.querySelectorAll('select').forEach((input) => { input.disabled = true; });
+    submitButton.disabled = true;
+    submitButton.textContent = 'Sample reading shown below';
+  },
+  unlock(email) {
+    accessApproved = true;
+    document.body.classList.add('access-approved');
+    form.classList.remove('is-sample');
+    form.querySelectorAll('input:not([type="hidden"])').forEach((input) => { input.readOnly = false; });
+    form.querySelectorAll('select').forEach((input) => { input.disabled = false; });
+    form.reset();
+    selectedLocation = null;
+    locationQuery = '';
+    locationChoice.hidden = true;
+    offsetChoice.hidden = true;
+    updateFromYears();
+    updateTime();
+    result.hidden = true;
+    document.querySelector('#demo-result-note').hidden = true;
+    submitButton.disabled = false;
+    submitButton.innerHTML = 'Begin My Reflection in Christ <span aria-hidden="true">↗</span>';
+    document.querySelector('#access-status').textContent = `Signed in as ${email}. Enter your own details to begin.`;
+    document.querySelector('#access-preview-note').hidden = true;
+  }
+});
 dateInput.addEventListener('change', updateFromYears);
 birthCalendar.addEventListener('change', () => {
   dateInput.type = birthCalendar.value === 'julian' ? 'text' : 'date';
@@ -165,6 +218,7 @@ updateTime();
 
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
+  if (!accessApproved) return;
   if (submitButton.disabled) return;
   error.hidden = true;
   const invalidInput = validatedInputs.filter((input) => !validateField(input))[0];

@@ -4,6 +4,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {calculateReading} from './src/reading.mjs';
 import {searchBirthplaces} from './src/location.mjs';
+import accessHandler from './api/access.mjs';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const port = Number(process.env.PORT || 3000);
@@ -11,6 +12,22 @@ const mime = {'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8
 
 const server = http.createServer(async (req, res) => {
   try {
+    if (req.url?.startsWith('/api/access?')) {
+      const url = new URL(req.url, `http://localhost:${port}`);
+      if (req.method === 'POST') {
+        let body = '';
+        for await (const chunk of req) {
+          body += chunk;
+          if (body.length > 10_000) throw new Error('Request is too large.');
+        }
+        req.body = JSON.parse(body || '{}');
+      }
+      req.query = Object.fromEntries(url.searchParams);
+      res.status = (code) => { res.statusCode = code; return res; };
+      res.json = (data) => { res.setHeader('Content-Type', 'application/json; charset=utf-8'); res.end(JSON.stringify(data)); return res; };
+      await accessHandler(req, res);
+      return;
+    }
     if (req.method === 'POST' && req.url === '/api/reading') {
       let body = '';
       for await (const chunk of req) {

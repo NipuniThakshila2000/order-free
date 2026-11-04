@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Reading applications | Redeeming the Seasons</title>
+  <link rel="stylesheet" href="admin-access.css">
+  <script defer src="src/admin-access.js"></script>
+</head>
+<body>
+  <main>
+    <header><span>REDEEMING THE SEASONS</span><h1>Reading applications</h1><p>Review each request and grant access to the full reading.</p></header>
+    <section id="admin-login" class="panel" aria-labelledby="admin-login-title">
+      <h2 id="admin-login-title">Admin sign in</h2>
+      <p>Use the same token as the existing WOWLife customer dashboard.</p>
+      <form id="admin-token-form"><label>Dashboard token<input name="token" type="password" autocomplete="current-password" required></label><button type="submit">Sign in</button></form>
+      <p id="admin-login-status" role="status" aria-live="polite"></p>
+    </section>
+    <section id="admin-dashboard" hidden>
+      <div class="toolbar"><div id="admin-counts" aria-live="polite"></div><div><button id="admin-refresh" type="button">Refresh</button><button id="admin-logout" type="button">Sign out</button></div></div>
+      <p id="admin-status" role="status" aria-live="polite"></p>
+      <div class="table-wrap"><table><thead><tr><th>Applicant</th><th>Years at WOWLife Church</th><th>How they found the teachings</th><th>Submitted</th><th>Status</th><th>Action</th></tr></thead><tbody id="applications-body"></tbody></table></div>
+    </section>
+  </main>
+</body>
+</html>
