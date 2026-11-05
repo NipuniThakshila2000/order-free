@@ -2,6 +2,11 @@
 const REGISTRATION_SHEET_ID = '18Nh09g0nwYdh3Xo7UdNUzXXV_rclv3XgTpvNoJgFEd4';
 const MAIL_BATCH_SIZE = 20;
 
+// Run this once in the Apps Script editor to grant the deployment account MailApp access.
+function authorizeMail() {
+  return MailApp.getRemainingDailyQuota();
+}
+
 function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);

@@ -68,7 +68,7 @@ export default async function handler(request, response) {
     }
     const proxyUrl = process.env.BULK_EMAIL_PROXY_URL;
     const scriptUrl = process.env.BULK_EMAIL_SCRIPT_URL || process.env.GOOGLE_SCRIPT_URL;
-    const token = process.env.REGISTRATION_TOKEN;
+    const token = process.env.BULK_EMAIL_TOKEN || process.env.REGISTRATION_TOKEN;
     if (!proxyUrl && (!scriptUrl || !token)) return response.status(503).json({error:'Contact mailing is not configured on this deployment.'});
     const payload = {action:data.action};
     for (const key of ['audience','subject','message','campaignId','testEmail','offset']) if (data[key] !== undefined) payload[key] = data[key];
