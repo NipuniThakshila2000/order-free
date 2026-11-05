@@ -1,4 +1,10 @@
-# Connect the NOV 10 registration form to Google Sheets
+# Nov 10 program registration storage
+
+The website form posts to `/api/register`. In production, it saves each registration as a JSON record in a **private Vercel Blob store** linked to the `order-free` project. Vercel supplies `BLOB_READ_WRITE_TOKEN` to the server; never expose it in browser code. The dashboard's `/api/admin-registrations` endpoint checks the existing admin session before reading the private records. The dashboard table shows every row with submission time, first and last name, email, and attendance, newest first, 50 per page. These records are independent of Google Apps Script.
+
+The existing Sheet registrations were imported with `node scripts/migrate-registration-sheet.mjs`. The migration is repeatable: it skips rows already present. It requires `BLOB_READ_WRITE_TOKEN` in the process environment. Run it again after any final Sheet submissions made before the production form cutover. The legacy Google Sheet path remains as a fallback only if the private Blob token is absent.
+
+## Legacy Google Sheet connection
 
 The public form posts to `/api/register`. On the original site, that endpoint forwards validated entries to a Google Apps Script, which writes them to a `Registrations` tab. The form stays disabled until the required production environment variables are configured.
 
@@ -9,11 +15,11 @@ The public form posts to `/api/register`. On the original site, that endpoint fo
 5. Test a write to the Sheet. Only after it succeeds, set production environment variable `REGISTRATION_OPEN` to `true` and redeploy the site. Until then the public form remains closed.
 6. Submit one test registration through the site and verify a row appears in the Sheet with timestamp, name, email, and attendance. The form should then show a confirmation.
 
-Keep the Sheet private. The Apps Script is publicly callable, but it requires the private token supplied only by the Vercel server endpoint. Do not put the token in the site HTML or browser JavaScript.
+After verifying the Blob migration, restrict the Sheet's sharing and any published/export access to authorized accounts. An unauthenticated export of the `Registrations` tab was reachable during migration. The Apps Script web app still requires its private token for mailing operations; do not put that token in the site HTML or browser JavaScript.
 
 ## Admin registration table
 
-The admin dashboard has a separate **Nov 10 program registrations** table. It reads the private `Registrations` tab through the authenticated `/api/bulk-email` proxy with `action=registrations`, showing every row's submission time, first and last name, email, and attendance choice, newest first, 50 per page. Publish a new version of `scripts/registration-sheet.gs` in the mailing Apps Script project to enable full rows. Until then, the dashboard shows a limited list of unique email contacts from the older `recipients` action and labels that view as incomplete.
+The admin dashboard has a separate **Nov 10 program registrations** table. It reads the private Blob store through the authenticated `/api/admin-registrations` endpoint. Google Apps Script updates are no longer needed for this table.
 
 ## Bulk email from the admin dashboard
 

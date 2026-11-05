@@ -1,3 +1,5 @@
+import {allRegistrations, registrationStoreReady} from '../src/registration-store.mjs';
+
 const accessUrl = process.env.READING_ACCESS_BACKEND_URL || 'https://order.wowlife.lk/api/reading-access';
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const audiences = ['all','registrants','online','in-person','applicants'];
@@ -15,15 +17,19 @@ async function scriptCall(url, token, payload) {
 async function contactsFor(audience, scriptUrl, token, cookie) {
   const applicationsUrl = new URL(accessUrl);
   applicationsUrl.searchParams.set('action', 'applications');
-  const [sheet, applicationsResponse] = await Promise.all([
+  const [sheet, applicationsResponse, stored] = await Promise.all([
     scriptCall(scriptUrl, token, {action:'recipients'}),
-    fetch(applicationsUrl, {headers:{Cookie:cookie, Accept:'application/json'}, redirect:'manual'})
+    fetch(applicationsUrl, {headers:{Cookie:cookie, Accept:'application/json'}, redirect:'manual'}),
+    registrationStoreReady() ? allRegistrations() : Promise.resolve([])
   ]);
   const applicationsData = await applicationsResponse.json();
   if (!applicationsResponse.ok || !Array.isArray(applicationsData.applications)) throw new Error('The applicant list is unavailable.');
-  const registrations = sheet.recipients.filter((person) => emailPattern.test(person.email)).map((person) => ({
+  const legacyRegistrations = sheet.recipients.filter((person) => emailPattern.test(person.email)).map((person) => ({
     firstName:String(person.firstName || '').trim(), email:person.email.trim().toLowerCase(), attendance:person.attendance
   }));
+  const registrations = [...legacyRegistrations, ...stored.filter((person) => emailPattern.test(person.email)).map((person) => ({
+    firstName:String(person.firstName || '').trim(), email:person.email.trim().toLowerCase(), attendance:person.attendance
+  }))];
   const applicants = applicationsData.applications.filter((person) => emailPattern.test(person.email)).map((person) => ({
     firstName:String(person.fullName || '').trim().split(/\s+/)[0], email:person.email.trim().toLowerCase()
   }));

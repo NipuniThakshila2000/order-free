@@ -2,6 +2,7 @@
 *.pdf
 *.docx
 test/
+scripts/migrate-registration-sheet.mjs
 assets/angels/*.png
 server.mjs
 SOURCE_NOTES.md

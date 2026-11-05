@@ -12,7 +12,7 @@ The experience site's `/api/access` and `/api/experience-data` functions proxy t
 
 The admin dashboard also includes bulk email for all contacts, event registrants, or access applicants. It offers a personalized plain-text draft, a test send, a recipient count preview, batched sending with pause and resume, daily quota visibility, and a delivery log. Contacts shared by both sources receive one email per campaign. It uses the private registration Sheet and Google Apps Script; see `REGISTRATION_SETUP.md` for deployment.
 
-The admin dashboard has a separate Nov 10 program registrations table with every submitted name, email, attendance choice, and timestamp. This table uses the same admin session and registration Sheet web app; publish the updated Apps Script version to enable the complete rows.
+The website's Nov 10 form saves each submission to private Vercel Blob storage. The admin dashboard reads those records through an authenticated endpoint and shows the submitted name, email, attendance choice, and timestamp. Existing Sheet rows were imported into the same store; the form and table no longer require the Sheet web app. See `REGISTRATION_SETUP.md` for storage and migration details.
 
 The admin screen also shows aggregate page loads for the Redeeming the Seasons page: today, the last 7 and 30 days, all time, a 30-day chart, and counts by published site address. The browser sends only the site hostname; the main database stores daily counters with no visitor identifier. Counts start when this tracking is deployed and exclude visitors whose browsers block the request.
 

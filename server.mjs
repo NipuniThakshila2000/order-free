@@ -6,6 +6,8 @@ import {calculateReading} from './src/reading.mjs';
 import {searchBirthplaces} from './src/location.mjs';
 import accessHandler from './api/access.mjs';
 import bulkEmailHandler from './api/bulk-email.mjs';
+import registerHandler from './api/register.mjs';
+import adminRegistrationsHandler from './api/admin-registrations.mjs';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const port = Number(process.env.PORT || 3000);
@@ -13,7 +15,8 @@ const mime = {'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8
 
 const server = http.createServer(async (req, res) => {
   try {
-    if (req.url?.startsWith('/api/access?') || req.url === '/api/bulk-email') {
+    if (req.url?.startsWith('/api/access?') || req.url === '/api/bulk-email' ||
+        req.url === '/api/register' || req.url?.startsWith('/api/admin-registrations?')) {
       const url = new URL(req.url, `http://localhost:${port}`);
       if (req.method === 'POST') {
         let body = '';
@@ -26,7 +29,10 @@ const server = http.createServer(async (req, res) => {
       req.query = Object.fromEntries(url.searchParams);
       res.status = (code) => { res.statusCode = code; return res; };
       res.json = (data) => { res.setHeader('Content-Type', 'application/json; charset=utf-8'); res.end(JSON.stringify(data)); return res; };
-      await (req.url === '/api/bulk-email' ? bulkEmailHandler : accessHandler)(req, res);
+      const handler = req.url === '/api/bulk-email' ? bulkEmailHandler :
+        req.url === '/api/register' ? registerHandler :
+        req.url?.startsWith('/api/admin-registrations?') ? adminRegistrationsHandler : accessHandler;
+      await handler(req, res);
       return;
     }
     if (req.method === 'POST' && req.url === '/api/reading') {

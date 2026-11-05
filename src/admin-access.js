@@ -110,10 +110,8 @@ async function loadRegistrations(offset = registrationsOffset) {
   const registrationBody = document.querySelector('#registrations-body');
   registrationStatus.textContent = 'Loading registrations…';
   try {
-    const response = await fetch('/api/bulk-email', {
-      method:'POST', credentials:'same-origin', cache:'no-store',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'registrations', offset})
+    const response = await fetch(`/api/admin-registrations?offset=${offset}`, {
+      credentials:'same-origin', cache:'no-store'
     });
     const result = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(result.error || 'Registrations are unavailable.');
@@ -128,7 +126,7 @@ async function loadRegistrations(offset = registrationsOffset) {
     document.querySelector('#registrations-page').textContent = result.total ? `${offset + 1}–${offset + result.registrations.length} of ${result.total}` : '0 registrations';
     document.querySelector('#registrations-previous').disabled = offset === 0;
     document.querySelector('#registrations-next').disabled = offset + result.registrations.length >= result.total;
-    registrationStatus.textContent = result.partial ? 'Showing unique email contacts only. Publish the updated Google Apps Script to show every registration, full names, and submission times.' : '';
+    registrationStatus.textContent = '';
   } catch (error) {
     registrationStatus.textContent = error.message;
   }

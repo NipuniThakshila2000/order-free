@@ -1,3 +1,5 @@
+import {registrationStoreReady, saveRegistration} from '../src/registration-store.mjs';
+
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default async function handler(request, response) {
@@ -5,7 +7,7 @@ export default async function handler(request, response) {
   const proxyUrl = process.env.REGISTRATION_PROXY_URL;
   const scriptUrl = process.env.GOOGLE_SCRIPT_URL;
   const token = process.env.REGISTRATION_TOKEN;
-  const ready = Boolean((proxyUrl || (scriptUrl && token)) && process.env.REGISTRATION_OPEN === 'true');
+  const ready = Boolean((registrationStoreReady() || proxyUrl || (scriptUrl && token)) && process.env.REGISTRATION_OPEN === 'true');
   if (request.method === 'GET') return response.status(200).json({ready});
   if (request.method !== 'POST') return response.status(405).json({error: 'Method not allowed.'});
   if (!ready) return response.status(503).json({error: 'Registration is not open yet.'});
@@ -26,6 +28,10 @@ export default async function handler(request, response) {
     return response.status(400).json({error: 'Check your name, email, and attendance choice.'});
   }
   try {
+    if (registrationStoreReady()) {
+      await saveRegistration({...data, submittedAt:new Date().toISOString()});
+      return response.status(200).json({ok:true});
+    }
     const sheetResponse = await fetch(proxyUrl || scriptUrl, {
       method: 'POST',
       headers: {'Content-Type': proxyUrl ? 'application/json' : 'text/plain;charset=utf-8'},
@@ -35,7 +41,7 @@ export default async function handler(request, response) {
     if (!sheetResponse.ok || result.ok !== true) throw new Error(`Registration upstream returned ${sheetResponse.status}.`);
     return response.status(200).json({ok: true});
   } catch (problem) {
-    console.error(`Registration ${proxyUrl ? 'proxy' : 'sheet'} failed: ${problem instanceof Error ? problem.message : 'unknown error'}`);
+    console.error(`Registration ${registrationStoreReady() ? 'storage' : proxyUrl ? 'proxy' : 'sheet'} failed: ${problem instanceof Error ? problem.message : 'unknown error'}`);
     return response.status(502).json({error: 'Registration could not be saved. Please try again.'});
   }
 }
