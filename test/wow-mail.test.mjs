@@ -1,25 +1,44 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mailConfigured, senderAddress} from '../src/wow-mail.mjs';
+import {mailConfigured, mailStatus, sendWowEmail, senderAddress} from '../src/wow-mail.mjs';
 
-test('direct SMTP requires WOW mailbox credentials and a TLS port', () => {
-  const keys=['WOW_SMTP_HOST','WOW_SMTP_PORT','WOW_SMTP_USER','WOW_SMTP_PASSWORD'];
-  const previous=keys.map((key)=>[key,process.env[key]]);
+test('Mandrill checks the WOW sending domain and sends from the WOW address', async () => {
+  const previousKey=process.env.MANDRILL_API_KEY;
+  const previousFetch=globalThis.fetch;
+  const calls=[];
+  process.env.MANDRILL_API_KEY='test-key';
+  globalThis.fetch=async (url, options) => {
+    const data=JSON.parse(options.body);
+    calls.push({url:String(url),data});
+    if (String(url).includes('/senders/domains')) return new Response(JSON.stringify([
+      {domain:'wowlife.lk',verified_at:'2026-01-01',valid_signing:true,dmarc:{valid:true}}
+    ]));
+    return new Response(JSON.stringify([{email:'jane@example.com',status:'sent',_id:'provider-id'}]));
+  };
   try {
-    process.env.WOW_SMTP_HOST='smtp.example.com';
-    process.env.WOW_SMTP_PORT='587';
-    process.env.WOW_SMTP_USER='personal@gmail.com';
-    process.env.WOW_SMTP_PASSWORD='app-password';
-    assert.equal(mailConfigured(),false);
-    process.env.WOW_SMTP_USER=senderAddress;
     assert.equal(mailConfigured(),true);
-    process.env.WOW_SMTP_PORT='25';
-    assert.equal(mailConfigured(),false);
-    process.env.WOW_SMTP_PORT='465';
-    assert.equal(mailConfigured(),true);
-    delete process.env.WOW_SMTP_PASSWORD;
-    assert.equal(mailConfigured(),false);
+    assert.equal((await mailStatus()).senderAddress,senderAddress);
+    assert.deepEqual(await sendWowEmail({to:'jane@example.com',subject:'Details',message:'Hello'}),{status:'sent',id:'provider-id'});
+    assert.equal(calls[1].data.message.from_email,'info@wowlife.lk');
+    assert.equal(calls[1].data.message.headers['Reply-To'],'info@wowlife.lk');
+    assert.equal(calls[1].data.message.to.length,1);
   } finally {
-    for (const [key,value] of previous) if (value===undefined) delete process.env[key]; else process.env[key]=value;
+    globalThis.fetch=previousFetch;
+    if (previousKey===undefined) delete process.env.MANDRILL_API_KEY; else process.env.MANDRILL_API_KEY=previousKey;
+  }
+});
+
+test('Mandrill domain or recipient rejection prevents a successful send', async () => {
+  const previousKey=process.env.MANDRILL_API_KEY;
+  const previousFetch=globalThis.fetch;
+  process.env.MANDRILL_API_KEY='test-key';
+  try {
+    globalThis.fetch=async()=>new Response(JSON.stringify([{domain:'wowlife.lk',verified_at:null,valid_signing:false}]));
+    await assert.rejects(mailStatus(),/verified/);
+    globalThis.fetch=async()=>new Response(JSON.stringify([{email:'jane@example.com',status:'rejected',reject_reason:'unsigned'}]));
+    await assert.rejects(sendWowEmail({to:'jane@example.com',subject:'Details',message:'Hello'}),/unsigned/);
+  } finally {
+    globalThis.fetch=previousFetch;
+    if (previousKey===undefined) delete process.env.MANDRILL_API_KEY; else process.env.MANDRILL_API_KEY=previousKey;
   }
 });

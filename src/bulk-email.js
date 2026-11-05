@@ -121,11 +121,11 @@ form.addEventListener('submit', async (event) => {
       result = await mailingApi({action:'send', ...data, campaignId, offset});
       offset = result.nextOffset;
       sessionStorage.setItem('contactMailDraft', JSON.stringify({fingerprint, campaignId, offset}));
-      status.textContent = `Campaign ${campaignId}: ${result.completed} of ${result.total} recipients sent; ${result.remaining} remaining.${result.remainingDailyQuota == null ? '' : ` ${result.remainingDailyQuota} emails left in today's quota.`}`;
+      status.textContent = `Campaign ${campaignId}: ${result.completed} of ${result.total} messages accepted by Mandrill; ${result.remaining} remaining.${result.remainingDailyQuota == null ? '' : ` ${result.remainingDailyQuota} emails left in today's quota.`}`;
       if (result.failed || result.held || !result.sent) break;
     } while (result.remaining > 0 && !pauseRequested);
     if (result.remaining === 0) {
-      status.textContent = `Completed: ${result.completed} of ${result.total} recipients. Campaign ${campaignId}.`;
+      status.textContent = `Completed: ${result.completed} of ${result.total} messages accepted by Mandrill. Campaign ${campaignId}.`;
       sessionStorage.removeItem('contactMailDraft');
     } else if (result.failed) {
       status.textContent += ' Some sends failed. Check the delivery log, then use Send again to retry.';

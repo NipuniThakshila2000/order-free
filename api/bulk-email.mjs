@@ -90,7 +90,7 @@ export function createBulkEmailHandler(deps = {}) {
       }
       if (!storeReady()) return response.status(503).json({error:'Private contact storage is not configured.'});
       if (data.action === 'history') return response.status(200).json({ok:true, entries:await logs.recentMailLog()});
-      if (!mail.configured()) return response.status(503).json({error:'WOW mailbox SMTP is not configured.'});
+      if (!mail.configured()) return response.status(503).json({error:'Mandrill API key is not configured.'});
       const status = await mail.status();
       if (String(status.senderAddress || '').toLowerCase() !== senderAddress) {
         return response.status(503).json({error:'The WOW sender address is not verified in Gmail.'});
@@ -122,7 +122,7 @@ export function createBulkEmailHandler(deps = {}) {
         if (previous && previous.entry.draftHash !== draftHash) {
           return response.status(409).json({error:'This campaign ID belongs to another message.'});
         }
-        if (previous?.entry.status === 'sent') { alreadySent++; continue; }
+        if (['sent','queued','scheduled'].includes(previous?.entry.status)) { alreadySent++; continue; }
         if (previous?.entry.status === 'sending') { held++; continue; }
         const entry = {
           date:new Date().toISOString(), campaignId:data.campaignId,
@@ -132,8 +132,9 @@ export function createBulkEmailHandler(deps = {}) {
         let reservation;
         try { reservation = await logs.writeMailLog(pathname, entry, previous?.etag); }
         catch { held++; continue; }
+        let delivery;
         try {
-          await mail.send({
+          delivery = await mail.send({
             to:person.email, subject:data.subject.trim(),
             message:personalize(data.message.trim(), person.firstName)
           });
@@ -147,7 +148,7 @@ export function createBulkEmailHandler(deps = {}) {
           }
           continue;
         }
-        await logs.writeMailLog(pathname, {...entry, status:'sent'}, reservation.etag);
+        await logs.writeMailLog(pathname, {...entry, status:delivery?.status || 'sent', providerId:delivery?.id || ''}, reservation.etag);
         sent++;
       }
       const completed = data.offset + sent + alreadySent;

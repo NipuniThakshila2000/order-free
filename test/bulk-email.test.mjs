@@ -22,7 +22,7 @@ function fixture(alias='info@wowlife.lk') {
     mail:{
       configured:()=>true,
       status:async()=>({senderAddress:alias,remainingDailyQuota:null}),
-      send:async(payload)=>{calls.push(payload);}
+      send:async(payload)=>{calls.push(payload);return {status:'queued',id:'mandrill-id'};}
     }
   });
   async function call(body,cookie='redeeming_session=admin') {
@@ -66,7 +66,9 @@ test('deduplicates contacts and logs delivery without a Sheet',async()=>{
     const retry=await call(campaign);
     assert.equal(retry.body.sent,0);
     assert.equal(calls.length,3);
-    assert.equal((await call({action:'history'})).body.entries.length,3);
+    const history=(await call({action:'history'})).body.entries;
+    assert.equal(history.length,3);
+    assert.equal(history[0].status,'queued');
     assert.equal((await call({...campaign,subject:'Changed'})).statusCode,409);
   } finally {
     globalThis.fetch=original;
