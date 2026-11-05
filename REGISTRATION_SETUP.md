@@ -10,7 +10,7 @@ The dashboard's **Email sending** section combines the private registration reco
 
 The Architecture of Freedom main site holds `MANDRILL_API_KEY` and `EMAIL_FROM` in its production environment. Its `/api/bulk-email-bridge` endpoint verifies the existing admin session and sends one message at a time through Mandrill. The `order-free` dashboard forwards only the admin session cookie to that endpoint; it does not store or receive the Mandrill key. The WOWMedia site, if serving this dashboard, needs `BULK_EMAIL_PROXY_URL=https://order-free.vercel.app/api/bulk-email` so its dashboard uses the same private contacts and log.
 
-The main site checks that `wowlife.lk` is verified for signing and has valid DMARC in its Mandrill account before enabling Send. Each message uses `info@wowlife.lk` as From and Reply-To. Mandrill may accept a message as `sent` or `queued`; the delivery log records that response. The provider's sending limits still apply.
+The main site checks that `wowlife.lk` is verified for signing and has valid DMARC in its Mandrill account before enabling Send. Each message uses `info@wowlife.lk` as From and `info@wowlife.in` as Reply-To. Mandrill may accept a message as `sent` or `queued`; the delivery log records that response. The provider's sending limits still apply.
 
 The dashboard requires confirmation before a real bulk send. A campaign ID and private log prevent automatic repeat delivery to addresses already recorded as sent. Any delivery marked `sending` after an interruption is held for manual review, since the mail may already have gone out.
 

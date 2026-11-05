@@ -21,7 +21,7 @@ function fixture(alias='info@wowlife.lk') {
     logs,
     mail:{
       configured:()=>true,
-      status:async()=>({senderAddress:alias,remainingDailyQuota:null}),
+      status:async()=>({senderAddress:alias,replyToAddress:'info@wowlife.in',remainingDailyQuota:null}),
       send:async(payload)=>{calls.push(payload);return {status:'queued',id:'mandrill-id'};}
     }
   });
@@ -57,6 +57,7 @@ test('deduplicates contacts and logs delivery without a Sheet',async()=>{
     assert.equal(summary.body.selected,3);
     assert.equal(summary.body.registrants,2);
     assert.equal(summary.body.applicants,2);
+    assert.equal(summary.body.replyToAddress,'info@wowlife.in');
     const campaign={action:'send',audience:'all',subject:'Details',message:'Hi {{firstName}}',campaignId:'e40972d7-7488-4c58-a3fa-03345371e629',offset:0};
     const first=await call(campaign);
     assert.equal(first.statusCode,200);

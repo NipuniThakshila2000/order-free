@@ -3,6 +3,7 @@ import {mailLogPath, mailDraftHash, readMailLog, writeMailLog, recentMailLog} fr
 import {mailStatus, sendWowEmail, senderAddress} from '../src/wow-mail.mjs';
 
 const accessUrl = process.env.READING_ACCESS_BACKEND_URL || 'https://order.wowlife.lk/api/reading-access';
+const replyToAddress = 'info@wowlife.in';
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const audiences = ['all','registrants','online','in-person','applicants'];
 const batchSize = 5;
@@ -92,7 +93,10 @@ export function createBulkEmailHandler(deps = {}) {
       if (data.action === 'history') return response.status(200).json({ok:true, entries:await logs.recentMailLog()});
       const status = await mail.status(cookie);
       if (String(status.senderAddress || '').toLowerCase() !== senderAddress) {
-        return response.status(503).json({error:'The WOW sender address is not verified in Gmail.'});
+        return response.status(503).json({error:'The WOW sender address is not configured in Mandrill.'});
+      }
+      if (String(status.replyToAddress || '').toLowerCase() !== replyToAddress) {
+        return response.status(503).json({error:'The WOW reply-to address is not configured.'});
       }
       if (data.action === 'test') {
         await mail.send({
@@ -105,7 +109,7 @@ export function createBulkEmailHandler(deps = {}) {
       const {selected, counts} = await contactsFor(data.audience, cookie, registrationRecords);
       if (data.action === 'summary') {
         return response.status(200).json({ok:true, ...counts, selected:selected.length,
-          remainingDailyQuota:status.remainingDailyQuota, senderAddress});
+          remainingDailyQuota:status.remainingDailyQuota, senderAddress, replyToAddress});
       }
       if (data.offset > selected.length) return response.status(400).json({error:'Campaign position is beyond the contact list.'});
       const quota = status.remainingDailyQuota == null ? null : Math.max(0, Number(status.remainingDailyQuota) || 0);
