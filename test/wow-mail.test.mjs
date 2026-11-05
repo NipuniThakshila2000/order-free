@@ -1,44 +1,25 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mailConfigured, mailStatus, sendWowEmail, senderAddress} from '../src/wow-mail.mjs';
+import {mailStatus, sendWowEmail} from '../src/wow-mail.mjs';
 
-test('Mandrill checks the WOW sending domain and sends from the WOW address', async () => {
-  const previousKey=process.env.MANDRILL_API_KEY;
-  const previousFetch=globalThis.fetch;
+test('mail bridge forwards the admin session and one recipient to the main site',async()=>{
+  const original=globalThis.fetch;
   const calls=[];
-  process.env.MANDRILL_API_KEY='test-key';
-  globalThis.fetch=async (url, options) => {
-    const data=JSON.parse(options.body);
-    calls.push({url:String(url),data});
-    if (String(url).includes('/senders/domains')) return new Response(JSON.stringify([
-      {domain:'wowlife.lk',verified_at:'2026-01-01',valid_signing:true,dmarc:{valid:true}}
-    ]));
-    return new Response(JSON.stringify([{email:'jane@example.com',status:'sent',_id:'provider-id'}]));
+  globalThis.fetch=async(url,options)=>{
+    calls.push({url,options});
+    const action=JSON.parse(options.body).action;
+    return new Response(JSON.stringify(action==='status'?
+      {ok:true,senderAddress:'info@wowlife.lk',remainingDailyQuota:null}:
+      {ok:true,status:'queued',id:'mandrill-id'}));
   };
   try {
-    assert.equal(mailConfigured(),true);
-    assert.equal((await mailStatus()).senderAddress,senderAddress);
-    assert.deepEqual(await sendWowEmail({to:'jane@example.com',subject:'Details',message:'Hello'}),{status:'sent',id:'provider-id'});
-    assert.equal(calls[1].data.message.from_email,'info@wowlife.lk');
-    assert.equal(calls[1].data.message.headers['Reply-To'],'info@wowlife.lk');
-    assert.equal(calls[1].data.message.to.length,1);
-  } finally {
-    globalThis.fetch=previousFetch;
-    if (previousKey===undefined) delete process.env.MANDRILL_API_KEY; else process.env.MANDRILL_API_KEY=previousKey;
-  }
-});
-
-test('Mandrill domain or recipient rejection prevents a successful send', async () => {
-  const previousKey=process.env.MANDRILL_API_KEY;
-  const previousFetch=globalThis.fetch;
-  process.env.MANDRILL_API_KEY='test-key';
-  try {
-    globalThis.fetch=async()=>new Response(JSON.stringify([{domain:'wowlife.lk',verified_at:null,valid_signing:false}]));
-    await assert.rejects(mailStatus(),/verified/);
-    globalThis.fetch=async()=>new Response(JSON.stringify([{email:'jane@example.com',status:'rejected',reject_reason:'unsigned'}]));
-    await assert.rejects(sendWowEmail({to:'jane@example.com',subject:'Details',message:'Hello'}),/unsigned/);
-  } finally {
-    globalThis.fetch=previousFetch;
-    if (previousKey===undefined) delete process.env.MANDRILL_API_KEY; else process.env.MANDRILL_API_KEY=previousKey;
-  }
+    const cookie='redeeming_session=admin';
+    assert.equal((await mailStatus(cookie)).senderAddress,'info@wowlife.lk');
+    assert.deepEqual(await sendWowEmail({to:'jane@example.com',subject:'Details',message:'Hello'},cookie),
+      {status:'queued',id:'mandrill-id'});
+    assert.equal(calls[0].options.headers.Cookie,cookie);
+    assert.equal(calls[1].url,'https://order.wowlife.lk/api/bulk-email-bridge');
+    assert.equal(JSON.parse(calls[1].options.body).to,'jane@example.com');
+    await assert.rejects(mailStatus(''),/Admin sign-in/);
+  } finally {globalThis.fetch=original;}
 });

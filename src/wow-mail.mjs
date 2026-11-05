@@ -1,54 +1,29 @@
 export const senderAddress = 'info@wowlife.lk';
 
-const apiRoot = 'https://mandrillapp.com/api/1.4/';
+const bridgeUrl = 'https://order.wowlife.lk/api/bulk-email-bridge';
 
-export function mailConfigured() {
-  return Boolean(process.env.MANDRILL_API_KEY);
-}
-
-async function mandrillRequest(method, payload = {}) {
-  if (!mailConfigured()) throw new Error('Mandrill API key is not configured.');
-  const response = await fetch(`${apiRoot}${method}.json`, {
+async function bridgeRequest(action, payload, cookie) {
+  if (!cookie) throw new Error('Admin sign-in required.');
+  const response = await fetch(bridgeUrl, {
     method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({key:process.env.MANDRILL_API_KEY, ...payload}),
-    signal:AbortSignal.timeout(20000)
+    headers:{'Content-Type':'application/json',Cookie:cookie},
+    body:JSON.stringify({action,...payload}),
+    signal:AbortSignal.timeout(25000)
   });
   const result = await response.json();
-  if (!response.ok) {
-    const error = new Error(result.message || `Mandrill returned ${response.status}.`);
+  if (!response.ok || result.ok !== true) {
+    const error = new Error(result.error || 'WOW email service is unavailable.');
     error.expected = response.status >= 400 && response.status < 500;
     throw error;
   }
   return result;
 }
 
-export async function mailStatus() {
-  const domains = await mandrillRequest('senders/domains');
-  const domain = Array.isArray(domains) && domains.find((item) => String(item.domain).toLowerCase() === 'wowlife.lk');
-  if (!domain?.verified_at || domain.valid_signing !== true || domain.dmarc?.valid !== true) {
-    throw new Error('wowlife.lk must be verified with valid DKIM and DMARC in Mandrill.');
-  }
-  return {senderAddress, remainingDailyQuota:null};
+export async function mailStatus(cookie) {
+  return bridgeRequest('status', {}, cookie);
 }
 
-export async function sendWowEmail({to, subject, message}) {
-  const results = await mandrillRequest('messages/send', {
-    async:false,
-    message:{
-      from_email:senderAddress,
-      from_name:'WOWLife Church',
-      headers:{'Reply-To':senderAddress},
-      to:[{email:to,type:'to'}],
-      subject,
-      text:message
-    }
-  });
-  const delivery = Array.isArray(results) && results.find((item) => String(item.email).toLowerCase() === to.toLowerCase());
-  if (!delivery || !['sent','queued','scheduled'].includes(delivery.status)) {
-    const error = new Error(delivery?.reject_reason || `Mandrill ${delivery?.status || 'did not accept the recipient'}.`);
-    error.expected = true;
-    throw error;
-  }
-  return {status:delivery.status, id:delivery._id || ''};
+export async function sendWowEmail({to, subject, message}, cookie) {
+  const result = await bridgeRequest('send-one', {to,subject,message}, cookie);
+  return {status:result.status, id:result.id};
 }

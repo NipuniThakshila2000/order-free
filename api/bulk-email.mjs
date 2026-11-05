@@ -1,6 +1,6 @@
 import {allRegistrations, registrationStoreReady} from '../src/registration-store.mjs';
 import {mailLogPath, mailDraftHash, readMailLog, writeMailLog, recentMailLog} from '../src/mail-log-store.mjs';
-import {mailConfigured, mailStatus, sendWowEmail, senderAddress} from '../src/wow-mail.mjs';
+import {mailStatus, sendWowEmail, senderAddress} from '../src/wow-mail.mjs';
 
 const accessUrl = process.env.READING_ACCESS_BACKEND_URL || 'https://order.wowlife.lk/api/reading-access';
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -47,7 +47,7 @@ function personalize(message, firstName) {
 }
 
 export function createBulkEmailHandler(deps = {}) {
-  const mail = deps.mail || {configured:mailConfigured, status:mailStatus, send:sendWowEmail};
+  const mail = deps.mail || {status:mailStatus, send:sendWowEmail};
   const registrationRecords = deps.registrationRecords || allRegistrations;
   const storeReady = deps.storeReady || registrationStoreReady;
   const logs = deps.logs || {mailLogPath, mailDraftHash, readMailLog, writeMailLog, recentMailLog};
@@ -90,8 +90,7 @@ export function createBulkEmailHandler(deps = {}) {
       }
       if (!storeReady()) return response.status(503).json({error:'Private contact storage is not configured.'});
       if (data.action === 'history') return response.status(200).json({ok:true, entries:await logs.recentMailLog()});
-      if (!mail.configured()) return response.status(503).json({error:'Mandrill API key is not configured.'});
-      const status = await mail.status();
+      const status = await mail.status(cookie);
       if (String(status.senderAddress || '').toLowerCase() !== senderAddress) {
         return response.status(503).json({error:'The WOW sender address is not verified in Gmail.'});
       }
@@ -100,7 +99,7 @@ export function createBulkEmailHandler(deps = {}) {
           to:data.testEmail.trim(),
           subject:`[TEST] ${data.subject.trim()}`,
           message:personalize(data.message.trim(), 'Test recipient')
-        });
+        }, cookie);
         return response.status(200).json({ok:true});
       }
       const {selected, counts} = await contactsFor(data.audience, cookie, registrationRecords);
@@ -137,7 +136,7 @@ export function createBulkEmailHandler(deps = {}) {
           delivery = await mail.send({
             to:person.email, subject:data.subject.trim(),
             message:personalize(data.message.trim(), person.firstName)
-          });
+          }, cookie);
         } catch (error) {
           if (error.expected) {
             await logs.writeMailLog(pathname, {...entry, status:'failed', error:error.message}, reservation.etag);
