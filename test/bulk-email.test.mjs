@@ -52,9 +52,11 @@ test('all contacts combines registration and applicant lists without duplicate a
   const oldFetch = globalThis.fetch;
   const oldProxy = process.env.BULK_EMAIL_PROXY_URL;
   const oldScript = process.env.GOOGLE_SCRIPT_URL;
+  const oldMailScript = process.env.BULK_EMAIL_SCRIPT_URL;
   const oldToken = process.env.REGISTRATION_TOKEN;
   delete process.env.BULK_EMAIL_PROXY_URL;
   process.env.GOOGLE_SCRIPT_URL = 'https://script.example/exec';
+  process.env.BULK_EMAIL_SCRIPT_URL = 'https://mail-script.example/exec';
   process.env.REGISTRATION_TOKEN = 'secret';
   const calls = [];
   globalThis.fetch = async (url, options) => {
@@ -79,13 +81,14 @@ test('all contacts combines registration and applicant lists without duplicate a
     const result = await call({action:'send', audience:'all', subject:'Details', message:'Hi {{firstName}}', campaignId:'e40972d7-7488-4c58-a3fa-03345371e629', offset:0});
     assert.equal(result.statusCode, 200);
     const sendCall = calls.find((entry) => entry.options.body && JSON.parse(entry.options.body).action === 'send');
+    assert.equal(sendCall.url, 'https://mail-script.example/exec');
     const payload = JSON.parse(sendCall.options.body);
     assert.equal(payload.recipients.length, 3);
     assert.equal(new Set(payload.recipients.map((person) => person.email)).size, 3);
     assert.equal(payload.token, 'secret');
   } finally {
     globalThis.fetch = oldFetch;
-    for (const [key, value] of [['BULK_EMAIL_PROXY_URL', oldProxy], ['GOOGLE_SCRIPT_URL', oldScript], ['REGISTRATION_TOKEN', oldToken]]) {
+    for (const [key, value] of [['BULK_EMAIL_PROXY_URL', oldProxy], ['GOOGLE_SCRIPT_URL', oldScript], ['BULK_EMAIL_SCRIPT_URL', oldMailScript], ['REGISTRATION_TOKEN', oldToken]]) {
       if (value === undefined) delete process.env[key]; else process.env[key] = value;
     }
   }

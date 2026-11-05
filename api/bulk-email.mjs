@@ -67,7 +67,7 @@ export default async function handler(request, response) {
       if (data.action === 'test' && (typeof data.testEmail !== 'string' || !emailPattern.test(data.testEmail) || data.testEmail.length > 254)) return response.status(400).json({error:'Enter a valid test email.'});
     }
     const proxyUrl = process.env.BULK_EMAIL_PROXY_URL;
-    const scriptUrl = process.env.GOOGLE_SCRIPT_URL;
+    const scriptUrl = process.env.BULK_EMAIL_SCRIPT_URL || process.env.GOOGLE_SCRIPT_URL;
     const token = process.env.REGISTRATION_TOKEN;
     if (!proxyUrl && (!scriptUrl || !token)) return response.status(503).json({error:'Contact mailing is not configured on this deployment.'});
     const payload = {action:data.action};
