@@ -121,7 +121,7 @@ form.addEventListener('submit', async (event) => {
       result = await mailingApi({action:'send', ...data, campaignId, offset});
       offset = result.nextOffset;
       sessionStorage.setItem('contactMailDraft', JSON.stringify({fingerprint, campaignId, offset}));
-      status.textContent = `Campaign ${campaignId}: ${result.completed} of ${result.total} recipients sent or held; ${result.remaining} remaining. ${result.remainingDailyQuota} emails left in today's quota.`;
+      status.textContent = `Campaign ${campaignId}: ${result.completed} of ${result.total} recipients sent; ${result.remaining} remaining. ${result.remainingDailyQuota} emails left in today's quota.`;
       if (result.failed || result.held || !result.sent) break;
     } while (result.remaining > 0 && !pauseRequested);
     if (result.remaining === 0) {
