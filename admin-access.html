@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
   <title>Experience applications | Redeeming the Seasons</title>
-  <link rel="stylesheet" href="admin-access.css?v=4">
-  <script type="module" src="src/admin-access.js?v=3"></script>
+  <link rel="stylesheet" href="admin-access.css?v=5">
+  <script type="module" src="src/admin-access.js?v=5"></script>
 </head>
 <body>
   <main>
@@ -20,6 +20,28 @@
     <section id="admin-dashboard" hidden>
       <div class="toolbar"><div id="admin-counts" aria-live="polite"></div><div><button id="admin-refresh" type="button">Refresh</button><button id="admin-logout" type="button">Sign out</button></div></div>
       <p id="admin-status" role="status" aria-live="polite"></p>
+      <section class="mailing" aria-labelledby="mailing-title">
+        <h2 id="mailing-title">Email contacts</h2>
+        <p>Send relevant updates to registrants, access applicants, or everyone. Each address receives an individual message from the Google account that owns the registration Sheet.</p>
+        <p id="mailing-summary" role="status" aria-live="polite">Loading recipients…</p>
+        <form id="mailing-form">
+          <label>Recipients
+            <select name="audience"><option value="all">All contacts</option><option value="registrants">All event registrants</option><option value="online">Online registrants</option><option value="in-person">In-person registrants</option><option value="applicants">All access applicants</option></select>
+          </label>
+          <label>Subject<input name="subject" maxlength="150" required></label>
+          <label>Message <small>Use {{firstName}} to insert each recipient's first name.</small>
+            <textarea name="message" rows="9" maxlength="10000" required></textarea>
+          </label>
+          <div class="mailing-actions"><button id="mailing-preview" type="button">Preview</button><button id="mailing-send" type="submit">Send to selected contacts</button><button id="mailing-stop" type="button" hidden>Pause after this batch</button></div>
+        </form>
+        <div id="mailing-preview-content" class="mailing-preview" hidden><strong>Message preview</strong><pre></pre></div>
+        <form id="mailing-test-form">
+          <label>Send a test to<input name="testEmail" type="email" autocomplete="email" required></label>
+          <button type="submit">Send test</button>
+        </form>
+        <p id="mailing-status" role="status" aria-live="polite"></p>
+        <details><summary>Recent delivery log</summary><button id="mailing-history-refresh" type="button">Refresh log</button><div class="table-wrap"><table class="mailing-log"><thead><tr><th>When</th><th>Recipient</th><th>Subject</th><th>Status</th><th>Issue</th></tr></thead><tbody id="mailing-history"></tbody></table></div></details>
+      </section>
       <section class="page-metrics" aria-labelledby="page-metrics-title">
         <div class="metrics-heading"><div><h2 id="page-metrics-title">Page metrics</h2><p>Daily page loads for Redeeming the Seasons.</p></div><span>Asia/Colombo time</span></div>
         <p id="page-metrics-status" role="status" aria-live="polite">Loading page metrics…</p>

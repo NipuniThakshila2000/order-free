@@ -66,3 +66,22 @@
 .metric-day small{height:14px;font-size:9px;color:var(--muted);white-space:nowrap;overflow:visible}
 .metrics-note{font-size:12px;margin:14px 0 0}
 @media(max-width:760px){.metrics-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.mailing{margin:26px 0 34px;padding:24px;border:1px solid rgba(214,174,88,.35);background:var(--panel)}
+.mailing h2{margin:0}
+.mailing p{margin:8px 0}
+.mailing form{max-width:760px}
+.mailing label small{color:var(--muted);font-size:12px}
+.mailing select,.mailing textarea{width:100%;padding:13px;border:1px solid #64809c;background:#102f52;color:#fff;font:16px Arial,sans-serif}
+.mailing textarea{resize:vertical;line-height:1.5}
+.mailing select:focus-visible,.mailing textarea:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.mailing-actions{display:flex;gap:10px;flex-wrap:wrap}
+.mailing-actions button:first-child,.mailing-actions button:last-child,#mailing-test-form button,#mailing-history-refresh{background:transparent;color:var(--gold)}
+.mailing-preview{margin-top:16px;max-width:760px;padding:16px;border:1px solid rgba(214,174,88,.3);background:#102f52}
+.mailing-preview pre{white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.5 Arial,sans-serif;color:var(--cream)}
+#mailing-test-form{display:flex;align-items:end;gap:10px;flex-wrap:wrap;margin-top:24px}
+#mailing-test-form label{min-width:min(100%,320px)}
+#mailing-status{min-height:1.5em;margin:18px 0}
+.mailing details{margin-top:24px}
+.mailing summary{cursor:pointer;color:var(--gold);font-weight:bold}
+#mailing-history-refresh{margin:12px 0}
+.mailing-log{min-width:700px}

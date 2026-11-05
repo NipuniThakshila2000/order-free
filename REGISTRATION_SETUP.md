@@ -11,6 +11,14 @@ The public form posts to `/api/register`. On the original site, that endpoint fo
 
 Keep the Sheet private. The Apps Script is publicly callable, but it requires the private token supplied only by the Vercel server endpoint. Do not put the token in the site HTML or browser JavaScript.
 
+## Bulk email from the admin dashboard
+
+The admin dashboard at `/admin-access.html` now has an **Email contacts** section. It combines the private `Registrations` Sheet with the admin access-application list. Audiences are all unique contacts, all event registrants, online or in-person registrants, and all access applicants. An address in both sources receives one email per campaign. Admins can send a test, preview the selected count and message, personalize the body with `{{firstName}}`, see progress and the Google daily quota, pause and resume, and inspect the latest delivery log. The `MailLog` tab is created automatically. A browser session can resume an interrupted campaign with the same draft and campaign ID; sent and in-progress addresses are held to prevent automatic duplicates. Review any `sending` rows in the log before manually retrying them.
+
+To enable it, replace the Apps Script code with the updated `scripts/registration-sheet.gs` and **create a new web-app deployment version**. Update `GOOGLE_SCRIPT_URL` if the deployment URL changes. The original Vercel project needs `GOOGLE_SCRIPT_URL` and `REGISTRATION_TOKEN`; its `/api/bulk-email` endpoint verifies the existing admin session and reads the main site's application list before calling Apps Script. Grant Apps Script permission to send email when prompted. The sending address is the Google account that deployed the web app, and that account's MailApp daily quota limits sends.
+
+On the WOWMedia deployment, set `BULK_EMAIL_PROXY_URL=https://order-free.vercel.app/api/bulk-email` (using the actual original project URL). Keep the Sheet token only on the original project. Deploy both updated projects before using the mailing section. Test with an admin account and one test email, then confirm the `MailLog` entry after a small send.
+
 ## WOWMedia deployment
 
 The WOWMedia project uses production variables `REGISTRATION_PROXY_URL=https://order-free.vercel.app/api/register` and `REGISTRATION_OPEN=true`. Its server endpoint forwards validated entries as JSON to the original site's API, which writes to the same Sheet. The original `REGISTRATION_TOKEN` stays in the original Vercel project; do not copy a placeholder token to WOWMedia. Keep the original site and its registration API active while this proxy is in use. To make WOWMedia independent later, configure its own `GOOGLE_SCRIPT_URL` and matching Apps Script `REGISTRATION_TOKEN`, remove `REGISTRATION_PROXY_URL`, and redeploy.

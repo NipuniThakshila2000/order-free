@@ -10,6 +10,8 @@ The admin review screen is `/admin-access.html`, or `/RedeemingTheSeasons/admin-
 
 The experience site's `/api/access` and `/api/experience-data` functions proxy to the main site's access and saved-data APIs. Both projects must be deployed for applications, approvals, email sign-in, and account history to work. The main site's admin screen lists saved records and allows viewing or downloading complete JSON. Account holders can view and delete their own saved records.
 
+The admin dashboard also includes bulk email for all contacts, event registrants, or access applicants. It offers a personalized plain-text draft, a test send, a recipient count preview, batched sending with pause and resume, daily quota visibility, and a delivery log. Contacts shared by both sources receive one email per campaign. It uses the private registration Sheet and Google Apps Script; see `REGISTRATION_SETUP.md` for deployment.
+
 The admin screen also shows aggregate page loads for the Redeeming the Seasons page: today, the last 7 and 30 days, all time, a 30-day chart, and counts by published site address. The browser sends only the site hostname; the main database stores daily counters with no visitor identifier. Counts start when this tracking is deployed and exclude visitors whose browsers block the request.
 
 The calculation code lives in `src/*.mjs`. After changing it, refresh the browser bundle with `npm run build`.

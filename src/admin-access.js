@@ -1,4 +1,5 @@
 import {renderExperienceReport, renderYearDetail} from './experience-report.mjs';
+import {loadMailing} from './bulk-email.js?v=2';
 
 const base = '/api/access';
 const loginPanel = document.querySelector('#admin-login');
@@ -169,7 +170,7 @@ document.querySelector('#generated-next').addEventListener('click', () => loadGe
 async function showDashboard() {
   loginPanel.hidden = true;
   dashboard.hidden = false;
-  await Promise.all([load(), loadGenerated(0), loadMetrics()]);
+  await Promise.all([load(), loadGenerated(0), loadMetrics(), loadMailing()]);
 }
 
 api('session').then((session) => {
@@ -204,7 +205,7 @@ tbody.addEventListener('click', async (event) => {
   } catch (error) { status.textContent = error.message; button.disabled = false; }
 });
 
-document.querySelector('#admin-refresh').addEventListener('click', () => { load(); loadGenerated(generatedOffset); loadMetrics(); });
+document.querySelector('#admin-refresh').addEventListener('click', () => { load(); loadGenerated(generatedOffset); loadMetrics(); loadMailing(); });
 document.querySelector('#admin-logout').addEventListener('click', async () => {
   try { await api('logout', {}); window.location.reload(); }
   catch (error) { status.textContent = error.message; }
