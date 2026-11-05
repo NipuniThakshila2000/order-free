@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
   <title>Experience applications | Redeeming the Seasons</title>
-  <link rel="stylesheet" href="admin-access.css?v=7">
-  <script type="module" src="src/admin-access.js?v=8"></script>
+  <link rel="stylesheet" href="admin-access.css?v=8">
+  <script type="module" src="src/admin-access.js?v=9"></script>
 </head>
 <body>
   <main>
@@ -51,6 +51,13 @@
         <p class="metrics-note">A page load is counted when the page runs in a browser. These are aggregate counts, not unique visitors. Counts begin when tracking was enabled.</p>
       </details>
       <div class="table-wrap"><table><thead><tr><th>Applicant</th><th>Phone</th><th>Country</th><th>Years at WOWLife Church</th><th>How they found the teachings</th><th>Recommended by</th><th>Submitted</th><th>Status</th><th>Action</th></tr></thead><tbody id="applications-body"></tbody></table></div>
+      <section class="registrations-admin" aria-labelledby="registrations-title">
+        <h2 id="registrations-title">Nov 10 program registrations</h2>
+        <p>Details submitted through the joining form, newest first.</p>
+        <p id="registrations-status" role="status" aria-live="polite"></p>
+        <div class="table-wrap"><table><thead><tr><th>Submitted</th><th>First name</th><th>Last name</th><th>Email</th><th>Attendance</th></tr></thead><tbody id="registrations-body"></tbody></table></div>
+        <div class="generated-pagination"><button id="registrations-previous" type="button">Previous</button><span id="registrations-page"></span><button id="registrations-next" type="button">Next</button></div>
+      </section>
       <section class="generated-admin" aria-labelledby="generated-title">
         <h2 id="generated-title">Stored experiences</h2>
         <p>Birth details and full generated results are kept in the separate experience database.</p>

@@ -17,6 +17,7 @@ const metricsStatus = document.querySelector('#page-metrics-status');
 const metricsCards = document.querySelector('#page-metrics-cards');
 const metricsChart = document.querySelector('#page-metrics-chart');
 let generatedOffset = 0;
+let registrationsOffset = 0;
 let selectedRecord = null;
 let applications = [];
 let activeFilter = 'all';
@@ -104,6 +105,35 @@ async function load() {
   } catch (error) { status.textContent = error.message; }
 }
 
+async function loadRegistrations(offset = registrationsOffset) {
+  const registrationStatus = document.querySelector('#registrations-status');
+  const registrationBody = document.querySelector('#registrations-body');
+  registrationStatus.textContent = 'Loading registrations…';
+  try {
+    const response = await fetch('/api/bulk-email', {
+      method:'POST', credentials:'same-origin', cache:'no-store',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'registrations', offset})
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || 'Registrations are unavailable.');
+    registrationsOffset = offset;
+    registrationBody.innerHTML = result.registrations.length ? result.registrations.map((item) => `<tr>
+      <td>${item.submittedAt ? escapeHtml(new Date(item.submittedAt).toLocaleString()) : '—'}</td>
+      <td>${escapeHtml(item.firstName)}</td>
+      <td>${escapeHtml(item.lastName || '—')}</td>
+      <td><a href="mailto:${encodeURIComponent(item.email)}">${escapeHtml(item.email)}</a></td>
+      <td>${escapeHtml(item.attendance)}</td>
+    </tr>`).join('') : '<tr><td colspan="5">No registrations yet.</td></tr>';
+    document.querySelector('#registrations-page').textContent = result.total ? `${offset + 1}–${offset + result.registrations.length} of ${result.total}` : '0 registrations';
+    document.querySelector('#registrations-previous').disabled = offset === 0;
+    document.querySelector('#registrations-next').disabled = offset + result.registrations.length >= result.total;
+    registrationStatus.textContent = result.partial ? 'Showing unique email contacts only. Publish the updated Google Apps Script to show every registration, full names, and submission times.' : '';
+  } catch (error) {
+    registrationStatus.textContent = error.message;
+  }
+}
+
 countsPanel.addEventListener('click', (event) => {
   const button = event.target.closest('button[data-filter]');
   if (!button) return;
@@ -182,11 +212,13 @@ document.querySelector('#generated-download').addEventListener('click', () => {
 });
 document.querySelector('#generated-previous').addEventListener('click', () => loadGenerated(Math.max(0, generatedOffset - 50)));
 document.querySelector('#generated-next').addEventListener('click', () => loadGenerated(generatedOffset + 50));
+document.querySelector('#registrations-previous').addEventListener('click', () => loadRegistrations(Math.max(0, registrationsOffset - 50)));
+document.querySelector('#registrations-next').addEventListener('click', () => loadRegistrations(registrationsOffset + 50));
 
 async function showDashboard() {
   loginPanel.hidden = true;
   dashboard.hidden = false;
-  await Promise.all([load(), loadGenerated(0), loadMetrics(), loadMailing()]);
+  await Promise.all([load(), loadRegistrations(0), loadGenerated(0), loadMetrics(), loadMailing()]);
 }
 
 api('session').then((session) => {
@@ -221,7 +253,7 @@ tbody.addEventListener('click', async (event) => {
   } catch (error) { status.textContent = error.message; button.disabled = false; }
 });
 
-document.querySelector('#admin-refresh').addEventListener('click', () => { load(); loadGenerated(generatedOffset); loadMetrics(); loadMailing(); });
+document.querySelector('#admin-refresh').addEventListener('click', () => { load(); loadRegistrations(registrationsOffset); loadGenerated(generatedOffset); loadMetrics(); loadMailing(); });
 document.querySelector('#admin-logout').addEventListener('click', async () => {
   try { await api('logout', {}); window.location.reload(); }
   catch (error) { status.textContent = error.message; }

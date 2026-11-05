@@ -11,6 +11,10 @@ The public form posts to `/api/register`. On the original site, that endpoint fo
 
 Keep the Sheet private. The Apps Script is publicly callable, but it requires the private token supplied only by the Vercel server endpoint. Do not put the token in the site HTML or browser JavaScript.
 
+## Admin registration table
+
+The admin dashboard has a separate **Nov 10 program registrations** table. It reads the private `Registrations` tab through the authenticated `/api/bulk-email` proxy with `action=registrations`, showing every row's submission time, first and last name, email, and attendance choice, newest first, 50 per page. Publish a new version of `scripts/registration-sheet.gs` in the mailing Apps Script project to enable full rows. Until then, the dashboard shows a limited list of unique email contacts from the older `recipients` action and labels that view as incomplete.
+
 ## Bulk email from the admin dashboard
 
 The admin dashboard at `/admin-access.html` now has an **Email contacts** section. It combines the private `Registrations` Sheet with the admin access-application list. Audiences are all unique contacts, all event registrants, online or in-person registrants, and all access applicants. An address in both sources receives one email per campaign. Admins can send a test, preview the selected count and message, personalize the body with `{{firstName}}`, see progress and the Google daily quota, pause and resume, and inspect the latest delivery log. The `MailLog` tab is created automatically. A browser session can resume an interrupted campaign with the same draft and campaign ID; sent and in-progress addresses are held to prevent automatic duplicates. Review any `sending` rows in the log before manually retrying them.

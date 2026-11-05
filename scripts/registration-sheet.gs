@@ -27,6 +27,7 @@ function doPost(e) {
       case 'register': result = saveRegistration_(book, data); break;
       case 'summary': result = {ok:true, ...mailSummary_(book, data.audience)}; break;
       case 'recipients': result = {ok:true, recipients:recipients_(book, 'all')}; break;
+      case 'registrations': result = registrationsPage_(book, data.offset); break;
       case 'history': result = mailHistory_(book); break;
       case 'test': result = sendTest_(data); break;
       case 'send': result = sendBatch_(book, data); break;
@@ -79,6 +80,25 @@ function recipients_(book, audience) {
     recipients.push({firstName:row[1].replace(/^'/, ''), email, attendance});
   });
   return recipients;
+}
+
+function registrationsPage_(book, requestedOffset) {
+  const offset = Number(requestedOffset || 0);
+  if (!Number.isSafeInteger(offset) || offset < 0) throw new Error('Invalid registration page.');
+  const sheet = book.getSheetByName('Registrations');
+  const total = sheet ? Math.max(0, sheet.getLastRow() - 1) : 0;
+  if (!total || offset >= total) return {ok:true, registrations:[], total};
+  const endRow = sheet.getLastRow() - offset;
+  const startRow = Math.max(2, endRow - 49);
+  const rows = sheet.getRange(startRow, 1, endRow - startRow + 1, 5).getValues();
+  const registrations = rows.reverse().map((row) => ({
+    submittedAt:row[0] instanceof Date ? row[0].toISOString() : String(row[0] || ''),
+    firstName:String(row[1] || '').replace(/^'/, ''),
+    lastName:String(row[2] || '').replace(/^'/, ''),
+    email:String(row[3] || '').replace(/^'/, ''),
+    attendance:String(row[4] || '')
+  }));
+  return {ok:true, registrations, total};
 }
 
 function mailSummary_(book, audience) {

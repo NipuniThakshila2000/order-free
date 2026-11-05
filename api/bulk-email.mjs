@@ -57,7 +57,8 @@ export default async function handler(request, response) {
       return response.status(403).json({error:'Admin access is required.'});
     }
     const data = request.body || {};
-    if (!['summary','send','test','history'].includes(data.action)) return response.status(400).json({error:'Invalid action.'});
+    if (!['summary','send','test','history','registrations'].includes(data.action)) return response.status(400).json({error:'Invalid action.'});
+    if (data.action === 'registrations' && (!Number.isSafeInteger(data.offset) || data.offset < 0)) return response.status(400).json({error:'Invalid registration page.'});
     if (['summary','send','test'].includes(data.action) && !audiences.includes(data.audience)) return response.status(400).json({error:'Invalid audience.'});
     if (data.action === 'send' || data.action === 'test') {
       if (typeof data.subject !== 'string' || !data.subject.trim() || data.subject.length > 150 || /[\r\n]/.test(data.subject) ||
@@ -77,6 +78,19 @@ export default async function handler(request, response) {
       const result = await upstream.json();
       if (!upstream.ok) return response.status(upstream.status).json({error:result.error || 'The mailing service is unavailable.'});
       return response.status(200).json(result);
+    }
+    if (data.action === 'registrations') {
+      try {
+        return response.status(200).json(await scriptCall(scriptUrl, token, payload));
+      } catch (error) {
+        if (!/Invalid action/i.test(error.message)) throw error;
+        const older = await scriptCall(scriptUrl, token, {action:'recipients'});
+        const rows = older.recipients.slice().reverse().map((person) => ({
+          submittedAt:'', firstName:person.firstName, lastName:'', email:person.email,
+          attendance:person.attendance === 'online' ? 'Online' : 'In-Person'
+        }));
+        return response.status(200).json({ok:true, registrations:rows.slice(data.offset, data.offset + 50), total:rows.length, partial:true});
+      }
     }
     if (data.action === 'history') {
       return response.status(200).json(await scriptCall(scriptUrl, token, payload));

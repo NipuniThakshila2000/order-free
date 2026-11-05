@@ -15,6 +15,7 @@ function scriptHarness() {
         appendRow(row) { rows.push(row); },
         getRange(start, column, count, width) {
           return {
+            getValues:() => rows.slice(start - 1, start - 1 + count).map((row) => row.slice(column - 1, column - 1 + width)),
             getDisplayValues:() => rows.slice(start - 1, start - 1 + count).map((row) => row.slice(column - 1, column - 1 + width).map(String)),
             setValues(values) { values.forEach((value, index) => value.forEach((cell, offset) => { rows[start - 1 + index][column - 1 + offset] = cell; })); }
           };
@@ -55,4 +56,9 @@ test('mailing deduplicates registrants and resumes without resending completed a
   assert.equal(harness.sent[0].body, 'Hello Jane');
   assert.equal(harness.sent[0].options.from, 'info@wowlife.lk');
   assert.equal(harness.sheets.get('MailLog').rows.length, 3);
+  const registrationPage = harness.post({action:'registrations', offset:0});
+  assert.equal(registrationPage.total, 3);
+  assert.equal(registrationPage.registrations[0].lastName, 'Lee');
+  assert.equal(registrationPage.registrations[1].email, 'jane@example.com');
+  assert.ok(registrationPage.registrations[0].submittedAt);
 });

@@ -14,10 +14,65 @@ function call(body, cookie = 'redeeming_session=admin') {
 
 test('requires an authenticated admin before reading or sending', async () => {
   assert.equal((await call({action:'summary'}, '')).statusCode, 401);
+  assert.equal((await call({action:'registrations', offset:0}, '')).statusCode, 401);
   const oldFetch = globalThis.fetch;
   globalThis.fetch = async () => new Response(JSON.stringify({authenticated:true, purpose:'reader'}));
   try { assert.equal((await call({action:'summary'})).statusCode, 403); }
   finally { globalThis.fetch = oldFetch; }
+});
+
+test('reads registration details for admins without requiring a mail sender alias', async () => {
+  const oldFetch = globalThis.fetch;
+  const oldProxy = process.env.BULK_EMAIL_PROXY_URL;
+  const oldScript = process.env.BULK_EMAIL_SCRIPT_URL;
+  const oldToken = process.env.BULK_EMAIL_TOKEN;
+  delete process.env.BULK_EMAIL_PROXY_URL;
+  process.env.BULK_EMAIL_SCRIPT_URL = 'https://script.example/exec';
+  process.env.BULK_EMAIL_TOKEN = 'secret';
+  globalThis.fetch = async (url, options) => {
+    if (String(url).includes('action=session')) return new Response(JSON.stringify({authenticated:true, purpose:'admin'}));
+    const payload = JSON.parse(options.body);
+    assert.equal(payload.action, 'registrations');
+    assert.equal(payload.offset, 0);
+    return new Response(JSON.stringify({ok:true, total:1, registrations:[{firstName:'Jane',lastName:'Doe',email:'jane@example.com',attendance:'Online',submittedAt:'2026-11-05T10:00:00.000Z'}]}));
+  };
+  try {
+    const result = await call({action:'registrations', offset:0});
+    assert.equal(result.statusCode, 200);
+    assert.equal(result.body.registrations[0].lastName, 'Doe');
+  } finally {
+    globalThis.fetch = oldFetch;
+    for (const [key, value] of [['BULK_EMAIL_PROXY_URL', oldProxy], ['BULK_EMAIL_SCRIPT_URL', oldScript], ['BULK_EMAIL_TOKEN', oldToken]]) {
+      if (value === undefined) delete process.env[key]; else process.env[key] = value;
+    }
+  }
+});
+
+test('shows a labeled limited registration list until the Sheet script is updated', async () => {
+  const oldFetch = globalThis.fetch;
+  const oldProxy = process.env.BULK_EMAIL_PROXY_URL;
+  const oldScript = process.env.BULK_EMAIL_SCRIPT_URL;
+  const oldToken = process.env.BULK_EMAIL_TOKEN;
+  delete process.env.BULK_EMAIL_PROXY_URL;
+  process.env.BULK_EMAIL_SCRIPT_URL = 'https://script.example/exec';
+  process.env.BULK_EMAIL_TOKEN = 'secret';
+  globalThis.fetch = async (url, options) => {
+    if (String(url).includes('action=session')) return new Response(JSON.stringify({authenticated:true, purpose:'admin'}));
+    const action = JSON.parse(options.body).action;
+    return new Response(JSON.stringify(action === 'registrations' ? {ok:false,error:'Invalid action.'} :
+      {ok:true,recipients:[{firstName:'Jane',email:'jane@example.com',attendance:'online'}]}));
+  };
+  try {
+    const result = await call({action:'registrations', offset:0});
+    assert.equal(result.statusCode, 200);
+    assert.equal(result.body.partial, true);
+    assert.equal(result.body.registrations[0].firstName, 'Jane');
+  } finally {
+    globalThis.fetch = oldFetch;
+    for (const [key, value] of [['BULK_EMAIL_PROXY_URL', oldProxy], ['BULK_EMAIL_SCRIPT_URL', oldScript], ['BULK_EMAIL_TOKEN', oldToken]]) {
+      if (value === undefined) delete process.env[key]; else process.env[key] = value;
+    }
+  }
 });
 
 test('validates draft and forwards mailing through original site without a sheet token', async () => {
