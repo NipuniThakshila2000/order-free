@@ -1,4 +1,4 @@
-const upstream = process.env.READING_ACCESS_BACKEND_URL || 'https://order.wowlife.lk/api/reading-access';
+const upstream = process.env.READING_ACCESS_BACKEND_URL || 'https://architecture-of-freedom-landing-page-wowmedias-projects.vercel.app/api/reading-access';
 
 export default async function handler(request, response) {
   response.setHeader('Cache-Control', 'no-store');

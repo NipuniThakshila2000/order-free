@@ -24,7 +24,7 @@ test('forwards only the reading session cookie and preserves the login cookie re
   try {
     const res = response();
     await handler({method:'POST', url:'/api/access?action=verify-code', headers:{cookie:'other=secret; redeeming_session=old'}, body:{email:'reader@example.com', code:'123456'}}, res);
-    assert.match(sent.url, /\/api\/reading-access\?action=verify-code$/);
+    assert.equal(sent.url, 'https://architecture-of-freedom-landing-page-wowmedias-projects.vercel.app/api/reading-access?action=verify-code');
     assert.equal(sent.options.headers.Cookie, 'redeeming_session=old');
     assert.deepEqual(JSON.parse(sent.options.body), {email:'reader@example.com', code:'123456'});
     assert.equal(res.headers['Set-Cookie'], 'redeeming_session=abc; Path=/; HttpOnly; SameSite=Lax');
