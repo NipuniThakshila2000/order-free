@@ -78,13 +78,17 @@ export default async function handler(request, response) {
       if (!upstream.ok) return response.status(upstream.status).json({error:result.error || 'The mailing service is unavailable.'});
       return response.status(200).json(result);
     }
-    if (data.action === 'history' || data.action === 'test') {
+    if (data.action === 'history') {
       return response.status(200).json(await scriptCall(scriptUrl, token, payload));
     }
+    const mailStatus = await scriptCall(scriptUrl, token, {action:'summary', audience:'all'});
+    if (typeof mailStatus.senderAddress !== 'string' || !emailPattern.test(mailStatus.senderAddress)) {
+      return response.status(503).json({error:'A verified WOW sender address is not configured in the mailing script.'});
+    }
+    if (data.action === 'test') return response.status(200).json(await scriptCall(scriptUrl, token, payload));
     const {selected, counts} = await contactsFor(data.audience, scriptUrl, token, cookie);
     if (data.action === 'summary') {
-      const quota = await scriptCall(scriptUrl, token, {action:'summary', audience:'all'});
-      return response.status(200).json({ok:true, ...counts, selected:selected.length, remainingDailyQuota:quota.remainingDailyQuota});
+      return response.status(200).json({ok:true, ...counts, selected:selected.length, remainingDailyQuota:mailStatus.remainingDailyQuota, senderAddress:mailStatus.senderAddress});
     }
     if (data.offset > selected.length) return response.status(400).json({error:'Campaign position is beyond the recipient list.'});
     const batch = selected.slice(data.offset, data.offset + 20);

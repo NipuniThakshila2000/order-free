@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
   <title>Experience applications | Redeeming the Seasons</title>
-  <link rel="stylesheet" href="admin-access.css?v=5">
-  <script type="module" src="src/admin-access.js?v=5"></script>
+  <link rel="stylesheet" href="admin-access.css?v=6">
+  <script type="module" src="src/admin-access.js?v=7"></script>
 </head>
 <body>
   <main>
@@ -18,11 +18,11 @@
       <p id="admin-login-status" role="status" aria-live="polite"></p>
     </section>
     <section id="admin-dashboard" hidden>
-      <div class="toolbar"><div id="admin-counts" aria-live="polite"></div><div><button id="admin-refresh" type="button">Refresh</button><button id="admin-logout" type="button">Sign out</button></div></div>
+      <div class="toolbar"><div id="admin-counts" role="group" aria-label="Filter applications by approval status"></div><div><button id="admin-refresh" type="button">Refresh</button><button id="admin-logout" type="button">Sign out</button></div></div>
       <p id="admin-status" role="status" aria-live="polite"></p>
-      <section class="mailing" aria-labelledby="mailing-title">
-        <h2 id="mailing-title">Email contacts</h2>
-        <p>Send relevant updates to registrants, access applicants, or everyone. Each address receives an individual message from the Google account that owns the registration Sheet.</p>
+      <details class="mailing">
+        <summary id="mailing-title">Email sending</summary>
+        <p>Send relevant updates to registrants, access applicants, or everyone. Each address receives an individual message from the verified WOW sender address shown below. Use applicant addresses for access-related notices and registration addresses for event details.</p>
         <p id="mailing-summary" role="status" aria-live="polite">Loading recipients…</p>
         <form id="mailing-form">
           <label>Recipients
@@ -41,14 +41,15 @@
         </form>
         <p id="mailing-status" role="status" aria-live="polite"></p>
         <details><summary>Recent delivery log</summary><button id="mailing-history-refresh" type="button">Refresh log</button><div class="table-wrap"><table class="mailing-log"><thead><tr><th>When</th><th>Recipient</th><th>Subject</th><th>Status</th><th>Issue</th></tr></thead><tbody id="mailing-history"></tbody></table></div></details>
-      </section>
-      <section class="page-metrics" aria-labelledby="page-metrics-title">
-        <div class="metrics-heading"><div><h2 id="page-metrics-title">Page metrics</h2><p>Daily page loads for Redeeming the Seasons.</p></div><span>Asia/Colombo time</span></div>
+      </details>
+      <details class="page-metrics">
+        <summary id="page-metrics-title">Page metrics</summary>
+        <div class="metrics-heading"><p>Daily page loads for Redeeming the Seasons.</p><span>Asia/Colombo time</span></div>
         <p id="page-metrics-status" role="status" aria-live="polite">Loading page metrics…</p>
         <div id="page-metrics-cards" class="metrics-cards"></div>
         <div class="metrics-panels"><div class="metrics-panel"><h3>Last 30 days</h3><div id="page-metrics-chart" class="metrics-chart" role="img" aria-label="Daily page loads over the last 30 days"></div></div></div>
         <p class="metrics-note">A page load is counted when the page runs in a browser. These are aggregate counts, not unique visitors. Counts begin when tracking was enabled.</p>
-      </section>
+      </details>
       <div class="table-wrap"><table><thead><tr><th>Applicant</th><th>Phone</th><th>Country</th><th>Years at WOWLife Church</th><th>How they found the teachings</th><th>Recommended by</th><th>Submitted</th><th>Status</th><th>Action</th></tr></thead><tbody id="applications-body"></tbody></table></div>
       <section class="generated-admin" aria-labelledby="generated-title">
         <h2 id="generated-title">Stored experiences</h2>

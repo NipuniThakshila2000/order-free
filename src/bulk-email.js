@@ -46,7 +46,7 @@ export async function loadMailing() {
     currentCount = result.selected;
     available = true;
     setBusy(busy);
-    summary.textContent = `${result.selected} selected · ${result.total} unique contacts (${result.registrants} registrants, ${result.applicants} applicants; ${result.online} online, ${result.inPerson} in person) · ${result.remainingDailyQuota} emails left in today's Google quota.`;
+    summary.textContent = `From: ${result.senderAddress} · ${result.selected} selected · ${result.total} unique contacts (${result.registrants} registrants, ${result.applicants} applicants; ${result.online} online, ${result.inPerson} in person) · ${result.remainingDailyQuota} emails left in today's Google quota.`;
   } catch (error) {
     available = false;
     setBusy(busy);

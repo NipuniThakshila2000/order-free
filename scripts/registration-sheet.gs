@@ -2,9 +2,18 @@
 const REGISTRATION_SHEET_ID = '18Nh09g0nwYdh3Xo7UdNUzXXV_rclv3XgTpvNoJgFEd4';
 const MAIL_BATCH_SIZE = 20;
 
-// Run this once in the Apps Script editor to grant the deployment account MailApp access.
+// Run this once in the Apps Script editor to grant email access.
 function authorizeMail() {
+  GmailApp.getAliases();
   return MailApp.getRemainingDailyQuota();
+}
+
+function senderAlias_() {
+  const configured = String(PropertiesService.getScriptProperties().getProperty('MAIL_FROM_ADDRESS') || '').trim().toLowerCase();
+  if (!configured) throw new Error('Set MAIL_FROM_ADDRESS in Apps Script properties before sending.');
+  const alias = GmailApp.getAliases().find((address) => address.toLowerCase() === configured);
+  if (!alias) throw new Error('MAIL_FROM_ADDRESS must be a verified Gmail Send mail as alias for this account.');
+  return alias;
 }
 
 function doPost(e) {
@@ -73,10 +82,11 @@ function recipients_(book, audience) {
 }
 
 function mailSummary_(book, audience) {
+  const senderAddress = senderAlias_();
   const all = recipients_(book, 'all');
   return {total:all.length, online:all.filter((person) => person.attendance === 'online').length,
     inPerson:all.filter((person) => person.attendance === 'in-person').length,
-    selected:recipients_(book, audience || 'all').length, remainingDailyQuota:MailApp.getRemainingDailyQuota()};
+    selected:recipients_(book, audience || 'all').length, remainingDailyQuota:MailApp.getRemainingDailyQuota(), senderAddress};
 }
 
 function validateMail_(data) {
@@ -93,10 +103,11 @@ function personalize_(message, person) {
 
 function sendTest_(data) {
   const mail = validateMail_(data);
+  const senderAddress = senderAlias_();
   const email = String(data.testEmail || '').trim();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('Invalid test email.');
   if (MailApp.getRemainingDailyQuota() < 1) throw new Error('Daily email quota reached.');
-  MailApp.sendEmail({to:email, subject:'[TEST] ' + mail.subject, body:personalize_(mail.message, {firstName:'Test recipient'}), name:'WOWLife Church'});
+  GmailApp.sendEmail(email, '[TEST] ' + mail.subject, personalize_(mail.message, {firstName:'Test recipient'}), {from:senderAddress, replyTo:senderAddress, name:'WOWLife Church'});
   return {ok:true};
 }
 
@@ -108,6 +119,7 @@ function logSheet_(book) {
 
 function sendBatch_(book, data) {
   const mail = validateMail_(data);
+  const senderAddress = senderAlias_();
   const campaignId = String(data.campaignId || '');
   if (!/^[a-f0-9-]{36}$/.test(campaignId)) throw new Error('Invalid campaign ID.');
   const lock = LockService.getScriptLock();
@@ -140,7 +152,7 @@ function sendBatch_(book, data) {
       const rowNumber = log.getLastRow() + 1;
       log.appendRow([new Date(), campaignId, safeCell_(person.email), data.audience, safeCell_(mail.subject), 'sending', '']);
       try {
-        MailApp.sendEmail({to:person.email, subject:mail.subject, body:personalize_(mail.message, person), name:'WOWLife Church'});
+        GmailApp.sendEmail(person.email, mail.subject, personalize_(mail.message, person), {from:senderAddress, replyTo:senderAddress, name:'WOWLife Church'});
         log.getRange(rowNumber, 6, 1, 2).setValues([['sent', '']]);
         completed.add(person.email);
         sent++;

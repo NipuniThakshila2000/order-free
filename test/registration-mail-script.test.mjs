@@ -27,9 +27,10 @@ function scriptHarness() {
   };
   const context = vm.createContext({
     SpreadsheetApp:{openById:() => book},
-    PropertiesService:{getScriptProperties:() => ({getProperty:() => 'secret'})},
+    PropertiesService:{getScriptProperties:() => ({getProperty:(name) => name === 'REGISTRATION_TOKEN' ? 'secret' : 'info@wowlife.lk'})},
     LockService:{getScriptLock:() => ({waitLock() {}, releaseLock() {}})},
-    MailApp:{getRemainingDailyQuota:() => 100, sendEmail: (mail) => sent.push(mail)},
+    MailApp:{getRemainingDailyQuota:() => 100},
+    GmailApp:{getAliases:() => ['info@wowlife.lk'], sendEmail:(to, subject, body, options) => sent.push({to, subject, body, options})},
     ContentService:{MimeType:{JSON:'json'}, createTextOutput:(text) => ({setMimeType() { return JSON.parse(text); }})},
     Date, Set
   });
@@ -52,5 +53,6 @@ test('mailing deduplicates registrants and resumes without resending completed a
   assert.equal(harness.post(campaign).sent, 0);
   assert.equal(harness.sent.length, 2);
   assert.equal(harness.sent[0].body, 'Hello Jane');
+  assert.equal(harness.sent[0].options.from, 'info@wowlife.lk');
   assert.equal(harness.sheets.get('MailLog').rows.length, 3);
 });
