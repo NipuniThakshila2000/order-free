@@ -46,7 +46,7 @@ export async function loadMailing() {
     currentCount = result.selected;
     available = true;
     setBusy(busy);
-    summary.textContent = `From: ${result.senderAddress} · ${result.selected} selected · ${result.total} unique contacts (${result.registrants} registrants, ${result.applicants} applicants; ${result.online} online, ${result.inPerson} in person) · ${result.remainingDailyQuota} emails left in today's Google quota.`;
+    summary.textContent = `From: ${result.senderAddress} · ${result.selected} selected · ${result.total} unique contacts (${result.registrants} registrants, ${result.applicants} applicants; ${result.online} online, ${result.inPerson} in person).${result.remainingDailyQuota == null ? '' : ` ${result.remainingDailyQuota} emails left in today's quota.`}`;
   } catch (error) {
     available = false;
     setBusy(busy);
@@ -121,7 +121,7 @@ form.addEventListener('submit', async (event) => {
       result = await mailingApi({action:'send', ...data, campaignId, offset});
       offset = result.nextOffset;
       sessionStorage.setItem('contactMailDraft', JSON.stringify({fingerprint, campaignId, offset}));
-      status.textContent = `Campaign ${campaignId}: ${result.completed} of ${result.total} recipients sent; ${result.remaining} remaining. ${result.remainingDailyQuota} emails left in today's quota.`;
+      status.textContent = `Campaign ${campaignId}: ${result.completed} of ${result.total} recipients sent; ${result.remaining} remaining.${result.remainingDailyQuota == null ? '' : ` ${result.remainingDailyQuota} emails left in today's quota.`}`;
       if (result.failed || result.held || !result.sent) break;
     } while (result.remaining > 0 && !pauseRequested);
     if (result.remaining === 0) {

@@ -1,25 +1,11 @@
 import {allRegistrations, registrationStoreReady} from '../src/registration-store.mjs';
 import {mailLogPath, mailDraftHash, readMailLog, writeMailLog, recentMailLog} from '../src/mail-log-store.mjs';
+import {mailConfigured, mailStatus, sendWowEmail, senderAddress} from '../src/wow-mail.mjs';
 
 const accessUrl = process.env.READING_ACCESS_BACKEND_URL || 'https://order.wowlife.lk/api/reading-access';
-const senderAddress = 'info@wowlife.lk';
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const audiences = ['all','registrants','online','in-person','applicants'];
 const batchSize = 5;
-
-async function scriptCall(url, token, payload) {
-  const response = await fetch(url, {
-    method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body:JSON.stringify({token, ...payload})
-  });
-  const result = await response.json();
-  if (!response.ok || result.ok !== true) {
-    const error = new Error(result.error || 'The WOW email service is unavailable.');
-    error.expected = true;
-    throw error;
-  }
-  return result;
-}
 
 async function contactsFor(audience, cookie, registrationRecords) {
   const registrations = (await registrationRecords()).filter((person) => emailPattern.test(person.email)).map((person) => ({
@@ -61,7 +47,7 @@ function personalize(message, firstName) {
 }
 
 export function createBulkEmailHandler(deps = {}) {
-  const scriptRequest = deps.scriptRequest || scriptCall;
+  const mail = deps.mail || {configured:mailConfigured, status:mailStatus, send:sendWowEmail};
   const registrationRecords = deps.registrationRecords || allRegistrations;
   const storeReady = deps.storeReady || registrationStoreReady;
   const logs = deps.logs || {mailLogPath, mailDraftHash, readMailLog, writeMailLog, recentMailLog};
@@ -104,16 +90,14 @@ export function createBulkEmailHandler(deps = {}) {
       }
       if (!storeReady()) return response.status(503).json({error:'Private contact storage is not configured.'});
       if (data.action === 'history') return response.status(200).json({ok:true, entries:await logs.recentMailLog()});
-      const scriptUrl = process.env.BULK_EMAIL_SCRIPT_URL;
-      const token = process.env.BULK_EMAIL_TOKEN;
-      if (!scriptUrl || !token) return response.status(503).json({error:'WOW email is not configured.'});
-      const mailStatus = await scriptRequest(scriptUrl, token, {action:'status'});
-      if (String(mailStatus.senderAddress || '').toLowerCase() !== senderAddress) {
+      if (!mail.configured()) return response.status(503).json({error:'WOW mailbox SMTP is not configured.'});
+      const status = await mail.status();
+      if (String(status.senderAddress || '').toLowerCase() !== senderAddress) {
         return response.status(503).json({error:'The WOW sender address is not verified in Gmail.'});
       }
       if (data.action === 'test') {
-        await scriptRequest(scriptUrl, token, {
-          action:'send-one', to:data.testEmail.trim(),
+        await mail.send({
+          to:data.testEmail.trim(),
           subject:`[TEST] ${data.subject.trim()}`,
           message:personalize(data.message.trim(), 'Test recipient')
         });
@@ -122,11 +106,11 @@ export function createBulkEmailHandler(deps = {}) {
       const {selected, counts} = await contactsFor(data.audience, cookie, registrationRecords);
       if (data.action === 'summary') {
         return response.status(200).json({ok:true, ...counts, selected:selected.length,
-          remainingDailyQuota:mailStatus.remainingDailyQuota, senderAddress});
+          remainingDailyQuota:status.remainingDailyQuota, senderAddress});
       }
       if (data.offset > selected.length) return response.status(400).json({error:'Campaign position is beyond the contact list.'});
-      const quota = Math.max(0, Number(mailStatus.remainingDailyQuota) || 0);
-      const batch = selected.slice(data.offset, data.offset + Math.min(batchSize, quota));
+      const quota = status.remainingDailyQuota == null ? null : Math.max(0, Number(status.remainingDailyQuota) || 0);
+      const batch = selected.slice(data.offset, data.offset + Math.min(batchSize, quota ?? batchSize));
       const draftHash = logs.mailDraftHash(data.audience, data.subject.trim(), data.message.trim());
       let sent = 0;
       let alreadySent = 0;
@@ -149,8 +133,8 @@ export function createBulkEmailHandler(deps = {}) {
         try { reservation = await logs.writeMailLog(pathname, entry, previous?.etag); }
         catch { held++; continue; }
         try {
-          await scriptRequest(scriptUrl, token, {
-            action:'send-one', to:person.email, subject:data.subject.trim(),
+          await mail.send({
+            to:person.email, subject:data.subject.trim(),
             message:personalize(data.message.trim(), person.firstName)
           });
         } catch (error) {
@@ -170,7 +154,7 @@ export function createBulkEmailHandler(deps = {}) {
       const nextOffset = failed || held ? data.offset : data.offset + batch.length;
       return response.status(200).json({ok:true, sent, failed, held, completed,
         total:selected.length, nextOffset, remaining:Math.max(0, selected.length - completed),
-        remainingDailyQuota:Math.max(0, quota - sent)});
+        remainingDailyQuota:quota == null ? null : Math.max(0, quota - sent)});
     } catch (error) {
       console.error('Bulk email failed:', error);
       return response.status(502).json({error:error.message || 'The WOW email service is temporarily unavailable.'});

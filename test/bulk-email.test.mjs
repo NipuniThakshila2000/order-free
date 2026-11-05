@@ -19,8 +19,11 @@ function fixture(alias='info@wowlife.lk') {
       {firstName:'Mark',email:'mark@example.com',attendance:'in-person'}
     ],
     logs,
-    scriptRequest:async(_url,_token,payload)=>{calls.push(payload);return payload.action==='status'?
-      {ok:true,senderAddress:alias,remainingDailyQuota:100}:{ok:true};}
+    mail:{
+      configured:()=>true,
+      status:async()=>({senderAddress:alias,remainingDailyQuota:null}),
+      send:async(payload)=>{calls.push(payload);}
+    }
   });
   async function call(body,cookie='redeeming_session=admin') {
     const result={statusCode:200};
@@ -42,10 +45,8 @@ test('requires admin access',async()=>{
 
 test('deduplicates contacts and logs delivery without a Sheet',async()=>{
   const original=globalThis.fetch;
-  const keys=['BULK_EMAIL_SCRIPT_URL','BULK_EMAIL_TOKEN','BULK_EMAIL_PROXY_URL'];
+  const keys=['BULK_EMAIL_PROXY_URL'];
   const previous=keys.map((key)=>[key,process.env[key]]);
-  process.env.BULK_EMAIL_SCRIPT_URL='https://example.com/exec';
-  process.env.BULK_EMAIL_TOKEN='test-token';
   delete process.env.BULK_EMAIL_PROXY_URL;
   globalThis.fetch=async(url)=>new Response(JSON.stringify(String(url).includes('action=session')?
     {authenticated:true,purpose:'admin'}:
@@ -61,10 +62,10 @@ test('deduplicates contacts and logs delivery without a Sheet',async()=>{
     assert.equal(first.statusCode,200);
     assert.equal(first.body.sent,3);
     assert.equal(first.body.remaining,0);
-    assert.equal(calls.filter((entry)=>entry.action==='send-one').length,3);
+    assert.equal(calls.length,3);
     const retry=await call(campaign);
     assert.equal(retry.body.sent,0);
-    assert.equal(calls.filter((entry)=>entry.action==='send-one').length,3);
+    assert.equal(calls.length,3);
     assert.equal((await call({action:'history'})).body.entries.length,3);
     assert.equal((await call({...campaign,subject:'Changed'})).statusCode,409);
   } finally {
@@ -73,22 +74,20 @@ test('deduplicates contacts and logs delivery without a Sheet',async()=>{
   }
 });
 
-test('test sends require the verified WOW alias',async()=>{
+test('test sends require the WOW mailbox sender',async()=>{
   const original=globalThis.fetch;
-  const keys=['BULK_EMAIL_SCRIPT_URL','BULK_EMAIL_TOKEN','BULK_EMAIL_PROXY_URL'];
+  const keys=['BULK_EMAIL_PROXY_URL'];
   const previous=keys.map((key)=>[key,process.env[key]]);
-  process.env.BULK_EMAIL_SCRIPT_URL='https://example.com/exec';
-  process.env.BULK_EMAIL_TOKEN='test-token';
   delete process.env.BULK_EMAIL_PROXY_URL;
   globalThis.fetch=async()=>new Response(JSON.stringify({authenticated:true,purpose:'admin'}));
   const data={action:'test',audience:'registrants',subject:'Details',message:'Hi',testEmail:'me@example.com'};
   try {
     const valid=fixture();
     assert.equal((await valid.call(data)).statusCode,200);
-    assert.equal(valid.calls.find((entry)=>entry.action==='send-one').to,'me@example.com');
+    assert.equal(valid.calls[0].to,'me@example.com');
     const invalid=fixture('personal@gmail.com');
     assert.equal((await invalid.call(data)).statusCode,503);
-    assert.equal(invalid.calls.some((entry)=>entry.action==='send-one'),false);
+    assert.equal(invalid.calls.length,0);
   } finally {
     globalThis.fetch=original;
     for (const [key,value] of previous) if (value===undefined) delete process.env[key]; else process.env[key]=value;

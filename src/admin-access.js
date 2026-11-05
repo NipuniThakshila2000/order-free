@@ -1,5 +1,5 @@
 import {renderExperienceReport, renderYearDetail} from './experience-report.mjs';
-import {loadMailing} from './bulk-email.js?v=4';
+import {loadMailing} from './bulk-email.js?v=5';
 
 const base = '/api/access';
 const loginPanel = document.querySelector('#admin-login');

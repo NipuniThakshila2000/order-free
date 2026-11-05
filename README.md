@@ -10,7 +10,7 @@ The admin review screen is `/admin-access.html`, or `/RedeemingTheSeasons/admin-
 
 The experience site's `/api/access` and `/api/experience-data` functions proxy to the main site's access and saved-data APIs. Both projects must be deployed for applications, approvals, email sign-in, and account history to work. The main site's admin screen lists saved records and allows viewing or downloading complete JSON. Account holders can view and delete their own saved records.
 
-The admin dashboard also includes bulk email for all contacts, event registrants, or access applicants. It offers a personalized plain-text draft, a test send, a recipient count preview, batched sending with pause and resume, daily quota visibility, and a private delivery log. Contacts shared by both sources receive one email per campaign. Gmail sends from the verified WOW address through a standalone Apps Script; see `REGISTRATION_SETUP.md` for deployment.
+The admin dashboard also includes bulk email for all contacts, event registrants, or access applicants. It offers a personalized plain-text draft, a test send, a recipient count preview, batched sending with pause and resume, and a private delivery log. Contacts shared by both sources receive one email per campaign. The server sends through the WOW mailbox SMTP service; see `REGISTRATION_SETUP.md` for deployment.
 
 The website's Nov 10 form saves each submission to private Vercel Blob storage. The admin dashboard reads those records through an authenticated endpoint and shows the submitted name, email, attendance choice, and timestamp. Existing Sheet rows were imported into the same store; the form and table no longer require the Sheet web app. See `REGISTRATION_SETUP.md` for storage and migration details.
 
