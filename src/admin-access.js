@@ -7,6 +7,7 @@ const dashboard = document.querySelector('#admin-dashboard');
 const tokenForm = document.querySelector('#admin-token-form');
 const loginStatus = document.querySelector('#admin-login-status');
 const status = document.querySelector('#admin-status');
+const countsPanel = document.querySelector('#admin-counts');
 const tbody = document.querySelector('#applications-body');
 const generatedBody = document.querySelector('#generated-body');
 const generatedStatus = document.querySelector('#generated-status');
@@ -17,6 +18,8 @@ const metricsCards = document.querySelector('#page-metrics-cards');
 const metricsChart = document.querySelector('#page-metrics-chart');
 let generatedOffset = 0;
 let selectedRecord = null;
+let applications = [];
+let activeFilter = 'all';
 
 async function api(action, data) {
   const response = await fetch(`${base}?action=${action}`, {
@@ -73,14 +76,13 @@ async function loadMetrics() {
   } catch (error) { metricsStatus.textContent = error.message; }
 }
 
-async function load() {
-  status.textContent = 'Loading applications…';
-  try {
-    const {applications} = await api('applications');
-    const counts = {pending:0,approved:0,rejected:0};
-    applications.forEach((item) => {counts[item.status] += 1;});
-    document.querySelector('#admin-counts').innerHTML = Object.entries(counts).map(([key, value]) => `<span>${value} ${key}</span>`).join('');
-    tbody.innerHTML = applications.length ? applications.map((item) => `<tr>
+function renderApplications() {
+  const counts = {all:applications.length,pending:0,approved:0,rejected:0};
+  applications.forEach((item) => { if (item.status in counts) counts[item.status] += 1; });
+  const labels = {all:'All',pending:'Pending approval',approved:'Approved',rejected:'Rejected'};
+  countsPanel.innerHTML = Object.entries(counts).map(([key, value]) => `<button type="button" data-filter="${key}" aria-pressed="${activeFilter === key}">${labels[key]} <span class="filter-count">${value}</span></button>`).join('');
+  const visible = activeFilter === 'all' ? applications : applications.filter((item) => item.status === activeFilter);
+  tbody.innerHTML = visible.length ? visible.map((item) => `<tr>
       <td><strong>${escapeHtml(item.fullName)}</strong><a href="mailto:${encodeURIComponent(item.email)}">${escapeHtml(item.email)}</a></td>
       <td>${escapeHtml(item.phone || '—')}</td><td>${escapeHtml(item.country || '—')}</td>
       <td>${escapeHtml(item.yearsAtChurch)}</td><td>${escapeHtml(item.discovery)}</td><td>${escapeHtml(item.recommendedBy || '—')}</td>
@@ -90,10 +92,24 @@ async function load() {
         ${item.status !== 'approved' ? `<button type="button" data-id="${item.id}" data-decision="approved">Approve</button>` : ''}
         ${item.status !== 'rejected' ? `<button type="button" class="reject" data-id="${item.id}" data-decision="rejected">Reject</button>` : ''}
         ${item.status === 'approved' ? `<button type="button" data-id="${item.id}" data-decision="resend">Resend email</button>` : ''}
-      </div></td></tr>`).join('') : '<tr><td colspan="9">No applications yet.</td></tr>';
+    </div></td></tr>`).join('') : `<tr><td colspan="9">${activeFilter === 'all' ? 'No applications yet.' : `No ${activeFilter} applications.`}</td></tr>`;
+}
+
+async function load() {
+  status.textContent = 'Loading applications…';
+  try {
+    ({applications} = await api('applications'));
+    renderApplications();
     status.textContent = '';
   } catch (error) { status.textContent = error.message; }
 }
+
+countsPanel.addEventListener('click', (event) => {
+  const button = event.target.closest('button[data-filter]');
+  if (!button) return;
+  activeFilter = button.dataset.filter;
+  renderApplications();
+});
 
 async function loadGenerated(offset = generatedOffset) {
   generatedStatus.textContent = 'Loading saved experiences…';

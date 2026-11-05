@@ -85,3 +85,10 @@
 .mailing summary{cursor:pointer;color:var(--gold);font-weight:bold}
 #mailing-history-refresh{margin:12px 0}
 .mailing-log{min-width:700px}
+#admin-counts button{padding:9px 12px;border-color:rgba(214,174,88,.4);font-size:13px}
+#admin-counts button[aria-pressed="true"]{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+#admin-counts .filter-count{margin-left:6px;padding:2px 6px;border:0;border-radius:999px;background:rgba(214,174,88,.18);font-size:11px}
+#admin-counts button[aria-pressed="true"] .filter-count{background:rgba(7,28,55,.14)}
+.mailing>summary,.page-metrics>summary{cursor:pointer;color:var(--cream);font:normal 32px Georgia,serif}
+.mailing>summary:focus-visible,.page-metrics>summary:focus-visible{outline:2px solid #fff;outline-offset:4px}
+.metrics-heading{margin-top:8px;align-items:center}
