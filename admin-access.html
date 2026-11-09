@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
   <title>Experience applications | Redeeming the Seasons</title>
-  <link rel="stylesheet" href="admin-access.css?v=8">
-  <script type="module" src="src/admin-access.js?v=14"></script>
+  <link rel="stylesheet" href="admin-access.css?v=9">
+  <script type="module" src="src/admin-access.js?v=15"></script>
 </head>
 <body>
   <main>
@@ -22,11 +22,14 @@
       <p id="admin-status" role="status" aria-live="polite"></p>
       <details class="mailing">
         <summary id="mailing-title">Email sending</summary>
-        <p>Send relevant updates to registrants, access applicants, or everyone. Each address receives an individual message from the WOW address shown below. Use applicant addresses for access-related notices and registration addresses for event details.</p>
+        <p>Send relevant updates to Nov 10 event registrants, access applicants, or everyone. Choose an attendance category for event messages. Each address receives an individual message from the WOW address shown below.</p>
         <p id="mailing-summary" role="status" aria-live="polite">Loading recipients…</p>
         <form id="mailing-form">
           <label>Recipients
-            <select name="audience"><option value="all">All contacts</option><option value="registrants">All event registrants</option><option value="online">Online registrants</option><option value="in-person">In-person registrants</option><option value="applicants">All access applicants</option></select>
+            <select name="audience"><option value="registrants">Nov 10 event registrations</option><option value="applicants">All access applicants</option><option value="all">All contacts</option></select>
+          </label>
+          <label id="mailing-category-label">Registration category
+            <select name="category"><option value="all">All registrations</option><option value="online">Online</option><option value="in-person">In person</option></select>
           </label>
           <label>Subject<input name="subject" maxlength="150" required></label>
           <label>Message <small>Use {{firstName}} to insert each recipient's first name.</small>

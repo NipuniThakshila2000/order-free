@@ -7,6 +7,9 @@ const sendButton = document.querySelector('#mailing-send');
 const stopButton = document.querySelector('#mailing-stop');
 const previewContent = document.querySelector('#mailing-preview-content');
 const testButton = testForm.querySelector('button');
+const audienceSelect = form.elements.namedItem('audience');
+const categorySelect = form.elements.namedItem('category');
+const categoryLabel = document.querySelector('#mailing-category-label');
 let busy = false;
 let available = false;
 let currentCount = 0;
@@ -24,10 +27,16 @@ async function mailingApi(data) {
 
 function draft() {
   return {
-    audience:form.elements.namedItem('audience').value,
+    audience:audienceSelect.value,
+    category:audienceSelect.value === 'registrants' ? categorySelect.value : 'all',
     subject:form.elements.namedItem('subject').value.trim(),
     message:form.elements.namedItem('message').value.trim()
   };
+}
+
+function updateCategoryVisibility() {
+  categoryLabel.hidden = audienceSelect.value !== 'registrants';
+  categorySelect.disabled = categoryLabel.hidden;
 }
 
 function setBusy(value) {
@@ -41,8 +50,10 @@ function setBusy(value) {
 setBusy(false);
 
 export async function loadMailing() {
+  const selection = draft();
   try {
-    const result = await mailingApi({action:'summary', audience:form.elements.namedItem('audience').value});
+    const result = await mailingApi({action:'summary', audience:selection.audience, category:selection.category});
+    if (selection.audience !== audienceSelect.value || selection.category !== draft().category) return;
     currentCount = result.selected;
     available = true;
     setBusy(busy);
@@ -72,13 +83,15 @@ async function loadHistory() {
   } catch (error) { status.textContent = error.message; }
 }
 
-form.elements.namedItem('audience').addEventListener('change', loadMailing);
+audienceSelect.addEventListener('change', () => { updateCategoryVisibility(); loadMailing(); });
+categorySelect.addEventListener('change', loadMailing);
+updateCategoryVisibility();
 document.querySelector('#mailing-preview').addEventListener('click', async () => {
   await loadMailing();
   const data = draft();
   previewContent.hidden = false;
   previewContent.querySelector('pre').textContent = `Subject: ${data.subject || '(empty)'}\n\n${data.message.replace(/{{firstName}}/g, 'Test recipient')}`;
-  status.textContent = `Audience: ${data.audience}; ${currentCount} unique recipients. The preview uses “Test recipient” for {{firstName}}.`;
+  status.textContent = `Recipients: ${audienceSelect.selectedOptions[0].textContent}${data.audience === 'registrants' ? ` / ${categorySelect.selectedOptions[0].textContent}` : ''}; ${currentCount} unique recipients. The preview uses “Test recipient” for {{firstName}}.`;
 });
 
 stopButton.addEventListener('click', () => {
@@ -107,10 +120,10 @@ form.addEventListener('submit', async (event) => {
   pauseRequested = false;
   try {
     const data = draft();
-    const preview = await mailingApi({action:'summary', audience:data.audience});
+    const preview = await mailingApi({action:'summary', audience:data.audience, category:data.category});
     currentCount = preview.selected;
     if (!currentCount) throw new Error('There are no contacts in this audience.');
-    if (!window.confirm(`Send “${data.subject}” to ${currentCount} unique contacts in ${data.audience}? This sends real email.`)) return;
+    if (!window.confirm(`Send “${data.subject}” to ${currentCount} unique contacts in ${audienceSelect.selectedOptions[0].textContent}${data.audience === 'registrants' ? ` / ${categorySelect.selectedOptions[0].textContent}` : ''}? This sends real email.`)) return;
     const fingerprint = JSON.stringify(data);
     const saved = JSON.parse(sessionStorage.getItem('contactMailDraft') || 'null');
     const campaignId = saved?.fingerprint === fingerprint ? saved.campaignId : crypto.randomUUID();

@@ -58,6 +58,18 @@ test('deduplicates contacts and logs delivery without a Sheet',async()=>{
     assert.equal(summary.body.registrants,2);
     assert.equal(summary.body.applicants,2);
     assert.equal(summary.body.replyToAddress,'info@wowlife.in');
+    const online=await call({action:'summary',audience:'registrants',category:'online'});
+    assert.equal(online.body.selected,1);
+    assert.equal((await call({action:'summary',audience:'registrants',category:'in-person'})).body.selected,1);
+    assert.equal((await call({action:'summary',audience:'registrants',category:'all'})).body.selected,2);
+    assert.equal((await call({action:'summary',audience:'applicants',category:'online'})).statusCode,400);
+    assert.equal((await call({action:'summary',audience:'registrants',category:'unknown'})).statusCode,400);
+    const eventCampaign={action:'send',audience:'registrants',category:'online',subject:'Online details',message:'Hi {{firstName}}',campaignId:'e40972d7-7488-4c58-a3fa-03345371e628',offset:0};
+    assert.equal((await call(eventCampaign)).body.sent,1);
+    assert.equal(calls[0].to,'jane@example.com');
+    assert.equal((await call({...eventCampaign,category:'in-person',campaignId:'e40972d7-7488-4c58-a3fa-03345371e627'})).body.sent,1);
+    assert.equal(calls[1].to,'mark@example.com');
+    calls.length=0;
     const campaign={action:'send',audience:'all',subject:'Details',message:'Hi {{firstName}}',campaignId:'e40972d7-7488-4c58-a3fa-03345371e629',offset:0};
     const first=await call(campaign);
     assert.equal(first.statusCode,200);
@@ -68,7 +80,7 @@ test('deduplicates contacts and logs delivery without a Sheet',async()=>{
     assert.equal(retry.body.sent,0);
     assert.equal(calls.length,3);
     const history=(await call({action:'history'})).body.entries;
-    assert.equal(history.length,3);
+    assert.equal(history.length,5);
     assert.equal(history[0].status,'queued');
     assert.equal((await call({...campaign,subject:'Changed'})).statusCode,409);
   } finally {

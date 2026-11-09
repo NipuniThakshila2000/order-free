@@ -6,9 +6,10 @@ const accessUrl = process.env.READING_ACCESS_BACKEND_URL || 'https://order.wowli
 const replyToAddress = 'info@wowlife.in';
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const audiences = ['all','registrants','online','in-person','applicants'];
+const categories = ['all','online','in-person'];
 const batchSize = 5;
 
-async function contactsFor(audience, cookie, registrationRecords) {
+async function contactsFor(audience, category, cookie, registrationRecords) {
   const registrations = (await registrationRecords()).filter((person) => emailPattern.test(person.email)).map((person) => ({
     firstName:String(person.firstName || '').trim(),
     email:person.email.trim().toLowerCase(),
@@ -34,7 +35,8 @@ async function contactsFor(audience, cookie, registrationRecords) {
     'in-person':dedupe(registrations.filter((person) => person.attendance === 'in-person')),
     applicants:dedupe(applicants)
   };
-  return {selected:filtered[audience], counts:{
+  const selected = audience === 'registrants' && category !== 'all' ? filtered[category] : filtered[audience];
+  return {selected, counts:{
     total:filtered.all.length,
     registrants:filtered.registrants.length,
     applicants:filtered.applicants.length,
@@ -69,6 +71,10 @@ export function createBulkEmailHandler(deps = {}) {
       const data = request.body || {};
       if (!['summary','send','test','history'].includes(data.action)) return response.status(400).json({error:'Invalid action.'});
       if (data.action !== 'history' && !audiences.includes(data.audience)) return response.status(400).json({error:'Invalid audience.'});
+      const category = data.category ?? 'all';
+      if (data.action !== 'history' && (!categories.includes(category) || (data.audience !== 'registrants' && category !== 'all'))) {
+        return response.status(400).json({error:'Invalid registration category.'});
+      }
       if (data.action === 'send' || data.action === 'test') {
         if (typeof data.subject !== 'string' || !data.subject.trim() || data.subject.length > 150 || /[\r\n]/.test(data.subject) ||
             typeof data.message !== 'string' || !data.message.trim() || data.message.length > 10000) {
@@ -81,7 +87,7 @@ export function createBulkEmailHandler(deps = {}) {
         }
       }
       const payload = {action:data.action};
-      for (const key of ['audience','subject','message','campaignId','testEmail','offset']) if (data[key] !== undefined) payload[key] = data[key];
+      for (const key of ['audience','category','subject','message','campaignId','testEmail','offset']) if (data[key] !== undefined) payload[key] = data[key];
       const proxyUrl = process.env.BULK_EMAIL_PROXY_URL;
       if (proxyUrl) {
         const upstream = await fetch(proxyUrl, {method:'POST', headers:{'Content-Type':'application/json', Cookie:cookie}, body:JSON.stringify(payload)});
@@ -106,7 +112,7 @@ export function createBulkEmailHandler(deps = {}) {
         }, cookie);
         return response.status(200).json({ok:true});
       }
-      const {selected, counts} = await contactsFor(data.audience, cookie, registrationRecords);
+      const {selected, counts} = await contactsFor(data.audience, category, cookie, registrationRecords);
       if (data.action === 'summary') {
         return response.status(200).json({ok:true, ...counts, selected:selected.length,
           remainingDailyQuota:status.remainingDailyQuota, senderAddress, replyToAddress});
@@ -114,7 +120,7 @@ export function createBulkEmailHandler(deps = {}) {
       if (data.offset > selected.length) return response.status(400).json({error:'Campaign position is beyond the contact list.'});
       const quota = status.remainingDailyQuota == null ? null : Math.max(0, Number(status.remainingDailyQuota) || 0);
       const batch = selected.slice(data.offset, data.offset + Math.min(batchSize, quota ?? batchSize));
-      const draftHash = logs.mailDraftHash(data.audience, data.subject.trim(), data.message.trim());
+      const draftHash = logs.mailDraftHash(data.audience, data.subject.trim(), data.message.trim(), ...(category === 'all' ? [] : [category]));
       let sent = 0;
       let alreadySent = 0;
       let failed = 0;
@@ -129,7 +135,7 @@ export function createBulkEmailHandler(deps = {}) {
         if (previous?.entry.status === 'sending') { held++; continue; }
         const entry = {
           date:new Date().toISOString(), campaignId:data.campaignId,
-          email:person.email, audience:data.audience, subject:data.subject.trim(),
+          email:person.email, audience:data.audience, category, subject:data.subject.trim(),
           draftHash, status:'sending', error:''
         };
         let reservation;
