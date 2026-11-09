@@ -15,11 +15,12 @@ test('mail bridge forwards the admin session and one recipient to the main site'
   try {
     const cookie='redeeming_session=admin';
     assert.equal((await mailStatus(cookie)).senderAddress,'info@wowlife.lk');
-    assert.deepEqual(await sendWowEmail({to:'jane@example.com',subject:'Details',message:'Hello'},cookie),
+    assert.deepEqual(await sendWowEmail({to:'jane@example.com',subject:'Details',message:'Hello',headerImageUrl:'https://example.com/header.png'},cookie),
       {status:'queued',id:'mandrill-id'});
     assert.equal(calls[0].options.headers.Cookie,cookie);
     assert.equal(calls[1].url,'https://order.wowlife.lk/api/bulk-email-bridge');
     assert.equal(JSON.parse(calls[1].options.body).to,'jane@example.com');
+    assert.equal(JSON.parse(calls[1].options.body).headerImageUrl,'https://example.com/header.png');
     await assert.rejects(mailStatus(''),/Admin sign-in/);
   } finally {globalThis.fetch=original;}
 });

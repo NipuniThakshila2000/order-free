@@ -64,11 +64,15 @@ test('deduplicates contacts and logs delivery without a Sheet',async()=>{
     assert.equal((await call({action:'summary',audience:'registrants',category:'all'})).body.selected,2);
     assert.equal((await call({action:'summary',audience:'applicants',category:'online'})).statusCode,400);
     assert.equal((await call({action:'summary',audience:'registrants',category:'unknown'})).statusCode,400);
+    assert.equal((await call({action:'test',audience:'registrants',subject:'Hi',message:'Hello',testEmail:'me@example.com',headerImageUrl:'javascript:alert(1)'})).statusCode,400);
+    assert.equal((await call({action:'test',audience:'registrants',subject:'Hi',message:'Hello',testEmail:'me@example.com',headerImage:{type:'image/png',content:'bad!'}})).statusCode,400);
     const eventCampaign={action:'send',audience:'registrants',category:'online',subject:'Online details',message:'Hi {{firstName}}',campaignId:'e40972d7-7488-4c58-a3fa-03345371e628',offset:0};
     assert.equal((await call(eventCampaign)).body.sent,1);
     assert.equal(calls[0].to,'jane@example.com');
+    assert.equal((await call({...eventCampaign,subject:'Image details',campaignId:'e40972d7-7488-4c58-a3fa-03345371e626',headerImageUrl:'https://example.com/header.jpg'})).body.sent,1);
+    assert.equal(calls[1].headerImageUrl,'https://example.com/header.jpg');
     assert.equal((await call({...eventCampaign,category:'in-person',campaignId:'e40972d7-7488-4c58-a3fa-03345371e627'})).body.sent,1);
-    assert.equal(calls[1].to,'mark@example.com');
+    assert.equal(calls[2].to,'mark@example.com');
     calls.length=0;
     const campaign={action:'send',audience:'all',subject:'Details',message:'Hi {{firstName}}',campaignId:'e40972d7-7488-4c58-a3fa-03345371e629',offset:0};
     const first=await call(campaign);
@@ -80,9 +84,10 @@ test('deduplicates contacts and logs delivery without a Sheet',async()=>{
     assert.equal(retry.body.sent,0);
     assert.equal(calls.length,3);
     const history=(await call({action:'history'})).body.entries;
-    assert.equal(history.length,5);
+    assert.equal(history.length,6);
     assert.equal(history[0].status,'queued');
     assert.equal((await call({...campaign,subject:'Changed'})).statusCode,409);
+    assert.equal((await call({...campaign,headerImageUrl:'https://example.com/other.png'})).statusCode,409);
   } finally {
     globalThis.fetch=original;
     for (const [key,value] of previous) if (value===undefined) delete process.env[key]; else process.env[key]=value;
@@ -100,6 +105,9 @@ test('test sends require the WOW mailbox sender',async()=>{
     const valid=fixture();
     assert.equal((await valid.call(data)).statusCode,200);
     assert.equal(valid.calls[0].to,'me@example.com');
+    const headerImage={type:'image/png',content:Buffer.from('fake png bytes').toString('base64')};
+    assert.equal((await valid.call({...data,headerImage})).statusCode,200);
+    assert.deepEqual(valid.calls[1].headerImage,headerImage);
     const invalid=fixture('personal@gmail.com');
     assert.equal((await invalid.call(data)).statusCode,503);
     assert.equal(invalid.calls.length,0);

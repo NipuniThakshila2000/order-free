@@ -23,7 +23,7 @@ export async function mailStatus(cookie) {
   return bridgeRequest('status', {}, cookie);
 }
 
-export async function sendWowEmail({to, subject, message}, cookie) {
-  const result = await bridgeRequest('send-one', {to,subject,message}, cookie);
+export async function sendWowEmail({to, subject, message, headerImageUrl = '', headerImage}, cookie) {
+  const result = await bridgeRequest('send-one', {to,subject,message,headerImageUrl,...(headerImage ? {headerImage} : {})}, cookie);
   return {status:result.status, id:result.id};
 }

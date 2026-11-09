@@ -9,6 +9,23 @@ const audiences = ['all','registrants','online','in-person','applicants'];
 const categories = ['all','online','in-person'];
 const batchSize = 5;
 
+function validHeaderImage(data) {
+  const url = data.headerImageUrl ?? '';
+  if (typeof url !== 'string' || url.length > 2048) return false;
+  if (url) {
+    try {
+      const parsed = new URL(url);
+      if (parsed.protocol !== 'https:' || parsed.username || parsed.password) return false;
+    } catch { return false; }
+  }
+  const image = data.headerImage;
+  if (image === undefined) return true;
+  if (url || !image || !['image/png','image/jpeg'].includes(image.type) ||
+      typeof image.content !== 'string' || image.content.length > 1_333_336 ||
+      image.content.length % 4 !== 0 || !/^[A-Za-z0-9+/]+={0,2}$/.test(image.content)) return false;
+  return Buffer.from(image.content, 'base64').length <= 1_000_000;
+}
+
 async function contactsFor(audience, category, cookie, registrationRecords) {
   const registrations = (await registrationRecords()).filter((person) => emailPattern.test(person.email)).map((person) => ({
     firstName:String(person.firstName || '').trim(),
@@ -76,6 +93,7 @@ export function createBulkEmailHandler(deps = {}) {
         return response.status(400).json({error:'Invalid registration category.'});
       }
       if (data.action === 'send' || data.action === 'test') {
+        if (!validHeaderImage(data)) return response.status(400).json({error:'Check the header image. Use an HTTPS URL or a PNG/JPEG under 1 MB.'});
         if (typeof data.subject !== 'string' || !data.subject.trim() || data.subject.length > 150 || /[\r\n]/.test(data.subject) ||
             typeof data.message !== 'string' || !data.message.trim() || data.message.length > 10000) {
           return response.status(400).json({error:'Check the subject and message.'});
@@ -87,7 +105,7 @@ export function createBulkEmailHandler(deps = {}) {
         }
       }
       const payload = {action:data.action};
-      for (const key of ['audience','category','subject','message','campaignId','testEmail','offset']) if (data[key] !== undefined) payload[key] = data[key];
+      for (const key of ['audience','category','subject','message','headerImageUrl','headerImage','campaignId','testEmail','offset']) if (data[key] !== undefined) payload[key] = data[key];
       const proxyUrl = process.env.BULK_EMAIL_PROXY_URL;
       if (proxyUrl) {
         const upstream = await fetch(proxyUrl, {method:'POST', headers:{'Content-Type':'application/json', Cookie:cookie}, body:JSON.stringify(payload)});
@@ -108,7 +126,8 @@ export function createBulkEmailHandler(deps = {}) {
         await mail.send({
           to:data.testEmail.trim(),
           subject:`[TEST] ${data.subject.trim()}`,
-          message:personalize(data.message.trim(), 'Test recipient')
+          message:personalize(data.message.trim(), 'Test recipient'),
+          headerImageUrl:data.headerImageUrl || '', headerImage:data.headerImage
         }, cookie);
         return response.status(200).json({ok:true});
       }
@@ -120,7 +139,8 @@ export function createBulkEmailHandler(deps = {}) {
       if (data.offset > selected.length) return response.status(400).json({error:'Campaign position is beyond the contact list.'});
       const quota = status.remainingDailyQuota == null ? null : Math.max(0, Number(status.remainingDailyQuota) || 0);
       const batch = selected.slice(data.offset, data.offset + Math.min(batchSize, quota ?? batchSize));
-      const draftHash = logs.mailDraftHash(data.audience, data.subject.trim(), data.message.trim(), ...(category === 'all' ? [] : [category]));
+      const imageIdentity = data.headerImage ? JSON.stringify(data.headerImage) : data.headerImageUrl || '';
+      const draftHash = logs.mailDraftHash(data.audience, data.subject.trim(), data.message.trim(), ...(category === 'all' ? [] : [category]), ...(imageIdentity ? [imageIdentity] : []));
       let sent = 0;
       let alreadySent = 0;
       let failed = 0;
@@ -145,7 +165,8 @@ export function createBulkEmailHandler(deps = {}) {
         try {
           delivery = await mail.send({
             to:person.email, subject:data.subject.trim(),
-            message:personalize(data.message.trim(), person.firstName)
+            message:personalize(data.message.trim(), person.firstName),
+            headerImageUrl:data.headerImageUrl || '', headerImage:data.headerImage
           }, cookie);
         } catch (error) {
           if (error.expected) {

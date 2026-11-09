@@ -75,6 +75,7 @@
 .mailing form{max-width:760px}
 .mailing label small{color:var(--muted);font-size:12px}
 .mailing label[hidden]{display:none}
+.mailing-preview img[hidden]{display:none}
 .mailing select,.mailing textarea{width:100%;padding:13px;border:1px solid #64809c;background:#102f52;color:#fff;font:16px Arial,sans-serif}
 .mailing textarea{resize:vertical;line-height:1.5}
 .mailing select:focus-visible,.mailing textarea:focus-visible{outline:2px solid #fff;outline-offset:2px}

@@ -10,6 +10,10 @@ const testButton = testForm.querySelector('button');
 const audienceSelect = form.elements.namedItem('audience');
 const categorySelect = form.elements.namedItem('category');
 const categoryLabel = document.querySelector('#mailing-category-label');
+const imageMode = form.elements.namedItem('headerImageMode');
+const imageUrl = form.elements.namedItem('headerImageUrl');
+const imageFile = form.elements.namedItem('headerImageFile');
+const siteHeaderImageUrl = 'https://order-free.vercel.app/Theme/ChatGPT%20Image%203%20Nov%202026%2C%2014_49_28%20%281%29.png';
 let busy = false;
 let available = false;
 let currentCount = 0;
@@ -25,18 +29,52 @@ async function mailingApi(data) {
   return result;
 }
 
-function draft() {
+function selection() {
   return {
     audience:audienceSelect.value,
-    category:audienceSelect.value === 'registrants' ? categorySelect.value : 'all',
-    subject:form.elements.namedItem('subject').value.trim(),
-    message:form.elements.namedItem('message').value.trim()
+    category:audienceSelect.value === 'registrants' ? categorySelect.value : 'all'
   };
+}
+
+async function draft() {
+  const data = {
+    ...selection(),
+    subject:form.elements.namedItem('subject').value.trim(),
+    message:form.elements.namedItem('message').value.trim(),
+    headerImageUrl:''
+  };
+  if (imageMode.value === 'site') data.headerImageUrl = siteHeaderImageUrl;
+  if (imageMode.value === 'url') data.headerImageUrl = imageUrl.value.trim();
+  if (imageMode.value === 'upload') {
+    const file = imageFile.files[0];
+    if (!file) throw new Error('Choose a header image to upload.');
+    if (!['image/png','image/jpeg'].includes(file.type) || file.size > 1_000_000) {
+      throw new Error('Choose a PNG or JPEG header image under 1 MB.');
+    }
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    let binary = '';
+    for (let index = 0; index < bytes.length; index += 8192) {
+      binary += String.fromCharCode(...bytes.subarray(index, index + 8192));
+    }
+    data.headerImage = {type:file.type, content:btoa(binary)};
+  }
+  return data;
 }
 
 function updateCategoryVisibility() {
   categoryLabel.hidden = audienceSelect.value !== 'registrants';
   categorySelect.disabled = categoryLabel.hidden;
+}
+
+function updateImageControls() {
+  for (const [label, input, visible] of [
+    [document.querySelector('#mailing-image-url-label'), imageUrl, imageMode.value === 'url'],
+    [document.querySelector('#mailing-image-file-label'), imageFile, imageMode.value === 'upload']
+  ]) {
+    label.hidden = !visible;
+    input.disabled = !visible;
+    input.required = visible;
+  }
 }
 
 function setBusy(value) {
@@ -50,10 +88,10 @@ function setBusy(value) {
 setBusy(false);
 
 export async function loadMailing() {
-  const selection = draft();
+  const selected = selection();
   try {
-    const result = await mailingApi({action:'summary', audience:selection.audience, category:selection.category});
-    if (selection.audience !== audienceSelect.value || selection.category !== draft().category) return;
+    const result = await mailingApi({action:'summary', ...selected});
+    if (selected.audience !== audienceSelect.value || selected.category !== selection().category) return;
     currentCount = result.selected;
     available = true;
     setBusy(busy);
@@ -86,12 +124,22 @@ async function loadHistory() {
 audienceSelect.addEventListener('change', () => { updateCategoryVisibility(); loadMailing(); });
 categorySelect.addEventListener('change', loadMailing);
 updateCategoryVisibility();
+imageMode.addEventListener('change', updateImageControls);
+updateImageControls();
 document.querySelector('#mailing-preview').addEventListener('click', async () => {
-  await loadMailing();
-  const data = draft();
-  previewContent.hidden = false;
-  previewContent.querySelector('pre').textContent = `Subject: ${data.subject || '(empty)'}\n\n${data.message.replace(/{{firstName}}/g, 'Test recipient')}`;
-  status.textContent = `Recipients: ${audienceSelect.selectedOptions[0].textContent}${data.audience === 'registrants' ? ` / ${categorySelect.selectedOptions[0].textContent}` : ''}; ${currentCount} unique recipients. The preview uses “Test recipient” for {{firstName}}.`;
+  if (imageUrl.required && !imageUrl.reportValidity()) return;
+  if (imageFile.required && !imageFile.reportValidity()) return;
+  try {
+    await loadMailing();
+    const data = await draft();
+    const image = previewContent.querySelector('img');
+    image.hidden = !data.headerImageUrl && !data.headerImage;
+    if (!image.hidden) image.src = data.headerImageUrl || `data:${data.headerImage.type};base64,${data.headerImage.content}`;
+    else image.removeAttribute('src');
+    previewContent.hidden = false;
+    previewContent.querySelector('pre').textContent = `Subject: ${data.subject || '(empty)'}\n\n${data.message.replace(/{{firstName}}/g, 'Test recipient')}`;
+    status.textContent = `Recipients: ${audienceSelect.selectedOptions[0].textContent}${data.audience === 'registrants' ? ` / ${categorySelect.selectedOptions[0].textContent}` : ''}; ${currentCount} unique recipients. The preview uses “Test recipient” for {{firstName}}.`;
+  } catch (error) { status.textContent = error.message; }
 });
 
 stopButton.addEventListener('click', () => {
@@ -106,7 +154,7 @@ testForm.addEventListener('submit', async (event) => {
   setBusy(true);
   status.textContent = 'Sending test…';
   try {
-    await mailingApi({action:'test', ...draft(), testEmail:testForm.elements.namedItem('testEmail').value.trim()});
+    await mailingApi({action:'test', ...await draft(), testEmail:testForm.elements.namedItem('testEmail').value.trim()});
     status.textContent = 'Test email sent. Check the inbox before sending to registrants.';
     await loadMailing();
   } catch (error) { status.textContent = error.message; }
@@ -119,12 +167,13 @@ form.addEventListener('submit', async (event) => {
   setBusy(true);
   pauseRequested = false;
   try {
-    const data = draft();
+    const data = await draft();
     const preview = await mailingApi({action:'summary', audience:data.audience, category:data.category});
     currentCount = preview.selected;
     if (!currentCount) throw new Error('There are no contacts in this audience.');
     if (!window.confirm(`Send “${data.subject}” to ${currentCount} unique contacts in ${audienceSelect.selectedOptions[0].textContent}${data.audience === 'registrants' ? ` / ${categorySelect.selectedOptions[0].textContent}` : ''}? This sends real email.`)) return;
-    const fingerprint = JSON.stringify(data);
+    const imageDigest = data.headerImage ? Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(data.headerImage.content))), (byte) => byte.toString(16).padStart(2, '0')).join('') : '';
+    const fingerprint = JSON.stringify({...data, headerImage:imageDigest});
     const saved = JSON.parse(sessionStorage.getItem('contactMailDraft') || 'null');
     const campaignId = saved?.fingerprint === fingerprint ? saved.campaignId : crypto.randomUUID();
     let offset = saved?.fingerprint === fingerprint ? saved.offset || 0 : 0;

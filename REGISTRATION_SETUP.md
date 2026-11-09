@@ -6,7 +6,7 @@ Production needs `BLOB_READ_WRITE_TOKEN` and `REGISTRATION_OPEN=true`. Only serv
 
 ## Bulk email
 
-The dashboard's **Email sending** section combines the private registration records with access applicants from the main site's admin API. Audiences include all contacts, registrants, online registrants, in-person registrants, and applicants. Addresses are deduplicated. Admins can preview counts, personalize plain text with `{{firstName}}`, send a test, send in batches, pause or resume, and view a delivery log. The log is stored privately in Vercel Blob, not in a Sheet.
+The dashboard's **Email sending** section combines the private registration records with access applicants from the main site's admin API. Admins can select Nov 10 registrations by attendance category, applicants, or all contacts. Addresses are deduplicated. Each message can use the site's header image, a public HTTPS image URL, an uploaded PNG/JPEG under 1 MB, or no image. The preview, test send, and campaign use the same image choice. Admins can preview counts, personalize text with `{{firstName}}`, send in batches, pause or resume, and view a delivery log. The log is stored privately in Vercel Blob, not in a Sheet.
 
 The Architecture of Freedom main site holds `MANDRILL_API_KEY` and `EMAIL_FROM` in its production environment. Its `/api/bulk-email-bridge` endpoint verifies the existing admin session and sends one message at a time through Mandrill. The `order-free` dashboard forwards only the admin session cookie to that endpoint; it does not store or receive the Mandrill key. The WOWMedia site, if serving this dashboard, needs `BULK_EMAIL_PROXY_URL=https://order-free.vercel.app/api/bulk-email` so its dashboard uses the same private contacts and log.
 
