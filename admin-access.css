@@ -81,6 +81,7 @@
 .mailing-actions{display:flex;gap:10px;flex-wrap:wrap}
 .mailing-actions button:first-child,.mailing-actions button:last-child,#mailing-test-form button,#mailing-history-refresh{background:transparent;color:var(--gold)}
 .mailing-preview{margin-top:16px;max-width:760px;padding:16px;border:1px solid rgba(214,174,88,.3);background:#102f52}
+.mailing-preview img{display:block;width:100%;max-width:600px;height:auto;margin:14px 0 18px}
 .mailing-preview pre{white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.5 Arial,sans-serif;color:var(--cream)}
 #mailing-test-form{display:flex;align-items:end;gap:10px;flex-wrap:wrap;margin-top:24px}
 #mailing-test-form label{min-width:min(100%,320px)}
