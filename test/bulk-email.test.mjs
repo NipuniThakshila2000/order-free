@@ -108,6 +108,8 @@ test('test sends require the WOW mailbox sender',async()=>{
     const headerImage={type:'image/png',content:Buffer.from('fake png bytes').toString('base64')};
     assert.equal((await valid.call({...data,headerImage})).statusCode,200);
     assert.deepEqual(valid.calls[1].headerImage,headerImage);
+    assert.match(valid.calls[0].subject,/^\[TEST [a-f0-9]{8}\] Details$/);
+    assert.notEqual(valid.calls[0].subject,valid.calls[1].subject);
     const invalid=fixture('personal@gmail.com');
     assert.equal((await invalid.call(data)).statusCode,503);
     assert.equal(invalid.calls.length,0);

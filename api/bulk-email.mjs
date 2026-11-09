@@ -1,6 +1,7 @@
 import {allRegistrations, registrationStoreReady} from '../src/registration-store.mjs';
 import {mailLogPath, mailDraftHash, readMailLog, writeMailLog, recentMailLog} from '../src/mail-log-store.mjs';
 import {mailStatus, sendWowEmail, senderAddress} from '../src/wow-mail.mjs';
+import {randomUUID} from 'node:crypto';
 
 const accessUrl = process.env.READING_ACCESS_BACKEND_URL || 'https://order.wowlife.lk/api/reading-access';
 const replyToAddress = 'info@wowlife.in';
@@ -123,9 +124,10 @@ export function createBulkEmailHandler(deps = {}) {
         return response.status(503).json({error:'The WOW reply-to address is not configured.'});
       }
       if (data.action === 'test') {
+        const testPrefix = `[TEST ${randomUUID().slice(0, 8)}] `;
         await mail.send({
           to:data.testEmail.trim(),
-          subject:`[TEST] ${data.subject.trim()}`,
+          subject:`${testPrefix}${data.subject.trim().slice(0, 150 - testPrefix.length)}`,
           message:personalize(data.message.trim(), 'Test recipient'),
           headerImageUrl:data.headerImageUrl || '', headerImage:data.headerImage
         }, cookie);
