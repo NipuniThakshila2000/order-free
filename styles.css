@@ -568,17 +568,3 @@ body.access-approved .demo-gate{display:none}
 .privacy-content strong{color:var(--cream)}
 .privacy-content a{text-decoration:underline;text-underline-offset:3px}
 @media(max-width:760px){.site-footer .footer-main{display:block}.site-footer .footer-main p{margin:14px 0}.privacy-statement{margin-top:30px}}
-
-/* Give displayed copy the same gentle fade in and fade out as the supplied example. */
-@keyframes text-fade-cycle{
-  0%,100%{opacity:0}
-  15%,85%{opacity:1}
-}
-@media (prefers-reduced-motion:no-preference){
-  main :is(h1,h2,h3,h4,h5,h6,p,blockquote,figcaption,small,.section-number){animation:text-fade-cycle 8s ease-in-out infinite}
-  main form :is(h1,h2,h3,h4,h5,h6,p,blockquote,figcaption,small,.section-number),
-  main :is([role="status"],[role="alert"]){animation:none}
-}
-@media print{
-  main :is(h1,h2,h3,h4,h5,h6,p,blockquote,figcaption,small,.section-number){animation:none!important;opacity:1!important}
-}
