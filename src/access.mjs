@@ -119,7 +119,7 @@ export function initializeReadingAccess({showSample, unlock}) {
     try {
       await post('request-code', {email:loginForm.elements.email.value, purpose:'reader'});
       codeForm.hidden = false;
-      loginMessage.textContent = 'If this email is approved, a six-digit sign-in code is on its way. Check your inbox and spam folder.';
+      loginMessage.textContent = 'If this email matches an approved application, a six-digit code is on its way. Check your inbox and spam folder. If none arrives, use the email you applied with or contact info@wowlife.lk.';
       codeForm.elements.code.focus();
     } catch (error) { loginMessage.textContent = error.message; }
     finally { button.disabled = false; }
